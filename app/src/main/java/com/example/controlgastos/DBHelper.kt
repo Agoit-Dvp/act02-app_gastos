@@ -110,7 +110,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
     }
 
     //Metodos para manejar las tablas: Insertar, Consultar, Eliminar
-    // ------------------------- Insertar ------------------------------
+    // ------------------------- INSERT: Insertar DATOS ------------------------------
     //Usuarios
     fun userInsert(nombre: String, email: String, telefono: String, fechaCreacion: String): Long {
         val db = writableDatabase
@@ -222,7 +222,16 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         return listaGastos
     }
 
-    // ------------------------- SELECT: OBTENER DATOS ------------------------------
+    // ------------------------- DROP: ELIMINAR DATOS ------------------------------
     //Usuarios
+    fun eliminarUsuario(id: Int): Int {
+        val db = writableDatabase
+        return db.delete("usuarios", "id = ?", arrayOf(id.toString()))
+    }
 
+    //Gastos
+    fun eliminarGasto(id: Int): Int{
+        val db = writableDatabase
+        return db.delete("gastos", "id = ?", arrayOf(id.toString()))
+    }
 }
