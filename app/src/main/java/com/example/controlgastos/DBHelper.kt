@@ -20,7 +20,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla categoria_gasto
         val createCategoriaGasto = """
             CREATE TABLE categoria_gasto(
-            id INTERGER PRIMARY KEY AUTOINCREMENTE,
+            id INTERGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NUL
             )
         """.trimIndent()
@@ -28,9 +28,9 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla Gastos
         val createGastoTable = """
         CREATE TABLE gastos (
-        id INTERGER PRIMARY KEY AUTOINCREMENTE,
-        usuario_id INTERGER NOT NULL,
+        id INTERGER PRIMARY KEY AUTOINCREMENT,        
         nombre TEXT NOT NULL,
+        usuario_id INTERGER NOT NULL,
         fecha TEXT NO NULL,
         nota TEXT NOT NULL,
         monto REAL NOT NULL,
@@ -42,5 +42,45 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         )
         
     """.trimIndent()
+
+        //Tabla categoria_presupuesto
+        val createCategoriaPresupuesto = """
+            CREATE TABLE categoria_presupuesto(
+            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL            
+            )
+        """.trimIndent()
+
+        //Tabla Presupuesto
+        val createPresupuesto = """
+            CREATE TABLE presupuesto(
+            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NUL,
+            fechaInicio TEXT NOT NULL,
+            fechaFin TEXT NOT NULL,
+            montoAsignado REAL NOT NULL,
+            notas TEXT NOT NULL,
+            recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),
+            frequencia TEXT NOT NULL CHECK(frequencia IN('mensual','trimestral','anual')),
+            totalGastos REAL NOT NULL,
+            valorDisponible REAL NOT NULL,
+            usuario_id INTERGER NOT NULL,
+            categoria_id INTERNGER NOT NULL,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+            FOREIGN KEY (categoria_id) REFERENCES categoria_presupuesto(id) ON DELETE CASCADE            
+            )
+        """.trimIndent()
+
+        //Tabla ingreso
+        val createIngreso = """
+            CREATE TABLE ingreso(
+            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTERGER NOT NULL,
+            descripcion TEXT NOT NULL,
+            monto REAL NOT NULL,
+            recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),            
+            fecha TEXT NOT NULL,
+            )
+        """.trimIndent()
     }
 }
