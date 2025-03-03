@@ -189,7 +189,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
     }
 
     // ------------------------- SELECT: OBTENER DATOS ------------------------------
-    //Usuarios
+    //Obtener Usuarios
     fun selectUsuarios(): List<Pair<Int, String>>{
         val db = readableDatabase
         val cursor: Cursor = db.rawQuery("SELECT id, nombre FROM usuarios", null)
@@ -203,7 +203,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         return usersList
     }
 
-    //Gastos
+    //Obtener Gastos
     //       por usuario
     fun gastosByUser(usuario_id: Int): List<Triple<Int, String, Double>>{
         val db = readableDatabase
@@ -220,6 +220,34 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
 
         cursor.close()
         return listaGastos
+    }
+
+    //Obtener Categoria gastos
+    fun selectCatGastos(): List<Pair<Int, String>>{
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT id, nombre FROM categoria_gasto", null)
+        val catList = mutableListOf<Pair<Int, String>>()
+        while (cursor.moveToNext()){
+            val id = cursor.getInt(0)
+            val nombre = cursor.getString(1)
+            catList.add(Pair(id, nombre))
+        }
+        cursor.close()
+        return catList
+    }
+
+    //Obtener Categoria presupuesto
+    fun selectCatPresupuesto(): List<Pair<Int, String>>{
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT id, nombre FROM categoria_presupuesto", null)
+        val catPresupuesto = mutableListOf<Pair<Int, String>>()
+        while (cursor.moveToNext()){
+            val id = cursor.getInt(0)
+            val nombre = cursor.getString(1)
+            catPresupuesto.add(Pair(id, nombre))
+        }
+        cursor.close()
+        return catPresupuesto
     }
 
     // ------------------------- DROP: ELIMINAR DATOS ------------------------------
