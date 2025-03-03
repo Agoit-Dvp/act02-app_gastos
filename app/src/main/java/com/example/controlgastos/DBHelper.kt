@@ -21,7 +21,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         val createCategoriaGasto = """
             CREATE TABLE categoria_gasto(
             id INTERGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NUL
+            nombre TEXT NOT NULL
             )
         """.trimIndent()
 
@@ -31,7 +31,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         id INTERGER PRIMARY KEY AUTOINCREMENT,        
         nombre TEXT NOT NULL,
         usuario_id INTERGER NOT NULL,
-        fecha TEXT NO NULL,
+        fecha TEXT NOT NULL,
         nota TEXT NOT NULL,
         monto REAL NOT NULL,
         estado TEXT NOT NULL CHECK(estado IN('PENDIENTE', 'PAGADO', 'CANCELADO')),
@@ -55,7 +55,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         val createPresupuesto = """
             CREATE TABLE presupuesto(
             id INTERGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NUL,
+            nombre TEXT NOT NULL,
             fechaInicio TEXT NOT NULL,
             fechaFin TEXT NOT NULL,
             montoAsignado REAL NOT NULL,
@@ -75,12 +75,35 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         val createIngreso = """
             CREATE TABLE ingreso(
             id INTERGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTERGER NOT NULL,
+            usuario_id INTERGER NOT NULL,
             descripcion TEXT NOT NULL,
             monto REAL NOT NULL,
             recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),            
             fecha TEXT NOT NULL,
+            FOREIGN KEY (userio_id) REFERENCES usuarios(id) ON DELETE CASCADE
             )
         """.trimIndent()
+        //Ejecutar query SQL create
+        db.execSQL(createUserTable)
+        db.execSQL(createCategoriaGasto)
+        db.execSQL(createGastoTable)
+        db.execSQL(createCategoriaPresupuesto)
+        db.execSQL(createPresupuesto)
+        db.execSQL(createIngreso)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS usuarios")
+        db.execSQL("DROP TABLE IF EXISTS categoria_gasto")
+        db.execSQL("DROP TABLE IF EXISTS gastos")
+        db.execSQL("DROP TABLE IF EXISTS categoria_presupuesto")
+        db.execSQL("DROP TABLE IF EXISTS presupuesto")
+        db.execSQL("DROP TABLE IF EXISTS ingreso")
+        onCreate(db)
+    }
+
+    companion object{
+        private const val DATABASE_NAME = "ControlGatos.db"
+        private const val DATABASE_VERSION = 1
     }
 }
