@@ -1,6 +1,8 @@
 package com.example.controlgastos
 
+import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
@@ -101,9 +103,126 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         db.execSQL("DROP TABLE IF EXISTS ingreso")
         onCreate(db)
     }
-
+    //Generar archivo de la base de datos
     companion object{
         private const val DATABASE_NAME = "ControlGatos.db"
         private const val DATABASE_VERSION = 1
     }
+
+    //Metodos para manejar las tablas: Insertar, Consultar, Eliminar
+    // ------------------------- Insertar ------------------------------
+    //Usuarios
+    fun userInsert(nombre: String, email: String, telefono: String, fechaCreacion: String): Long {
+        val db = writableDatabase
+        val valores = ContentValues().apply {
+            put("nombre", nombre)
+            put("email", email)
+            put("telefono", telefono)
+            put("fechaCreacion", fechaCreacion)
+        }
+        return db.insert("usuarios",null,valores)
+    }
+    //Categoria Gastos
+    fun categoriaGastoInsert(nombre: String): Long{
+        val db = writableDatabase
+        val valores = ContentValues().apply {
+            put("nombre", nombre)
+        }
+        return db.insert("categoria_gasto", null, valores)
+    }
+
+    //Gastos
+    fun gastosInsert(nombre: String, usuario_id: Int, fecha: String, nota: String, monto: Double, estado: String, recurrente: Boolean, frequencia: String): Long{
+        val db = writableDatabase
+        val valores = ContentValues().apply(){
+            put("nombre", nombre)
+            put("usuario_id",usuario_id)
+            put("fecha", fecha)
+            put("nota", nota)
+            put("monto", monto)
+            put("estado", estado)
+            put("recurrente", if(recurrente) 1 else 0)
+            put("frequencia", frequencia)
+        }
+        return db.insert("gastos", null, valores)
+    }
+
+    //Categoria presupuesto
+    fun categoriaPresuInsert(nombre: String): Long{
+        val db = writableDatabase
+        val valores = ContentValues().apply {
+            put("nombre", nombre)
+        }
+        return db.insert("categoria_presupuesto", null, valores)
+    }
+
+    //Presupuesto
+    fun presupuestoInsert(nombre: String, fechaInicio: String, fechaFin: String, montoAsignado: Double, notas: String, recurrente: Boolean, frequencia: String, totalGastos: Double, valorDisponible: Double, usuario_id: Int, categoria_id: Int): Long{
+        val db = writableDatabase
+        val valores = ContentValues().apply {
+            put("nombre", nombre)
+            put("fechaInicio", fechaInicio)
+            put("fechaFin", fechaFin)
+            put("montoAsignado", montoAsignado)
+            put("notas", notas)
+            put("recurrente", if(recurrente) 1 else 0)
+            put("frequencia", frequencia)
+            put("totalGastos", totalGastos)
+            put("valorDisponible", valorDisponible)
+            put("usuario_id", usuario_id)
+            put("categoria_id", categoria_id)
+        }
+        return db.insert("presupuesto", null, valores)
+    }
+
+    //Ingreso
+    fun ingresoInsert(usuario_id: Int, descripcion: String, monto: Double, recurrente: Boolean, fecha: String): Long{
+        val db = writableDatabase
+        val valores = ContentValues().apply {
+            put("usuario_id", usuario_id)
+            put("descripcion", descripcion)
+            put("monto", monto)
+            put("recurrente", if(recurrente) 1 else 0)
+            put("fecha", fecha)
+        }
+        return db.insert("ingreso", null, valores)
+    }
+
+    // ------------------------- SELECT: OBTENER DATOS ------------------------------
+    //Usuarios
+    fun selectUsuarios(): List<Pair<Int, String>>{
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT id, nombre FROM usuarios", null)
+        val usersList = mutableListOf<Pair<Int, String>>()
+        while (cursor.moveToNext()){
+            val id = cursor.getInt(0)
+            val nombre = cursor.getString(1)
+            usersList.add(Pair(id, nombre))
+        }
+        cursor.close()
+        return usersList
+    }
+
+    //Gastos
+    //       por usuario
+    fun gastosByUser(usuario_id: Int): List<Triple<Int, String, Double>>{
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT id, nombre, monto from gastos where usuario_id = ?", arrayOf(usuario_id.toString())
+        )
+        val listaGastos = mutableListOf<Triple<Int, String, Double>>()
+
+        while (cursor.moveToNext()){
+            val id = cursor.getInt(0)
+            val nombre = cursor.getString(1)
+            val monto = cursor.getDouble(2)
+            listaGastos.add(Triple(id, nombre, monto))
+        }
+
+        cursor.close()
+        return listaGastos
+    }
+
+    // ------------------------- SELECT: OBTENER DATOS ------------------------------
+    //Usuarios
+
 }
