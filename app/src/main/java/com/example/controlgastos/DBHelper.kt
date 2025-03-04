@@ -12,7 +12,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla usuario
         val createUserTable = """
             CREATE TABLE usuarios (
-            id INTERGER  PRIMARY KEY AUTOINCREMENT,
+            id INTEGER  PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             telefono TEXT NOT NULL,
@@ -23,7 +23,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla categoria_gasto
         val createCategoriaGasto = """
             CREATE TABLE categoria_gasto(
-            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL
             )
         """.trimIndent()
@@ -31,15 +31,16 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla Gastos
         val createGastoTable = """
         CREATE TABLE gastos (
-        id INTERGER PRIMARY KEY AUTOINCREMENT,        
-        nombre TEXT NOT NULL,
-        usuario_id INTERGER NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,        
+        nombre TEXT NOT NULL,        
         fecha TEXT NOT NULL,
         nota TEXT NOT NULL,
         monto REAL NOT NULL,
         estado TEXT NOT NULL CHECK(estado IN('PENDIENTE', 'PAGADO', 'CANCELADO')),
         recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),
         frequencia TEXT NOT NULL CHECK(frequencia IN('diario','semanal','mensual','anual')),
+        usuario_id INTEGER NOT NULL,
+        categoria_id INTEGER NOT NULL,
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
         FOREIGN KEY (categoria_id) REFERENCES categoria_gasto(id) ON DELETE CASCADE       
         )
@@ -49,7 +50,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla categoria_ingreso
         val createCategoriaIngreso = """
             CREATE TABLE categoria_ingreso(
-            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL
             )
         """.trimIndent()
@@ -57,7 +58,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla ingreso
         val createIngreso = """
             CREATE TABLE ingreso(
-            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTERGER NOT NULL,
             categoria_id INTERGER NOT NULL,
             descripcion TEXT NOT NULL,
@@ -71,11 +72,12 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Ejecutar query SQL create
         db.execSQL(createUserTable)
         db.execSQL(createCategoriaGasto)
+        catByDefaultInsert(db)
         db.execSQL(createGastoTable)
         db.execSQL(createCategoriaIngreso)
         db.execSQL(createIngreso)
     }
-
+    //Actualizaciones
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS usuarios")
         db.execSQL("DROP TABLE IF EXISTS categoria_gasto")
@@ -84,11 +86,13 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         db.execSQL("DROP TABLE IF EXISTS ingreso")
         onCreate(db)
     }
+
     //Generar archivo de la base de datos
     companion object{
         private const val DATABASE_NAME = "ControlGatos.db"
         private const val DATABASE_VERSION = 1
     }
+
 
     //Metodos para manejar las tablas: Insertar, Consultar, Eliminar
     // ------------------------- INSERT: Insertar DATOS ------------------------------
@@ -113,18 +117,29 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         return db.insert("categoria_gasto", null, valores)
     }
 
+    fun catByDefaultInsert(db: SQLiteDatabase){
+        val categorias = listOf("Vivienda","Suministros","Mercado", "Transporte", "Restaurante", "Ropa", "Salud", "Paseo", "Viaje", "Regalo", "Entretenimiento", "Mascota", "Créditos", "Otros")
+        categorias.forEach{ categoria ->
+            val valores = ContentValues().apply {
+                put("nombre", categoria)
+            }
+            db.insertWithOnConflict("categoria_gasto", null, valores, SQLiteDatabase.CONFLICT_IGNORE)
+        }
+    }
+
     //Gastos
-    fun gastosInsert(nombre: String, usuario_id: Int, fecha: String, nota: String, monto: Double, estado: String, recurrente: Boolean, frequencia: String): Long{
+    fun gastosInsert(nombre: String, fecha: String, nota: String, monto: Double, estado: String, recurrente: Boolean, frequencia: String, usuario_id: Int, categoria_id: Int): Long{
         val db = writableDatabase
         val valores = ContentValues().apply(){
             put("nombre", nombre)
-            put("usuario_id",usuario_id)
             put("fecha", fecha)
             put("nota", nota)
             put("monto", monto)
             put("estado", estado)
             put("recurrente", if(recurrente) 1 else 0)
             put("frequencia", frequencia)
+            put("usuario_id",usuario_id)
+            put("categoria_id",categoria_id)
         }
         return db.insert("gastos", null, valores)
     }

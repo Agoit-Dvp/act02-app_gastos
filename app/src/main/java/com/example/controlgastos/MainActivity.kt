@@ -1,6 +1,8 @@
 package com.example.controlgastos
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 
@@ -10,8 +12,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-
-        //Ejemplo de uso de DBHelper para manipular la base de datos SQLite
+        //****************************************************************
+/*        //Ejemplo de uso de DBHelper para manipular la base de datos SQLite
         //Creamos un objeto de tipo DBHelper
         val dbHelper = DBHelper(this)
 
@@ -27,6 +29,36 @@ class MainActivity : AppCompatActivity() {
 
         //Obtener gastos  del usuario
         val gastos = dbHelper.gastosByUser(usuarioId)
-        gastos.forEach{println("ID: ${it.first}, Nombre: ${it.second}, userID: ${it.third}")}
+        gastos.forEach{println("ID: ${it.first}, Nombre: ${it.second}, userID: ${it.third}")}*/
+
+        //********************************************************************
+
+        //Codigo MainActivity
+        val btnUsuario = findViewById<Button>(R.id.btnUsuario)
+        val btnGastos = findViewById<Button>(R.id.btnGastos)
+        val btnIngresos = findViewById<Button>(R.id.btnIngresos)
+
+        val dbHelper = DBHelper(this)
+        val db = dbHelper.writableDatabase
+
+        btnUsuario.setOnClickListener{
+            val intent = Intent(this, UsuarioActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnGastos.setOnClickListener{
+            val intent = Intent(this, GastosActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnIngresos.setOnClickListener{
+            val intent = Intent(this, IngresoActivity::class.java)
+            startActivity(intent)
+        }
+
+
+
+
+
     }
 }
