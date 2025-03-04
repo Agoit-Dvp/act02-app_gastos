@@ -16,6 +16,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
             nombre TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             telefono TEXT NOT NULL,
+            pass TEXT NOT NULL,
             fechaCreacion TEXT NOT NULL
             )                    
         """.trimIndent()
@@ -45,31 +46,11 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         
     """.trimIndent()
 
-        //Tabla categoria_presupuesto
-        val createCategoriaPresupuesto = """
-            CREATE TABLE categoria_presupuesto(
+        //Tabla categoria_ingreso
+        val createCategoriaIngreso = """
+            CREATE TABLE categoria_ingreso(
             id INTERGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL            
-            )
-        """.trimIndent()
-
-        //Tabla Presupuesto
-        val createPresupuesto = """
-            CREATE TABLE presupuesto(
-            id INTERGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            fechaInicio TEXT NOT NULL,
-            fechaFin TEXT NOT NULL,
-            montoAsignado REAL NOT NULL,
-            notas TEXT NOT NULL,
-            recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),
-            frequencia TEXT NOT NULL CHECK(frequencia IN('mensual','trimestral','anual')),
-            totalGastos REAL NOT NULL,
-            valorDisponible REAL NOT NULL,
-            usuario_id INTERGER NOT NULL,
-            categoria_id INTERNGER NOT NULL,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-            FOREIGN KEY (categoria_id) REFERENCES categoria_presupuesto(id) ON DELETE CASCADE            
+            nombre TEXT NOT NULL
             )
         """.trimIndent()
 
@@ -78,19 +59,20 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
             CREATE TABLE ingreso(
             id INTERGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTERGER NOT NULL,
+            categoria_id INTERGER NOT NULL,
             descripcion TEXT NOT NULL,
             monto REAL NOT NULL,
             recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),            
             fecha TEXT NOT NULL,
-            FOREIGN KEY (userio_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+            FOREIGN KEY (categoria_id) REFERENCES categoria_ingreso(id) ON DELETE CASCADE
             )
         """.trimIndent()
         //Ejecutar query SQL create
         db.execSQL(createUserTable)
         db.execSQL(createCategoriaGasto)
         db.execSQL(createGastoTable)
-        db.execSQL(createCategoriaPresupuesto)
-        db.execSQL(createPresupuesto)
+        db.execSQL(createCategoriaIngreso)
         db.execSQL(createIngreso)
     }
 
@@ -98,8 +80,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         db.execSQL("DROP TABLE IF EXISTS usuarios")
         db.execSQL("DROP TABLE IF EXISTS categoria_gasto")
         db.execSQL("DROP TABLE IF EXISTS gastos")
-        db.execSQL("DROP TABLE IF EXISTS categoria_presupuesto")
-        db.execSQL("DROP TABLE IF EXISTS presupuesto")
+        db.execSQL("DROP TABLE IF EXISTS categoria_ingreso")
         db.execSQL("DROP TABLE IF EXISTS ingreso")
         onCreate(db)
     }
@@ -112,12 +93,13 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
     //Metodos para manejar las tablas: Insertar, Consultar, Eliminar
     // ------------------------- INSERT: Insertar DATOS ------------------------------
     //Usuarios
-    fun userInsert(nombre: String, email: String, telefono: String, fechaCreacion: String): Long {
+    fun userInsert(nombre: String, email: String, telefono: String, pass: String, fechaCreacion: String): Long {
         val db = writableDatabase
         val valores = ContentValues().apply {
             put("nombre", nombre)
             put("email", email)
             put("telefono", telefono)
+            put("pass", telefono)
             put("fechaCreacion", fechaCreacion)
         }
         return db.insert("usuarios",null,valores)
@@ -147,32 +129,13 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         return db.insert("gastos", null, valores)
     }
 
-    //Categoria presupuesto
-    fun categoriaPresuInsert(nombre: String): Long{
+    //Categoria ingreso
+    fun categoriaIngresoInsert(nombre: String): Long{
         val db = writableDatabase
         val valores = ContentValues().apply {
             put("nombre", nombre)
         }
         return db.insert("categoria_presupuesto", null, valores)
-    }
-
-    //Presupuesto
-    fun presupuestoInsert(nombre: String, fechaInicio: String, fechaFin: String, montoAsignado: Double, notas: String, recurrente: Boolean, frequencia: String, totalGastos: Double, valorDisponible: Double, usuario_id: Int, categoria_id: Int): Long{
-        val db = writableDatabase
-        val valores = ContentValues().apply {
-            put("nombre", nombre)
-            put("fechaInicio", fechaInicio)
-            put("fechaFin", fechaFin)
-            put("montoAsignado", montoAsignado)
-            put("notas", notas)
-            put("recurrente", if(recurrente) 1 else 0)
-            put("frequencia", frequencia)
-            put("totalGastos", totalGastos)
-            put("valorDisponible", valorDisponible)
-            put("usuario_id", usuario_id)
-            put("categoria_id", categoria_id)
-        }
-        return db.insert("presupuesto", null, valores)
     }
 
     //Ingreso
@@ -236,18 +199,19 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         return catList
     }
 
-    //Obtener Categoria presupuesto
-    fun selectCatPresupuesto(): List<Pair<Int, String>>{
+
+   //Obtener Categoria ingreso
+    fun selectCatIngreso(): List<Pair<Int, String>>{
         val db = readableDatabase
-        val cursor: Cursor = db.rawQuery("SELECT id, nombre FROM categoria_presupuesto", null)
-        val catPresupuesto = mutableListOf<Pair<Int, String>>()
+        val cursor: Cursor = db.rawQuery("SELECT id, nombre FROM categoria_ingreso", null)
+        val catIngreso = mutableListOf<Pair<Int, String>>()
         while (cursor.moveToNext()){
             val id = cursor.getInt(0)
             val nombre = cursor.getString(1)
-            catPresupuesto.add(Pair(id, nombre))
+            catIngreso.add(Pair(id, nombre))
         }
         cursor.close()
-        return catPresupuesto
+        return catIngreso
     }
 
     // ------------------------- DROP: ELIMINAR DATOS ------------------------------
@@ -261,5 +225,19 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
     fun eliminarGasto(id: Int): Int{
         val db = writableDatabase
         return db.delete("gastos", "id = ?", arrayOf(id.toString()))
+    }
+
+    //Categorias Gastos
+
+    //Ingresos
+    fun eliminarIngreso(id: Int): Int{
+        val db = writableDatabase
+        return db.delete("ingreso", "id = ?", arrayOf(id.toString()))
+    }
+
+    //Categorias Ingresos
+    fun eliminarCatIngreso(id: Int): Int{
+        val db = writableDatabase
+        return db.delete("ingreso", "id = ?", arrayOf(id.toString()))
     }
 }
