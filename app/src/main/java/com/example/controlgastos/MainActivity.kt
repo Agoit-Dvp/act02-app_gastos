@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         val dbHelper = DBHelper(this)
 
         //Insertamos un usuario
-        val usuarioId = dbHelper.userInsert("Tiago","pjesus.tiagob92@linkifp.online","112344","03/03/2025").toInt()
+        val usuarioId = dbHelper.userInsert("Tiago","pjesus.tiagob92@linkifp.online","112344","sdfj23476l","03/03/2025").toInt()
 
         //Insertar un gasto para el usuario
         dbHelper.gastosInsert("Pizza",usuarioId, "03.03.2025", "Pizza dominos", 30.00,"pendiente", false, "mensual")
