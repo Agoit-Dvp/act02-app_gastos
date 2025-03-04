@@ -37,7 +37,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         nota TEXT NOT NULL,
         monto REAL NOT NULL,
         estado TEXT NOT NULL CHECK(estado IN('PENDIENTE', 'PAGADO', 'CANCELADO')),
-        recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),
+        recurrente INTEGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),
         frequencia TEXT NOT NULL CHECK(frequencia IN('diario','semanal','mensual','anual')),
         usuario_id INTEGER NOT NULL,
         categoria_id INTEGER NOT NULL,
@@ -59,11 +59,11 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         val createIngreso = """
             CREATE TABLE ingreso(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            usuario_id INTERGER NOT NULL,
-            categoria_id INTERGER NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            categoria_id INTEGER NOT NULL,
             descripcion TEXT NOT NULL,
             monto REAL NOT NULL,
-            recurrente INTERGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),            
+            recurrente INTEGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),            
             fecha TEXT NOT NULL,
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
             FOREIGN KEY (categoria_id) REFERENCES categoria_ingreso(id) ON DELETE CASCADE
