@@ -372,12 +372,12 @@ class DBHelper(context: Context) :
 
             Ingreso(
                 id = cursor.getInt(0),
-                usuario_id = cursor.getInt(1),
-                categoria_id = cursor.getInt(2),
+                usuarioId = cursor.getInt(1),
+                categoriaId = cursor.getInt(2),
                 descripcion = cursor.getString(3),
                 monto = cursor.getDouble(4),
-                recurrente = cursor.getInt(5),
-                fecha = date,
+                recurrente = cursor.getInt(cursor.getColumnIndexOrThrow("recurrente")) == 1,
+                fecha = date
             )
         } else {
             null
