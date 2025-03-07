@@ -110,15 +110,13 @@ class DBHelper(context: Context) :
         telefono: String,
         password: String,
         fechaCreacion: String
-        pass: String,
-        fechaCreacion: String
     ): Long {
         val db = writableDatabase
         val valores = ContentValues().apply {
             put("nombre", nombre)
             put("email", email)
             put("telefono", telefono)
-            put("pass", telefono)
+            put("password", password)
             put("fechaCreacion", fechaCreacion)
         }
         return db.insert("usuarios", null, valores)
