@@ -5,10 +5,12 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import java.util.Date
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.ZoneId
+
 
 
 class DBHelper(context: Context) :
@@ -22,7 +24,7 @@ class DBHelper(context: Context) :
             nombre TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             telefono TEXT NOT NULL,
-            pass TEXT NOT NULL,
+            password TEXT NOT NULL,
             fechaCreacion TEXT NOT NULL
             )                    
         """.trimIndent()
@@ -106,6 +108,8 @@ class DBHelper(context: Context) :
         nombre: String,
         email: String,
         telefono: String,
+        password: String,
+        fechaCreacion: String
         pass: String,
         fechaCreacion: String
     ): Long {
@@ -220,17 +224,27 @@ class DBHelper(context: Context) :
 
     // ------------------------- SELECT: OBTENER DATOS ------------------------------
     //Obtener Usuarios
-    fun selectUsuarios(): List<Pair<Int, String>> {
+
+    // Obtener todos los usuarios
+    fun getUsuarios(): List<Usuario> {
         val db = readableDatabase
-        val cursor: Cursor = db.rawQuery("SELECT id, nombre FROM usuarios", null)
-        val usersList = mutableListOf<Pair<Int, String>>()
+        val cursor: Cursor = db.rawQuery("SELECT id, usuario, email, telefono, fechaCreacion FROM usuarios", null)
+        val usuariosList = mutableListOf<Usuario>()
+
         while (cursor.moveToNext()) {
             val id = cursor.getInt(0)
-            val nombre = cursor.getString(1)
-            usersList.add(Pair(id, nombre))
+            val usuario = cursor.getString(1)
+            val email = cursor.getString(2)
+            val telefono = cursor.getString(3)
+            val fechaCreacion = Date(cursor.getLong(4))
+
+            // Crear el objeto Usuario y añadirlo a la lista
+            val usuarioObj = Usuario(id, usuario, "", email, telefono, fechaCreacion)
+            usuariosList.add(usuarioObj)
         }
+
         cursor.close()
-        return usersList
+        return usuariosList
     }
 
     //Obtener Gastos
@@ -377,14 +391,41 @@ class DBHelper(context: Context) :
     fun eliminarUsuario(id: Int): Int {
         val db = writableDatabase
         return db.delete("usuarios", "id = ?", arrayOf(id.toString()))
+    }    
+    
+    // Eliminar un usuario
+    fun eliminarUsuario(id: Int?): Int {
+        val db = writableDatabase
+        var result = 0
+        try {
+            // Verifica si el usuario existe antes de eliminarlo
+            val cursor = db.rawQuery("SELECT * FROM usuarios WHERE id = ?", arrayOf(id.toString()))
+
+            if (cursor.moveToFirst()) {
+                // Usuario encontrado, proceder con la eliminación
+                result = db.delete("usuarios", "id = ?", arrayOf(id.toString()))
+            } else {
+                // Usuario no encontrado
+                Log.e("EliminarUsuario", "Usuario con ID $id no encontrado.")
+            }
+
+            cursor.close()
+        } catch (e: Exception) {
+            // Manejo de cualquier excepción
+            Log.e("EliminarUsuario", "Error al eliminar el usuario con ID $id: ${e.message}")
+        } finally {
+            db.close()  // Cerrar la base de datos en el bloque finally
+        }
+        return result  // Retornar el resultado de la operación
     }
+    
 
     //Gastos
     fun eliminarGasto(id: Int): Int {
         val db = writableDatabase
         return db.delete("gastos", "id = ?", arrayOf(id.toString()))
     }
-
+    
     //Categorias Gastos
 
     //Ingresos
@@ -416,6 +457,21 @@ class DBHelper(context: Context) :
             put("pass", telefono)
         }
         return db.update("usuarios", valores, "id =?", arrayOf(id.toString()))
+    }
+    
+      fun actualizarDatosUsuario(usuarioEmail: String, nuevoNombre: String, nuevoTelefono: String, nuevoEmail: String, nuevaPassword: String): Boolean {
+        val db = writableDatabase
+        val valores = ContentValues().apply {
+            put("nombre", nuevoNombre)           // Actualizar nombre
+            put("telefono", nuevoTelefono)      // Actualizar teléfono
+            put("email", nuevoEmail)            // Actualizar correo electrónico
+            put("password", nuevaPassword)      // Actualizar contraseña
+        }
+
+        // Actualizamos los datos del usuario en la base de datos
+        val resultado = db.update("usuarios", valores, "email = ?", arrayOf(usuarioEmail))
+
+        return resultado > 0  // Si el número de filas actualizadas es mayor a 0, fue exitoso
     }
 
     //Gastos
@@ -499,5 +555,4 @@ class DBHelper(context: Context) :
         //Actualizar la categoria por id
         return db.update("categoria_ingreso", valores, "id =?", arrayOf(id.toString()))
     }
-
 }

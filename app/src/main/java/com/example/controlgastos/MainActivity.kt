@@ -5,60 +5,38 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_usuario)
 
-        //****************************************************************
-/*        //Ejemplo de uso de DBHelper para manipular la base de datos SQLite
-        //Creamos un objeto de tipo DBHelper
+        // Crear el objeto DBHelper para interactuar con la base de datos SQLite
         val dbHelper = DBHelper(this)
 
-        //Insertamos un usuario
-        val usuarioId = dbHelper.userInsert("Tiago","pjesus.tiagob92@linkifp.online","112344","sdfj23476l","03/03/2025").toInt()
+        // Generar la fecha actual en formato "dd/MM/yyyy"
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val fechaCreacion = sdf.format(Date()) // Fecha actual
 
-        //Insertar un gasto para el usuario
-        dbHelper.gastosInsert("Pizza",usuarioId, "03.03.2025", "Pizza dominos", 30.00,"pendiente", false, "mensual")
+        // Insertar un nuevo usuario
+        val usuarioId = dbHelper.userInsert(
+            "Tiago",
+            "pjesus.tiagob92@linkifp.online",
+            "112344",
+            fechaCreacion,
+            fechaCreacion
+        ) // Este ID lo obtendrás directamente del resultado de `userInsert`
 
-        //Obtener usuarios
-        val usuarios = dbHelper.selectUsuarios()
-        usuarios.forEach{println("ID: ${it.first}, Nombre: ${it.second}")}
 
-        //Obtener gastos  del usuario
-        val gastos = dbHelper.gastosByUser(usuarioId)
-        gastos.forEach{println("ID: ${it.first}, Nombre: ${it.second}, userID: ${it.third}")}*/
-
-        //********************************************************************
-
-        //Codigo MainActivity
-        val btnUsuario = findViewById<Button>(R.id.btnUsuario)
-        val btnGastos = findViewById<Button>(R.id.btnGastos)
-        val btnIngresos = findViewById<Button>(R.id.btnIngresos)
-
-        val dbHelper = DBHelper(this)
-        val db = dbHelper.writableDatabase
-
-        btnUsuario.setOnClickListener{
-            val intent = Intent(this, UsuarioActivity::class.java)
-            startActivity(intent)
+        // Obtener usuarios
+        val usuarios = dbHelper.getUsuarios() // Esta función debe devolver una lista de objetos Usuario
+        usuarios.forEach {
+            println("ID: ${it.id}, Nombre: ${it.usuario}, Email: ${it.email}, Teléfono: ${it.telefono}")
         }
-
-        btnGastos.setOnClickListener{
-            val intent = Intent(this, GastosMenuActivity::class.java)
-            startActivity(intent)
-        }
-
-        btnIngresos.setOnClickListener{
-            val intent = Intent(this, IngresoActivity::class.java)
-            startActivity(intent)
-        }
-
-
-
-
 
     }
 }
