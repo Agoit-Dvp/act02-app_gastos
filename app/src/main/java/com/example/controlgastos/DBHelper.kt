@@ -98,7 +98,7 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
     }
 
 
-    //Metodos para manejar las tablas: Insertar, Consultar, Eliminar
+    //Metodos para manejar las tablas: Insertar, Consultar, Actualizar, Eliminar
     // ------------------------- INSERT: Insertar DATOS ------------------------------
     //Usuarios
     fun userInsert(nombre: String, email: String, telefono: String, pass: String, fechaCreacion: String): Long {
@@ -160,63 +160,6 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         return db.insert("gastos", null, valores)
     }
 
-
-    // Obtener gasto por ID con categoría y método de pago correctos
-    fun obtenerGastoPorId(id: Int): Gasto? {
-        val db = this.readableDatabase
-        val cursor: Cursor = db.rawQuery(
-            "SELECT id, nombre, fecha, monto, estado, nota, categoria, usuario_id, metodo_pago FROM gastos WHERE id = ?",
-            arrayOf(id.toString())
-        )
-
-        return if (cursor.moveToFirst()) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val fecha = try {
-                LocalDate.parse(cursor.getString(2), formatter)
-            } catch (e: Exception) {
-                LocalDate.now()
-            }
-            val date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant())
-
-            Gasto(
-                id = cursor.getInt(0),
-                nombre = cursor.getString(1),
-                fecha = date,
-                valor = cursor.getDouble(3),
-                estado = cursor.getString(4),
-                notas = cursor.getString(5) ?: "Sin notas",
-                categoriaId = cursor.getString(6), // Recuperar el nombre de la categoría
-                metodoPago = cursor.getString(8)
-            )
-        } else {
-            null
-        }.also { cursor.close() }
-    }
-
-
-    //Categoria gasto
-    fun obtenerNombreCategoria(categoriaId: Int): String? {
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT nombre FROM categoria_gasto WHERE id = ?", arrayOf(categoriaId.toString()))
-        return if (cursor.moveToFirst()) {
-            cursor.getString(0)
-        } else {
-            null
-        }.also { cursor.close() }
-    }
-
-    //Metodo pago gasto
-    fun obtenerMetodoPagoPorId(id: Int): String {
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT metodo_pago FROM gastos WHERE id = ?", arrayOf(id.toString()))
-        return if (cursor.moveToFirst()) {
-            cursor.getString(0)
-        } else {
-            "No especificado"
-        }.also { cursor.close() }
-    }
-
-
     //Categoria ingreso
     fun categoriaIngresoInsert(nombre: String): Long{
         val db = writableDatabase
@@ -271,6 +214,60 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
 
         cursor.close()
         return listaGastos
+    }
+
+    // Obtener gasto por ID con categoría y método de pago correctos
+    fun obtenerGastoPorId(id: Int): Gasto? {
+        val db = this.readableDatabase
+        val cursor: Cursor = db.rawQuery(
+            "SELECT id, nombre, fecha, monto, estado, nota, categoria, usuario_id, metodo_pago FROM gastos WHERE id = ?",
+            arrayOf(id.toString())
+        )
+
+        return if (cursor.moveToFirst()) {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val fecha = try {
+                LocalDate.parse(cursor.getString(2), formatter)
+            } catch (e: Exception) {
+                LocalDate.now()
+            }
+            val date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+            Gasto(
+                id = cursor.getInt(0),
+                nombre = cursor.getString(1),
+                fecha = date,
+                valor = cursor.getDouble(3),
+                estado = cursor.getString(4),
+                notas = cursor.getString(5) ?: "Sin notas",
+                categoriaId = cursor.getString(6), // Recuperar el nombre de la categoría
+                metodoPago = cursor.getString(8)
+            )
+        } else {
+            null
+        }.also { cursor.close() }
+    }
+
+    //Categoria gasto
+    fun obtenerNombreCategoria(categoriaId: Int): String? {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT nombre FROM categoria_gasto WHERE id = ?", arrayOf(categoriaId.toString()))
+        return if (cursor.moveToFirst()) {
+            cursor.getString(0)
+        } else {
+            null
+        }.also { cursor.close() }
+    }
+
+    //Metodo pago gasto
+    fun obtenerMetodoPagoPorId(id: Int): String {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT metodo_pago FROM gastos WHERE id = ?", arrayOf(id.toString()))
+        return if (cursor.moveToFirst()) {
+            cursor.getString(0)
+        } else {
+            "No especificado"
+        }.also { cursor.close() }
     }
 
     //Obtener Categoria gastos
@@ -328,4 +325,8 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         val db = writableDatabase
         return db.delete("ingreso", "id = ?", arrayOf(id.toString()))
     }
+
+    // ------------------------- UPDATE: ACTUALIZAR DATOS ------------------------------
+    //Usuarios
+
 }
