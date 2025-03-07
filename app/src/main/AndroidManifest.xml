@@ -7,11 +7,12 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="ControlGastos"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ControlGastos"
         tools:targetApi="31">
+
         <activity
             android:name=".IngresoActivity"
             android:exported="false" />
@@ -26,10 +27,15 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Actividades añadidas -->
+        <activity android:name=".GastosMenuActivity" android:exported="false" />
+        <activity android:name=".ListaGastosActivity" android:exported="false" />
+        <activity android:name=".DetalleGastoActivity" android:exported="false" />
+
     </application>
 
 </manifest>

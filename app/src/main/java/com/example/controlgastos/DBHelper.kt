@@ -5,6 +5,12 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.util.Date
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.ZoneId
+
+
 
 class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     override fun onCreate(db: SQLiteDatabase){
@@ -31,21 +37,19 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
         //Tabla Gastos
         val createGastoTable = """
         CREATE TABLE gastos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,        
-        nombre TEXT NOT NULL,        
-        fecha TEXT NOT NULL,
-        nota TEXT NOT NULL,
-        monto REAL NOT NULL,
-        estado TEXT NOT NULL CHECK(estado IN('PENDIENTE', 'PAGADO', 'CANCELADO')),
-        recurrente INTEGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),
-        frequencia TEXT NOT NULL CHECK(frequencia IN('diario','semanal','mensual','anual')),
-        usuario_id INTEGER NOT NULL,
-        categoria_id INTEGER NOT NULL,
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-        FOREIGN KEY (categoria_id) REFERENCES categoria_gasto(id) ON DELETE CASCADE       
+            id INTEGER PRIMARY KEY AUTOINCREMENT,        
+            nombre TEXT NOT NULL,        
+            fecha TEXT NOT NULL,
+            nota TEXT NOT NULL,
+            monto REAL NOT NULL,
+            estado TEXT NOT NULL CHECK(estado IN('PENDIENTE', 'PAGADO', 'CANCELADO')),
+            recurrente INTEGER NOT NULL DEFAULT 0 CHECK(recurrente IN(0,1)),
+            frequencia TEXT NOT NULL CHECK(frequencia IN('diario','semanal','mensual','anual')),
+            usuario_id INTEGER NOT NULL,
+            categoria TEXT NOT NULL, -- Ahora almacena el nombre de la categoría
+            metodo_pago TEXT NOT NULL CHECK(metodo_pago IN('Efectivo', 'Pago bancario / tarjeta', 'Otros'))
         )
-        
-    """.trimIndent()
+        """.trimIndent()
 
         //Tabla categoria_ingreso
         val createCategoriaIngreso = """
@@ -128,21 +132,90 @@ class DBHelper (context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, nul
     }
 
     //Gastos
-    fun gastosInsert(nombre: String, fecha: String, nota: String, monto: Double, estado: String, recurrente: Boolean, frequencia: String, usuario_id: Int, categoria_id: Int): Long{
+    fun gastosInsert(
+        nombre: String,
+        fecha: String,
+        nota: String,
+        monto: Double,
+        estado: String,
+        recurrente: Boolean,
+        frequencia: String,
+        usuario_id: Int,
+        categoria: String,
+        metodo_pago: String
+    ): Long {
         val db = writableDatabase
-        val valores = ContentValues().apply(){
+        val valores = ContentValues().apply {
             put("nombre", nombre)
             put("fecha", fecha)
             put("nota", nota)
             put("monto", monto)
             put("estado", estado)
-            put("recurrente", if(recurrente) 1 else 0)
+            put("recurrente", if (recurrente) 1 else 0)
             put("frequencia", frequencia)
-            put("usuario_id",usuario_id)
-            put("categoria_id",categoria_id)
+            put("usuario_id", usuario_id)
+            put("categoria", categoria)
+            put("metodo_pago", metodo_pago)
         }
         return db.insert("gastos", null, valores)
     }
+
+
+    // Obtener gasto por ID con categoría y método de pago correctos
+    fun obtenerGastoPorId(id: Int): Gasto? {
+        val db = this.readableDatabase
+        val cursor: Cursor = db.rawQuery(
+            "SELECT id, nombre, fecha, monto, estado, nota, categoria, usuario_id, metodo_pago FROM gastos WHERE id = ?",
+            arrayOf(id.toString())
+        )
+
+        return if (cursor.moveToFirst()) {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val fecha = try {
+                LocalDate.parse(cursor.getString(2), formatter)
+            } catch (e: Exception) {
+                LocalDate.now()
+            }
+            val date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+            Gasto(
+                id = cursor.getInt(0),
+                nombre = cursor.getString(1),
+                fecha = date,
+                valor = cursor.getDouble(3),
+                estado = cursor.getString(4),
+                notas = cursor.getString(5) ?: "Sin notas",
+                categoriaId = cursor.getString(6), // Recuperar el nombre de la categoría
+                metodoPago = cursor.getString(8)
+            )
+        } else {
+            null
+        }.also { cursor.close() }
+    }
+
+
+    //Categoria gasto
+    fun obtenerNombreCategoria(categoriaId: Int): String? {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT nombre FROM categoria_gasto WHERE id = ?", arrayOf(categoriaId.toString()))
+        return if (cursor.moveToFirst()) {
+            cursor.getString(0)
+        } else {
+            null
+        }.also { cursor.close() }
+    }
+
+    //Metodo pago gasto
+    fun obtenerMetodoPagoPorId(id: Int): String {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT metodo_pago FROM gastos WHERE id = ?", arrayOf(id.toString()))
+        return if (cursor.moveToFirst()) {
+            cursor.getString(0)
+        } else {
+            "No especificado"
+        }.also { cursor.close() }
+    }
+
 
     //Categoria ingreso
     fun categoriaIngresoInsert(nombre: String): Long{

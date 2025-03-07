@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnGastos.setOnClickListener{
-            val intent = Intent(this, GastosActivity::class.java)
+            val intent = Intent(this, GastosMenuActivity::class.java)
             startActivity(intent)
         }
 
