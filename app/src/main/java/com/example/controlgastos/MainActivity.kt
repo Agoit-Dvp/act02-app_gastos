@@ -24,10 +24,10 @@ class MainActivity : AppCompatActivity() {
 
         // Insertar un nuevo usuario
         val usuarioId = dbHelper.userInsert(
-            "Tiago",
+            "Usuario",
             "pjesus.tiagob92@linkifp.online",
-            "112344",
-            fechaCreacion,
+            "1454512344",
+            "1234",
             fechaCreacion
         ) // Este ID lo obtendrás directamente del resultado de `userInsert`
 
