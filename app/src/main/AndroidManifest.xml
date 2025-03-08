@@ -10,9 +10,16 @@
         android:label="ControlGastos"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ControlGastos"
-        tools:targetApi="31">
+        android:theme="@style/Theme.ControlGastos" >
+        <activity
+            android:name=".PruebasActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".IngresoActivity"
             android:exported="false" />
@@ -27,15 +34,19 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Actividades añadidas -->
-        <activity android:name=".GastosMenuActivity" android:exported="false" />
-        <activity android:name=".ListaGastosActivity" android:exported="false" />
-        <activity android:name=".DetalleGastoActivity" android:exported="false" />
-
+        </activity> <!-- Actividades añadidas -->
+        <activity
+            android:name=".GastosMenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ListaGastosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetalleGastoActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

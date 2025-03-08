@@ -1,20 +1,21 @@
 <resources>
     <string name="app_name">ControlGastos</string>
+    <string name="ingresosTitleview">Ingresos</string>
 
-<string-array name="categorias_gasto">
-    <item>Ocio</item>
-    <item>Hogar</item>
-    <item>Imprevistos</item>
-</string-array>
+    <string-array name="categorias_gasto">
+        <item>Ocio</item>
+        <item>Hogar</item>
+        <item>Imprevistos</item>
+    </string-array>
 
-<string-array name="metodos_pago">
-    <item>Efectivo</item>
-    <item>Pago bancario / tarjeta</item>
-    <item>Otros</item>
-</string-array>
+    <string-array name="metodos_pago">
+        <item>Efectivo</item>
+        <item>Pago bancario / tarjeta</item>
+        <item>Otros</item>
+    </string-array>
 
-<string-array name="estados_gasto">
-    <item>Pagado</item>
-    <item>Pendiente</item>
-</string-array>
+    <string-array name="estados_gasto">
+        <item>Pagado</item>
+        <item>Pendiente</item>
+    </string-array>
 </resources>

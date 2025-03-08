@@ -2,7 +2,7 @@ package com.example.controlgastos
 
 import java.util.Date
 
-class Ingreso (
+data class Ingreso (
     val id: Int,
     val usuarioId: Int,
     val categoriaId: Int,
@@ -10,7 +10,4 @@ class Ingreso (
     val monto: Double,
     val recurrente: Boolean,
     val fecha: Date
-){
-
-
-}
+)

@@ -201,8 +201,8 @@ class DBHelper(context: Context) :
 
     //Ingreso
     fun ingresoInsert(
-        usuario_id: Int,
-        categoria_id: Int,
+        usuarioId: Int,
+        categoriaId: Int,
         descripcion: String,
         monto: Double,
         recurrente: Boolean,
@@ -210,8 +210,8 @@ class DBHelper(context: Context) :
     ): Long {
         val db = writableDatabase
         val valores = ContentValues().apply {
-            put("usuario_id", usuario_id)
-            put("categoria_id", categoria_id)
+            put("usuario_id", usuarioId)
+            put("categoria_id", categoriaId)
             put("descripcion", descripcion)
             put("monto", monto)
             put("recurrente", if (recurrente) 1 else 0)
