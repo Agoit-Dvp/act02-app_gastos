@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ControlGastos</string>
     <string name="ingresosTitleview">Ingresos</string>
+    <string name="agregar_ingreso">Agregar ingreso</string>
 
     <string-array name="categorias_gasto">
         <item>Ocio</item>

@@ -10,7 +10,10 @@
         android:label="ControlGastos"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ControlGastos" >
+        android:theme="@style/Theme.ControlGastos">
+        <activity
+            android:name=".DetalleIngresoActivity"
+            android:exported="false" />
         <activity
             android:name=".PruebasActivity"
             android:exported="true">
