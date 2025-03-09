@@ -6,6 +6,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class PruebasActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +27,10 @@ class PruebasActivity : AppCompatActivity() {
 
         val dbHelper = DBHelper(this)
         val db = dbHelper.writableDatabase
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val fechaCreacion = sdf.format(Date()) // Fecha actual*/
+
+        dbHelper.ingresoInsert("pizza",1, 1, "test", 30.0, false,fechaCreacion)
 
 
         txNombreU.text = UsuarioLogueado.nombreUsuario
