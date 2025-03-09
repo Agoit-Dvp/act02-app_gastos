@@ -1,11 +1,13 @@
 package com.example.controlgastos
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ListView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -45,25 +47,54 @@ class IngresoActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
-        imgBtAdd.setOnClickListener{
+
+        listView.setOnItemLongClickListener { _, _, position, _ ->
+            val ingreso = listView.adapter.getItem(position) as Ingreso
+
+            // Confirmar la eliminación (esto es opcional, pero recomendable)
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Eliminar Ingreso")
+                .setMessage("¿Estás seguro de que quieres eliminar este ingreso?")
+                .setPositiveButton("Sí") { dialog, _ ->
+                    // Eliminar el ingreso de la base de datos
+                    val success = dbHelper.eliminarIngreso(ingreso.id)
+
+                    if (success) {
+                        // Eliminar el ítem de la lista (se actualiza el adaptador)
+                        cargarIngresos()
+                    } else {
+                        Toast.makeText(this, "Error al eliminar el ingreso", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    dialog.dismiss()
+                }
+                .setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+            builder.create().show()
+
+            true // Indica que el evento ha sido manejado
+        }
+
+        imgBtAdd.setOnClickListener {
             val intent = Intent(this, AddIngresoActivity::class.java)
             startActivity(intent)
         }
     }
 
 
-
     private fun cargarIngresos() {
         val ingresos = dbHelper.getAllIngresos()
         if (ingresos.isNotEmpty()) {
-            val adapter = IngresoAdapter(this, ingresos)
+            val adapter = IngresoAdapter(this, ingresos.toMutableList())
             listView.adapter = adapter
-        }else{
+        } else {
             Log.d("IngresoActivity", "No hay ingresos disponibles.")
         }
     }
 
-    private fun initGUI(){
+    private fun initGUI() {
         imgBtAdd = findViewById(R.id.imgBtAdd)
     }
 

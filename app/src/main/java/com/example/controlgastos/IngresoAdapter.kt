@@ -28,3 +28,4 @@ class IngresoAdapter(private val context: Context, private val ingresos: List<In
         return view
     }
 }
+

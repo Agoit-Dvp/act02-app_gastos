@@ -2,6 +2,7 @@ package com.example.controlgastos
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
@@ -21,21 +22,11 @@ class AddIngresoActivity : AppCompatActivity() {
     private lateinit var chkRecurrente: CheckBox
     private lateinit var spnCategoria: Spinner
     private lateinit var edtUsuario: EditText
-    val usuarioId = UsuarioLogueado.usuarioId
+    private val usuarioId = UsuarioLogueado.usuarioId
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_ingreso)
-
-        // Vincular de las vistas
-        btnAdd = findViewById(R.id.btnAdd)
-        edtNombre = findViewById(R.id.edtNombre)
-        edtFecha = findViewById(R.id.edtFecha)
-        edtMonto = findViewById(R.id.edtMonto)
-        edtDesc = findViewById(R.id.edtDesc)
-        chkRecurrente = findViewById(R.id.chkRecurrente)
-        spnCategoria = findViewById(R.id.spnCategoria)
-        edtUsuario = findViewById(R.id.edtUsuario)
 
         initGUI()
         initDB()
@@ -48,7 +39,7 @@ class AddIngresoActivity : AppCompatActivity() {
 
     }
 
-    private fun initGUI(){
+    private fun initGUI() {
         // Inicialización de las vistas
         btnAdd = findViewById(R.id.btnAdd)
         edtNombre = findViewById(R.id.edtNombre)
@@ -58,24 +49,34 @@ class AddIngresoActivity : AppCompatActivity() {
         chkRecurrente = findViewById(R.id.chkRecurrente)
         spnCategoria = findViewById(R.id.spnCategoria)
         edtUsuario = findViewById(R.id.edtUsuario)
+        edtUsuario.setText(UsuarioLogueado.nombreUsuario)
+        edtUsuario.isEnabled = false
     }
 
-    private fun initDB(){
+    private fun initDB() {
         dbHelper = DBHelper(this)
     }
 
     private fun cargarCategorias() {
         val categorias = dbHelper.selectCatIngreso()
-        val categoriasAdapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            categorias.map { it.second }
-        )
-        categoriasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spnCategoria.adapter = categoriasAdapter
+
+        // Verificar que el método retorna categorías
+        Log.d("AddIngresoActivity", "Categorías: $categorias")
+
+        if (categorias.isNotEmpty()) {
+            val categoriasAdapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item,
+                categorias.map { it.second }  // Asegúrate de que la categoría sea el valor correcto
+            )
+            categoriasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spnCategoria.adapter = categoriasAdapter
+        } else {
+            Toast.makeText(this, "No se encontraron categorías", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun checkLogin(){
+    private fun checkLogin() {
         if (usuarioId == -1) {
             // Redirigir al login si no está logueado
             val intent = Intent(this, LoginActivity::class.java)
@@ -99,6 +100,13 @@ class AddIngresoActivity : AppCompatActivity() {
 
         // Obtener la categoría seleccionada
         val categoriaSeleccionada = spnCategoria.selectedItemPosition
+        // Verificar que el Spinner tenga elementos antes de intentar obtener el índice
+        if (spnCategoria.adapter == null || spnCategoria.adapter.count == 0 || categoriaSeleccionada == -1) {
+            Toast.makeText(this, "Por favor, seleccione una categoría válida.", Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+
         val categoriaId = dbHelper.selectCatIngreso()[categoriaSeleccionada].first
 
         // Insertar el ingreso en la base de datos
@@ -119,6 +127,7 @@ class AddIngresoActivity : AppCompatActivity() {
             Toast.makeText(this, "Error al agregar el ingreso", Toast.LENGTH_SHORT).show()
         }
     }
+
     //Limpiar edits text, para nueva insercción
     private fun limpiarCampos() {
         // Limpiar los campos para un nuevo ingreso
@@ -129,6 +138,5 @@ class AddIngresoActivity : AppCompatActivity() {
         chkRecurrente.isChecked = false
         spnCategoria.setSelection(0)
     }
-
 
 }

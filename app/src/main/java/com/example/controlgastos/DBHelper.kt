@@ -82,6 +82,7 @@ class DBHelper(context: Context) :
         catByDefaultInsert(db)
         db.execSQL(createGastoTable)
         db.execSQL(createCategoriaIngreso)
+        catIngresoByDefaultInsert(db)
         db.execSQL(createIngreso)
     }
 
@@ -198,6 +199,25 @@ class DBHelper(context: Context) :
             put("nombre", nombre)
         }
         return db.insert("categoria_ingreso", null, valores)
+    }
+    //Almacenar categorias de ingresos por defecto
+    fun catIngresoByDefaultInsert(db: SQLiteDatabase) {
+        val categorias = listOf(
+            "Salario",
+            "Regalo",
+            "Otros"
+        )
+        categorias.forEach { categoria ->
+            val valores = ContentValues().apply {
+                put("nombre", categoria)
+            }
+            db.insertWithOnConflict(
+                "categoria_ingreso",
+                null,
+                valores,
+                SQLiteDatabase.CONFLICT_IGNORE
+            )
+        }
     }
 
     //Ingreso
@@ -377,6 +397,20 @@ class DBHelper(context: Context) :
         return catList
     }
 
+    fun obtenerNombreCategoriaPorId(tabla: String, categoriaId: Int): String? {
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery(
+            "SELECT nombre FROM $tabla WHERE id = ?",
+            arrayOf(categoriaId.toString())
+        )
+
+        return if (cursor.moveToFirst()) {
+            cursor.getString(0)  // Recuperamos el nombre de la categoría
+        } else {
+            null  // Si no se encuentra el ID, retornamos null
+        }.also { cursor.close() }
+    }
+
 
     //Obtener Categoria ingreso
     fun selectCatIngreso(): List<Pair<Int, String>> {
@@ -455,60 +489,6 @@ class DBHelper(context: Context) :
         return ingresos
     }
 
-    // ------------------------- DROP: ELIMINAR DATOS ------------------------------
-    //Usuarios
-    fun eliminarUsuarioDefault(id: Int): Int {
-        val db = writableDatabase
-        return db.delete("usuarios", "id = ?", arrayOf(id.toString()))
-    }    
-    
-    // Eliminar un usuario
-    fun eliminarUsuario(id: Int?): Int {
-        val db = writableDatabase
-        var result = 0
-        try {
-            // Verifica si el usuario existe antes de eliminarlo
-            val cursor = db.rawQuery("SELECT * FROM usuarios WHERE id = ?", arrayOf(id.toString()))
-
-            if (cursor.moveToFirst()) {
-                // Usuario encontrado, proceder con la eliminación
-                result = db.delete("usuarios", "id = ?", arrayOf(id.toString()))
-            } else {
-                // Usuario no encontrado
-                Log.e("EliminarUsuario", "Usuario con ID $id no encontrado.")
-            }
-
-            cursor.close()
-        } catch (e: Exception) {
-            // Manejo de cualquier excepción
-            Log.e("EliminarUsuario", "Error al eliminar el usuario con ID $id: ${e.message}")
-        } finally {
-            db.close()  // Cerrar la base de datos en el bloque finally
-        }
-        return result  // Retornar el resultado de la operación
-    }
-    
-
-    //Gastos
-    fun eliminarGasto(id: Int): Int {
-        val db = writableDatabase
-        return db.delete("gastos", "id = ?", arrayOf(id.toString()))
-    }
-    
-    //Categorias Gastos
-
-    //Ingresos
-    fun eliminarIngreso(id: Int): Int {
-        val db = writableDatabase
-        return db.delete("ingresos", "id = ?", arrayOf(id.toString()))
-    }
-
-    //Categorias Ingresos
-    fun eliminarCatIngreso(id: Int): Int {
-        val db = writableDatabase
-        return db.delete("ingreso", "id = ?", arrayOf(id.toString()))
-    }
-
     // ------------------------- UPDATE: ACTUALIZAR DATOS ------------------------------
     
       fun actualizarDatosUsuario(usuarioEmail: String, nuevoNombre: String, nuevoTelefono: String, nuevoEmail: String, nuevaPassword: String): Boolean {
@@ -581,8 +561,8 @@ class DBHelper(context: Context) :
         val db = writableDatabase
         val valores = ContentValues().apply {
             put("nombre", nombre)
-            put("usuarioId", usuarioId)
-            put("categoriaId", categoriaId)
+            put("usuario_id", usuarioId)
+            put("categoria_id", categoriaId)
             put("descripcion", descripcion)
             put("monto", monto)
             put("recurrente", if (recurrente) 1 else 0)
@@ -600,5 +580,60 @@ class DBHelper(context: Context) :
 
         //Actualizar la categoria por id
         return db.update("categoria_ingreso", valores, "id =?", arrayOf(id.toString()))
+    }
+
+    // ------------------------- DROP: ELIMINAR DATOS ------------------------------
+    //Usuarios
+    fun eliminarUsuarioDefault(id: Int): Int {
+        val db = writableDatabase
+        return db.delete("usuarios", "id = ?", arrayOf(id.toString()))
+    }
+
+    // Eliminar un usuario
+    fun eliminarUsuario(id: Int?): Int {
+        val db = writableDatabase
+        var result = 0
+        try {
+            // Verifica si el usuario existe antes de eliminarlo
+            val cursor = db.rawQuery("SELECT * FROM usuarios WHERE id = ?", arrayOf(id.toString()))
+
+            if (cursor.moveToFirst()) {
+                // Usuario encontrado, proceder con la eliminación
+                result = db.delete("usuarios", "id = ?", arrayOf(id.toString()))
+            } else {
+                // Usuario no encontrado
+                Log.e("EliminarUsuario", "Usuario con ID $id no encontrado.")
+            }
+
+            cursor.close()
+        } catch (e: Exception) {
+            // Manejo de cualquier excepción
+            Log.e("EliminarUsuario", "Error al eliminar el usuario con ID $id: ${e.message}")
+        } finally {
+            db.close()  // Cerrar la base de datos en el bloque finally
+        }
+        return result  // Retornar el resultado de la operación
+    }
+
+
+    //Gastos
+    fun eliminarGasto(id: Int): Int {
+        val db = writableDatabase
+        return db.delete("gastos", "id = ?", arrayOf(id.toString()))
+    }
+
+    //Categorias Gastos
+
+    //Ingresos
+    fun eliminarIngreso(id: Int): Boolean {
+        val db = writableDatabase
+        val rowsDeleted = db.delete("ingresos", "id = ?", arrayOf(id.toString()))
+        return rowsDeleted > 0
+    }
+
+    //Categorias Ingresos
+    fun eliminarCatIngreso(id: Int): Int {
+        val db = writableDatabase
+        return db.delete("ingreso", "id = ?", arrayOf(id.toString()))
     }
 }

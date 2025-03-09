@@ -56,14 +56,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline17" />
 
-    <EditText
+    <CheckBox
         android:id="@+id/chkRecurrente"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:ems="10"
-        android:enabled="false"
-        android:hint="¿Es recurrente?"
-        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="¿Recurrente?"
+        android:layout_marginEnd="80dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline18"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
@@ -136,6 +134,19 @@
         android:enabled="false"
         android:hint="Categoria"
         android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/guideline15"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline10"
+        app:layout_constraintTop_toTopOf="@+id/guideline14" />
+
+    <Spinner
+        android:id="@+id/spnCategoria"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:ems="10"
+        android:hint="Categoria"
+        android:inputType="text"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/guideline15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
