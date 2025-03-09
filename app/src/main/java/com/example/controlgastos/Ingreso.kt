@@ -4,6 +4,7 @@ import java.util.Date
 
 data class Ingreso (
     val id: Int,
+    val nombre: String,
     val usuarioId: Int,
     val categoriaId: Int,
     val descripcion: String,

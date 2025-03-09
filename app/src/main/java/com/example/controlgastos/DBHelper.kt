@@ -65,6 +65,7 @@ class DBHelper(context: Context) :
         val createIngreso = """
             CREATE TABLE ingresos(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
             usuario_id INTEGER NOT NULL,
             categoria_id INTEGER NOT NULL,
             descripcion TEXT NOT NULL,
@@ -196,13 +197,14 @@ class DBHelper(context: Context) :
         val valores = ContentValues().apply {
             put("nombre", nombre)
         }
-        return db.insert("categoria_presupuesto", null, valores)
+        return db.insert("categoria_ingreso", null, valores)
     }
 
     //Ingreso
     fun ingresoInsert(
-        usuarioId: Int,
-        categoriaId: Int,
+        nombre: String,
+        usuario_id: Int,
+        categoria_id: Int,
         descripcion: String,
         monto: Double,
         recurrente: Boolean,
@@ -210,8 +212,9 @@ class DBHelper(context: Context) :
     ): Long {
         val db = writableDatabase
         val valores = ContentValues().apply {
-            put("usuario_id", usuarioId)
-            put("categoria_id", categoriaId)
+            put("nombre", nombre)
+            put("usuario_id", usuario_id)
+            put("categoria_id", categoria_id)
             put("descripcion", descripcion)
             put("monto", monto)
             put("recurrente", if (recurrente) 1 else 0)
@@ -226,7 +229,7 @@ class DBHelper(context: Context) :
     // Obtener todos los usuarios
     fun getUsuarios(): List<Usuario> {
         val db = readableDatabase
-        val cursor: Cursor = db.rawQuery("SELECT id, usuario, email, telefono, fechaCreacion FROM usuarios", null)
+        val cursor: Cursor = db.rawQuery("SELECT id, nombre, email, telefono, fechaCreacion FROM usuarios", null)
         val usuariosList = mutableListOf<Usuario>()
 
         while (cursor.moveToNext()) {
@@ -243,6 +246,19 @@ class DBHelper(context: Context) :
 
         cursor.close()
         return usuariosList
+    }
+    //Comprobar si hay usuarios
+    fun hayUsuarios(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM usuarios", null)
+        var existe = false
+
+        if (cursor.moveToFirst()) {
+            existe = cursor.getInt(0) > 0
+        }
+
+        cursor.close()
+        return existe
     }
 
     //Obtener Gastos
@@ -264,6 +280,29 @@ class DBHelper(context: Context) :
 
         cursor.close()
         return listaGastos
+    }
+
+    // En DBHelper
+    fun autenticarUsuario(email: String, password: String): Usuario? {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT id, nombre, password, email, telefono, fechaCreacion FROM usuarios WHERE email = ? AND password = ?",
+            arrayOf(email, password)
+        )
+
+        return if (cursor.moveToFirst()) {
+            val usuarioId = cursor.getInt(with(cursor) { getColumnIndex("id") })
+            val usuarioNombre = cursor.getString(with(cursor) { getColumnIndex("nombre") })
+            val usuarioPassword = cursor.getString(with(cursor) { getColumnIndex("password") })
+            val usuarioEmail = cursor.getString(with(cursor) { getColumnIndex("email") })
+            val usuarioTelefono = cursor.getString(with(cursor) { getColumnIndex("telefono") })
+            val fechaCreacion = Date(cursor.getLong(with(cursor) { getColumnIndex("fechaCreacion") }))
+
+            // Crear un objeto Usuario con los datos recuperados
+            Usuario(usuarioId, usuarioNombre, usuarioPassword, usuarioEmail, usuarioTelefono, fechaCreacion)
+        } else {
+            null  // Si no se encuentran las credenciales, retornar null
+        }.also { cursor.close() }
     }
 
     // Obtener gasto por ID con categoría y método de pago correctos
@@ -357,14 +396,14 @@ class DBHelper(context: Context) :
     fun obtenerIngresoPorId(id: Int): Ingreso? {
         val db = this.readableDatabase
         val cursor: Cursor = db.rawQuery(
-            "SELECT id, usuario_id, categoria_id, descripcion, monto, recurrente, fecha FROM ingresos WHERE id = ?",
+            "SELECT id, nombre, usuario_id, categoria_id, descripcion, monto, recurrente, fecha FROM ingresos WHERE id = ?",
             arrayOf(id.toString())
         )
 
         return if (cursor.moveToFirst()) {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             val fecha = try {
-                LocalDate.parse(cursor.getString(6), formatter)
+                LocalDate.parse(cursor.getString(7), formatter)
             } catch (e: Exception) {
                 LocalDate.now()
             }
@@ -372,10 +411,11 @@ class DBHelper(context: Context) :
 
             Ingreso(
                 id = cursor.getInt(0),
-                usuarioId = cursor.getInt(1),
-                categoriaId = cursor.getInt(2),
-                descripcion = cursor.getString(3),
-                monto = cursor.getDouble(4),
+                nombre = cursor.getString(1),
+                usuarioId = cursor.getInt(2),
+                categoriaId = cursor.getInt(3),
+                descripcion = cursor.getString(4),
+                monto = cursor.getDouble(5),
                 recurrente = cursor.getInt(cursor.getColumnIndexOrThrow("recurrente")) == 1,
                 fecha = date
             )
@@ -384,9 +424,40 @@ class DBHelper(context: Context) :
         }.also { cursor.close() }
     }
 
+    fun getAllIngresos(): List<Ingreso> {
+        val db = this.readableDatabase
+        val ingresos = mutableListOf<Ingreso>()
+        val cursor = db.rawQuery("SELECT id, nombre, usuario_id, categoria_id, descripcion, monto, recurrente, fecha FROM ingresos", null)
+
+        cursor.use {
+            while (it.moveToNext()) {
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val fecha = try {
+                    LocalDate.parse(it.getString(7), formatter)
+                } catch (e: Exception) {
+                    LocalDate.now()
+                }
+                val date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+                val ingreso = Ingreso(
+                    id = it.getInt(0),
+                    nombre = it.getString(1),
+                    usuarioId = it.getInt(2),
+                    categoriaId = it.getInt(3),
+                    descripcion = it.getString(4),
+                    monto = it.getDouble(5),
+                    recurrente = it.getInt(it.getColumnIndexOrThrow("recurrente")) == 1,
+                    fecha = date
+                )
+                ingresos.add(ingreso)
+            }
+        }
+        return ingresos
+    }
+
     // ------------------------- DROP: ELIMINAR DATOS ------------------------------
     //Usuarios
-    fun eliminarUsuario(id: Int): Int {
+    fun eliminarUsuarioDefault(id: Int): Int {
         val db = writableDatabase
         return db.delete("usuarios", "id = ?", arrayOf(id.toString()))
     }    
@@ -429,7 +500,7 @@ class DBHelper(context: Context) :
     //Ingresos
     fun eliminarIngreso(id: Int): Int {
         val db = writableDatabase
-        return db.delete("ingreso", "id = ?", arrayOf(id.toString()))
+        return db.delete("ingresos", "id = ?", arrayOf(id.toString()))
     }
 
     //Categorias Ingresos
@@ -439,23 +510,6 @@ class DBHelper(context: Context) :
     }
 
     // ------------------------- UPDATE: ACTUALIZAR DATOS ------------------------------
-    //Usuarios
-    fun actualizarUsuario(
-        id: Int,
-        nombre: String,
-        email: String,
-        telefono: String,
-        pass: String
-    ): Int {
-        val db = writableDatabase
-        val valores = ContentValues().apply {
-            put("nombre", nombre)
-            put("email", email)
-            put("telefono", telefono)
-            put("pass", telefono)
-        }
-        return db.update("usuarios", valores, "id =?", arrayOf(id.toString()))
-    }
     
       fun actualizarDatosUsuario(usuarioEmail: String, nuevoNombre: String, nuevoTelefono: String, nuevoEmail: String, nuevaPassword: String): Boolean {
         val db = writableDatabase
@@ -510,40 +564,34 @@ class DBHelper(context: Context) :
         }
 
         //Actualizar la categoria por id
-        return db.update("categoria_ingreso", valores, "id =?", arrayOf(id.toString()))
+        return db.update("categoria_gasto", valores, "id =?", arrayOf(id.toString()))
     }
 
     //Ingresos
     fun actualizarIngreso(
         id: Int,
         nombre: String,
-        fecha: String,
-        nota: String,
+        usuarioId: Int,
+        categoriaId: Int,
+        descripcion: String,
         monto: Double,
-        estado: String,
         recurrente: Boolean,
-        frequencia: String,
-        usuario_id: Int,
-        categoria: String,
-        metodo_pago: String
+        fecha: String
     ): Int {
         val db = writableDatabase
         val valores = ContentValues().apply {
             put("nombre", nombre)
-            put("fecha", fecha)
-            put("nota", nota)
+            put("usuarioId", usuarioId)
+            put("categoriaId", categoriaId)
+            put("descripcion", descripcion)
             put("monto", monto)
-            put("estado", estado)
             put("recurrente", if (recurrente) 1 else 0)
-            put("frequencia", frequencia)
-            put("usuario_id", usuario_id)
-            put("categoria", categoria)
-            put("metodo_pago", metodo_pago)
+            put("fecha", fecha)
         }
         return db.update("ingresos", valores, "id =?", arrayOf(id.toString()))
     }
 
-    //Categoria Gastos
+    //Categoria ingresos
     fun actualizarCatIngreso(id: Int, newName: String): Int{
         val db = writableDatabase
         val valores = ContentValues().apply {

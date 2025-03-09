@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ControlGastos">
         <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddIngresoActivity"
+            android:exported="false" />
+        <activity
             android:name=".DetalleIngresoActivity"
             android:exported="false" />
         <activity

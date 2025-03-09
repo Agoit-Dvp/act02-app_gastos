@@ -5,18 +5,17 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DetalleIngresoActivity">
+    tools:context=".AddIngresoActivity">
 
     <Button
         android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:backgroundTint="@color/addImgButton"
-        android:text="Modificar"
+        android:text="Agregar"
         android:textColor="@android:color/white"
+        android:textColorLink="@android:color/holo_green_dark"
         app:layout_constraintBottom_toTopOf="@+id/guideline12"
-        app:layout_constraintEnd_toStartOf="@+id/guideline20"
+        app:layout_constraintEnd_toStartOf="@+id/guideline21"
         app:layout_constraintStart_toStartOf="@+id/guideline22"
         app:layout_constraintTop_toTopOf="@+id/guideline19" />
 
@@ -36,7 +35,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:ems="10"
-        android:enabled="false"
         android:hint="Fecha ingreso"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/guideline19"
@@ -56,14 +54,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline17" />
 
-    <EditText
+    <CheckBox
         android:id="@+id/chkRecurrente"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:ems="10"
-        android:enabled="false"
-        android:hint="¿Es recurrente?"
-        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="¿Recurrente?"
+        android:layout_marginEnd="80dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline18"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
@@ -85,7 +81,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:ems="10"
-        android:enabled="false"
         android:hint="Valor del ingreso"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/guideline17"
@@ -109,7 +104,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:ems="10"
-        android:enabled="false"
         android:hint="Informacion"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/guideline16"
@@ -128,12 +122,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline14" />
 
-    <EditText
-        android:id="@+id/edtCategoria"
+    <Spinner
+        android:id="@+id/spnCategoria"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:ems="10"
-        android:enabled="false"
         android:hint="Categoria"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/guideline15"
@@ -157,7 +150,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:ems="10"
-        android:enabled="false"
         android:hint="Usuario"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
@@ -171,25 +163,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#663FB5"
-        android:text="Detalle del ingreso"
+        android:text="Nuevo Ingreso"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="30sp"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <Button
-        android:id="@+id/btnEliminar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:text="Eliminar"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/guideline12"
-        app:layout_constraintEnd_toStartOf="@+id/guideline21"
-        app:layout_constraintStart_toStartOf="@+id/guideline20"
-        app:layout_constraintTop_toTopOf="@+id/guideline19" />
 
     <TextView
         android:id="@+id/txNombre"
@@ -208,7 +187,6 @@
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:ems="10"
-        android:enabled="false"
         android:hint="Nombre ingreso"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/guideline13"
