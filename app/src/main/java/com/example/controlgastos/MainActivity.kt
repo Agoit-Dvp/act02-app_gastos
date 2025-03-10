@@ -2,12 +2,9 @@ package com.example.controlgastos
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,28 +12,19 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_usuario)
 
-        // Crear el objeto DBHelper para interactuar con la base de datos SQLite
         val dbHelper = DBHelper(this)
 
-        // Generar la fecha actual en formato "dd/MM/yyyy"
-        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val fechaCreacion = sdf.format(Date()) // Fecha actual
-
-        // Insertar un nuevo usuario
-        val usuarioId = dbHelper.userInsert(
-            "Usuario",
-            "pjesus.tiagob92@linkifp.online",
-            "1454512344",
-            "1234",
-            fechaCreacion
-        ) // Este ID lo obtendrás directamente del resultado de `userInsert`
-
-
-        // Obtener usuarios
-        val usuarios = dbHelper.getUsuarios() // Esta función debe devolver una lista de objetos Usuario
-        usuarios.forEach {
-            println("ID: ${it.id}, Nombre: ${it.usuario}, Email: ${it.email}, Teléfono: ${it.telefono}")
+        if (dbHelper.hayUsuarios()) {
+            // Si hay usuarios, abrir LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        } else {
+            // Si no hay usuarios, abrir UsuarioActivity para crear uno
+            val intent = Intent(this, UsuarioActivity::class.java)
+            startActivity(intent)
         }
+
+        finish() // Cierra MainActivity para que no se pueda volver atrás
 
     }
 }

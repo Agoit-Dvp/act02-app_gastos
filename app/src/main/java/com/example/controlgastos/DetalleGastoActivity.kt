@@ -53,7 +53,7 @@ class DetalleGastoActivity : AppCompatActivity() {
                             Toast.makeText(this, "Gasto eliminado correctamente", Toast.LENGTH_LONG).show()
 
                             // Verificar si quedan más gastos
-                            val gastosRestantes = dbHelper.gastosByUser(1) // Suponiendo usuario_id = 1
+                            val gastosRestantes = dbHelper.gastosByUser(UsuarioLogueado.usuarioId) // Suponiendo usuario_id = 1
 
                             val intent = if (gastosRestantes.isEmpty()) {
                                 Intent(this, GastosMenuActivity::class.java) // Si no hay gastos, ir a GastosMenuActivity

@@ -7,4 +7,41 @@
     android:layout_height="match_parent"
     tools:context=".IngresoActivity">
 
+    <TextView
+        android:id="@+id/txTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#663FB5"
+        android:text="@string/ingresosTitleview"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ListView
+        android:id="@+id/lvIngresos"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@id/txTitle" />
+
+    <ImageButton
+        android:id="@+id/imgBtAdd"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/ic_add_ingreso_24"
+        android:contentDescription="@string/agregar_ingreso"
+        app:layout_constraintLeft_toLeftOf="@id/gdAdd"
+        app:layout_constraintTop_toBottomOf="@id/lvIngresos"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.86" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -40,7 +40,7 @@ class GastosActivity : AppCompatActivity() {
             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val fecha: Date = dateFormat.parse(fechaString) ?: Date()
 
-            val usuarioId = 1 // Ajustar dinámicamente según el usuario logueado
+            val usuarioId = UsuarioLogueado.usuarioId
 
             val gastoId = dbHelper.gastosInsert(
                 nombre,
