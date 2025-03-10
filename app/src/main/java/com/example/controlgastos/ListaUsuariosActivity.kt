@@ -23,7 +23,7 @@ class ListaUsuariosActivity : AppCompatActivity() {
         // Usamos un ArrayAdapter para mostrar solo los campos que necesitamos (nombre, email, telefono, fecha)
         val adapter = ArrayAdapter(
             this,
-            android.R.layout.simple_list_item_2,
+            android.R.layout.simple_list_item_1,
             usuarios.map {
                 "${it.usuario}\n${it.email}\n${it.telefono}\n${SimpleDateFormat("dd/MM/yyyy").format(it.fechaCreacion)}"
             }

@@ -1,11 +1,13 @@
 package com.example.controlgastos
 
 import android.content.Context
+import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.BaseAdapter
+import java.util.Locale
 
 class IngresoAdapter(private val context: Context, private val ingresos: List<Ingreso>) :
     BaseAdapter() {
@@ -19,11 +21,13 @@ class IngresoAdapter(private val context: Context, private val ingresos: List<In
             .inflate(android.R.layout.simple_list_item_2, parent, false)
 
         val ingreso = ingresos[position]
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val fechaFormateada = sdf.format(ingreso.fecha)
         val text1 = view.findViewById<TextView>(android.R.id.text1)
         val text2 = view.findViewById<TextView>(android.R.id.text2)
 
         text1.text = ingreso.nombre
-        text2.text = "Monto: ${ingreso.monto} - ${ingreso.fecha}"
+        text2.text = "Monto: ${ingreso.monto} - ${fechaFormateada}"
 
         return view
     }

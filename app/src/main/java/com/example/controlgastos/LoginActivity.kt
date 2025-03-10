@@ -22,25 +22,23 @@ class LoginActivity : AppCompatActivity() {
 
         initGUI()
         initDB()
-        btnLogin.setOnClickListener{
+        btnLogin.setOnClickListener {
             login()
         }
 
-
-
     }
 
-    private fun initGUI(){
+    private fun initGUI() {
         edtEmail = findViewById(R.id.edtEmail)
         edtPassword = findViewById(R.id.edtPassword)
         btnLogin = findViewById(R.id.btnLogin)
     }
 
-    private fun initDB(){
+    private fun initDB() {
         dbHelper = DBHelper(this)
     }
 
-    private  fun login(){
+    private fun login() {
         val email = edtEmail.text.toString()
         val password = edtPassword.text.toString()
 
@@ -54,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
             UsuarioLogueado.emailUsuario = usuario.email
 
             // Redirigir al usuario a la siguiente actividad
-            val intent = Intent(this, PruebasActivity::class.java)
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()  // Finaliza la actividad de login para que no vuelva atrás
         } else {

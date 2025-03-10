@@ -14,7 +14,7 @@ class ListaGastosActivity : AppCompatActivity() {
 
         val listViewGastos = findViewById<ListView>(R.id.listViewGastos)
         val dbHelper = DBHelper(this)
-        val gastos = dbHelper.gastosByUser(1) // Suponiendo que el usuario es el ID 1
+        val gastos = dbHelper.gastosByUser(UsuarioLogueado.usuarioId) // Suponiendo que el usuario es el ID 1
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, gastos.map { it.second })
         listViewGastos.adapter = adapter

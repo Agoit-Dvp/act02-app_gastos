@@ -2,6 +2,7 @@ package com.example.controlgastos
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
@@ -12,6 +13,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import java.util.Locale
 
 class IngresoActivity : AppCompatActivity() {
 
@@ -39,7 +41,10 @@ class IngresoActivity : AppCompatActivity() {
             intent.putExtra("ingreso_id", ingreso.id)
             intent.putExtra("ingreso_nombre", ingreso.nombre)
             intent.putExtra("ingreso_monto", ingreso.monto)
-            intent.putExtra("ingreso_fecha", ingreso.fecha)
+            // Formatear la fecha antes de pasarla al intent
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val fechaFormateada = sdf.format(ingreso.fecha)
+            intent.putExtra("ingreso_fecha", fechaFormateada)
             intent.putExtra("ingreso_desc", ingreso.descripcion)
             intent.putExtra("ingreso_categoria", ingreso.categoriaId)
             intent.putExtra("ingreso_usuario", ingreso.usuarioId)
@@ -101,6 +106,7 @@ class IngresoActivity : AppCompatActivity() {
     // Recargar el ListView al regresar a la actividad
     override fun onResume() {
         super.onResume()
+        initGUI()
         cargarIngresos()
     }
 

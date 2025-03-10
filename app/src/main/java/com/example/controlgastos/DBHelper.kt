@@ -5,12 +5,13 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.icu.text.SimpleDateFormat
 import android.util.Log
 import java.util.Date
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.ZoneId
-
+import java.util.Locale
 
 
 class DBHelper(context: Context) :
@@ -228,7 +229,7 @@ class DBHelper(context: Context) :
         descripcion: String,
         monto: Double,
         recurrente: Boolean,
-        fecha: String
+        fecha: String // Fecha debe estar en formato dd/MM/yyyy
     ): Long {
         val db = writableDatabase
         val valores = ContentValues().apply {
@@ -435,14 +436,7 @@ class DBHelper(context: Context) :
         )
 
         return if (cursor.moveToFirst()) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val fecha = try {
-                LocalDate.parse(cursor.getString(7), formatter)
-            } catch (e: Exception) {
-                LocalDate.now()
-            }
-            val date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant())
-
+            val fecha = cursor.getString(7)
             Ingreso(
                 id = cursor.getInt(0),
                 nombre = cursor.getString(1),
@@ -451,7 +445,7 @@ class DBHelper(context: Context) :
                 descripcion = cursor.getString(4),
                 monto = cursor.getDouble(5),
                 recurrente = cursor.getInt(cursor.getColumnIndexOrThrow("recurrente")) == 1,
-                fecha = date
+                fecha = parseFecha(fecha)
             )
         } else {
             null
@@ -465,14 +459,7 @@ class DBHelper(context: Context) :
 
         cursor.use {
             while (it.moveToNext()) {
-                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                val fecha = try {
-                    LocalDate.parse(it.getString(7), formatter)
-                } catch (e: Exception) {
-                    LocalDate.now()
-                }
-                val date = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant())
-
+                val fecha = it.getString(7)
                 val ingreso = Ingreso(
                     id = it.getInt(0),
                     nombre = it.getString(1),
@@ -481,12 +468,17 @@ class DBHelper(context: Context) :
                     descripcion = it.getString(4),
                     monto = it.getDouble(5),
                     recurrente = it.getInt(it.getColumnIndexOrThrow("recurrente")) == 1,
-                    fecha = date
+                    fecha = parseFecha(fecha) // Convertir fecha a Date
                 )
                 ingresos.add(ingreso)
             }
         }
         return ingresos
+    }
+
+    private fun parseFecha(fechaString: String): Date {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return sdf.parse(fechaString) ?: Date() // Retorna la fecha parseada o la fecha actual si no se puede parsear
     }
 
     // ------------------------- UPDATE: ACTUALIZAR DATOS ------------------------------

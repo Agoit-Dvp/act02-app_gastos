@@ -44,7 +44,7 @@ class UsuarioActivity : AppCompatActivity() {
 
             if (usuarioId != -1L) {
                 Toast.makeText(this, "Usuario registrado correctamente", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, Usuario::class.java)
+                val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 finish()
             } else {
