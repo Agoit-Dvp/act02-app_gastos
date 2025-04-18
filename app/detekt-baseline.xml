@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ComplexCondition:AddIngresoActivity.kt$AddIngresoActivity$nombre.isEmpty() || fecha.isEmpty() || monto &lt;= 0.0 || descripcion.isEmpty()</ID>
+    <ID>ComplexCondition:DetalleIngresoActivity.kt$DetalleIngresoActivity$nombreModificado.isNotEmpty() &amp;&amp; montoModificado &gt; 0.0 &amp;&amp; fechaModificada.isNotEmpty() &amp;&amp; descripcionModificada.isNotEmpty()</ID>
+    <ID>ComplexCondition:UsuarioActivity.kt$UsuarioActivity$nombre.isEmpty() || nuevoTelefono.isEmpty() || nuevoEmail.isEmpty() || nuevaPassword.isEmpty()</ID>
+    <ID>ComplexCondition:UsuarioActivity.kt$UsuarioActivity$nombre.isEmpty() || password.isEmpty() || email.isEmpty() || telefono.isEmpty()</ID>
+    <ID>FunctionParameterNaming:DBHelper.kt$DBHelper$categoria_id: Int</ID>
+    <ID>FunctionParameterNaming:DBHelper.kt$DBHelper$metodo_pago: String</ID>
+    <ID>FunctionParameterNaming:DBHelper.kt$DBHelper$usuario_id: Int</ID>
+    <ID>LongMethod:DBHelper.kt$DBHelper$override fun onCreate(db: SQLiteDatabase)</ID>
+    <ID>LongMethod:DetalleIngresoActivity.kt$DetalleIngresoActivity$override fun onCreate(savedInstanceState: Bundle?)</ID>
+    <ID>LongParameterList:DBHelper.kt$DBHelper$( id: Int, nombre: String, fecha: String, nota: String, monto: Double, estado: String, recurrente: Boolean, frequencia: String, usuario_id: Int, categoria: String, metodo_pago: String )</ID>
+    <ID>LongParameterList:DBHelper.kt$DBHelper$( id: Int, nombre: String, usuarioId: Int, categoriaId: Int, descripcion: String, monto: Double, recurrente: Boolean, fecha: String )</ID>
+    <ID>LongParameterList:DBHelper.kt$DBHelper$( nombre: String, fecha: String, nota: String, monto: Double, estado: String, recurrente: Boolean, frequencia: String, usuario_id: Int, categoria: String, metodo_pago: String )</ID>
+    <ID>LongParameterList:DBHelper.kt$DBHelper$( nombre: String, usuario_id: Int, categoria_id: Int, descripcion: String, monto: Double, recurrente: Boolean, fecha: String // Fecha debe estar en formato dd/MM/yyyy )</ID>
+    <ID>LongParameterList:Gasto.kt$Gasto$( var id: Int? = null, var nombre: String, var fecha: Date, var valor: Double, var moneda: String? = null, var categoriaId: String, var metodoPago: String, var estado: String, var notas: String? = null, var recurrente: Boolean = false, var frecuencia: String? = null, )</ID>
+    <ID>MagicNumber:DBHelper.kt$DBHelper$3</ID>
+    <ID>MagicNumber:DBHelper.kt$DBHelper$4</ID>
+    <ID>MagicNumber:DBHelper.kt$DBHelper$5</ID>
+    <ID>MagicNumber:DBHelper.kt$DBHelper$6</ID>
+    <ID>MagicNumber:DBHelper.kt$DBHelper$7</ID>
+    <ID>MagicNumber:DBHelper.kt$DBHelper$8</ID>
+    <ID>MagicNumber:PruebasActivity.kt$PruebasActivity$30.0</ID>
+    <ID>MaxLineLength:DBHelper.kt$DBHelper$"SELECT id, nombre, fecha, monto, estado, nota, categoria, usuario_id, metodo_pago FROM gastos WHERE id = ?"</ID>
+    <ID>MaxLineLength:DBHelper.kt$DBHelper$"SELECT id, nombre, password, email, telefono, fechaCreacion FROM usuarios WHERE email = ? AND password = ?"</ID>
+    <ID>MaxLineLength:DBHelper.kt$DBHelper$"SELECT id, nombre, usuario_id, categoria_id, descripcion, monto, recurrente, fecha FROM ingresos WHERE id = ?"</ID>
+    <ID>MaxLineLength:DBHelper.kt$DBHelper$fun</ID>
+    <ID>MaxLineLength:DBHelper.kt$DBHelper$val cursor = db.rawQuery("SELECT id, nombre, usuario_id, categoria_id, descripcion, monto, recurrente, fecha FROM ingresos", null)</ID>
+    <ID>MaxLineLength:DetalleGastoActivity.kt$DetalleGastoActivity$Intent(this, GastosMenuActivity::class.java)</ID>
+    <ID>MaxLineLength:DetalleGastoActivity.kt$DetalleGastoActivity$val gastosRestantes = dbHelper.gastosByUser(UsuarioLogueado.usuarioId) // Suponiendo usuario_id = 1</ID>
+    <ID>MaxLineLength:DetalleIngresoActivity.kt$DetalleIngresoActivity$if</ID>
+    <ID>MaxLineLength:ListaUsuariosActivity.kt$ListaUsuariosActivity$"${it.usuario}\n${it.email}\n${it.telefono}\n${SimpleDateFormat("dd/MM/yyyy").format(it.fechaCreacion)}"</ID>
+    <ID>NewLineAtEndOfFile:AddIngresoActivity.kt$com.example.controlgastos.AddIngresoActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:DBHelper.kt$com.example.controlgastos.DBHelper.kt</ID>
+    <ID>NewLineAtEndOfFile:DetalleIngresoActivity.kt$com.example.controlgastos.DetalleIngresoActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:ExampleUnitTest.kt$com.example.controlgastos.ExampleUnitTest.kt</ID>
+    <ID>NewLineAtEndOfFile:HomeActivity.kt$com.example.controlgastos.HomeActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:Ingreso.kt$com.example.controlgastos.Ingreso.kt</ID>
+    <ID>NewLineAtEndOfFile:IngresoActivity.kt$com.example.controlgastos.IngresoActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:ListaGastosActivity.kt$com.example.controlgastos.ListaGastosActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:ListaUsuariosActivity.kt$com.example.controlgastos.ListaUsuariosActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:LoginActivity.kt$com.example.controlgastos.LoginActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:PruebasActivity.kt$com.example.controlgastos.PruebasActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:Usuario.kt$com.example.controlgastos.Usuario.kt</ID>
+    <ID>NewLineAtEndOfFile:UsuarioLogueado.kt$com.example.controlgastos.UsuarioLogueado.kt</ID>
+    <ID>SwallowedException:DBHelper.kt$DBHelper$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DBHelper.kt$DBHelper$e: Exception</ID>
+    <ID>TooManyFunctions:DBHelper.kt$DBHelper : SQLiteOpenHelper</ID>
+    <ID>UnusedPrivateProperty:GastosActivity.kt$GastosActivity$val fecha: Date = dateFormat.parse(fechaString) ?: Date()</ID>
+    <ID>UnusedPrivateProperty:PruebasActivity.kt$PruebasActivity$val db = dbHelper.writableDatabase</ID>
+    <ID>WildcardImport:ExampleUnitTest.kt$import org.junit.Assert.*</ID>
+    <ID>WildcardImport:GastosActivity.kt$import android.widget.*</ID>
+  </CurrentIssues>
+</SmellBaseline>
