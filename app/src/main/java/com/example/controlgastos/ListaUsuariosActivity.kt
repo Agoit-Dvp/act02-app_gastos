@@ -25,7 +25,11 @@ class ListaUsuariosActivity : AppCompatActivity() {
             this,
             android.R.layout.simple_list_item_1,
             usuarios.map {
-                "${it.usuario}\n${it.email}\n${it.telefono}\n${SimpleDateFormat("dd/MM/yyyy").format(it.fechaCreacion)}"
+                "${it.usuario}\n${it.email}\n${it.telefono}\n${
+                    SimpleDateFormat("dd/MM/yyyy").format(
+                        it.fechaCreacion
+                    )
+                }"
             }
         )
         listViewUsuarios.adapter = adapter
@@ -45,17 +49,23 @@ class ListaUsuariosActivity : AppCompatActivity() {
                 val resultado = dbHelper.eliminarUsuario(usuario.id)
 
                 if (resultado > 0) {
-                    Toast.makeText(this, "Usuario eliminado correctamente", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Usuario eliminado correctamente", Toast.LENGTH_LONG)
+                        .show()
 
                     // Actualizar la lista de usuarios después de la eliminación
-                    val updatedUsuarios = dbHelper.getUsuarios()  // Obtener la lista actualizada de usuarios
+                    val updatedUsuarios =
+                        dbHelper.getUsuarios()  // Obtener la lista actualizada de usuarios
 
                     // Crear un nuevo adaptador con la lista actualizada
                     val updatedAdapter = ArrayAdapter(
                         this,
                         android.R.layout.simple_list_item_2,
                         updatedUsuarios.map {
-                            "${it.usuario}\n${it.email}\n${it.telefono}\n${SimpleDateFormat("dd/MM/yyyy").format(it.fechaCreacion)}"
+                            "${it.usuario}\n${it.email}\n${it.telefono}\n${
+                                SimpleDateFormat("dd/MM/yyyy").format(
+                                    it.fechaCreacion
+                                )
+                            }"
                         }
                     )
 

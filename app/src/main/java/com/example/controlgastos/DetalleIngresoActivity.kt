@@ -62,7 +62,13 @@ class DetalleIngresoActivity : AppCompatActivity() {
                 val recurrenteModificado = chkRecurrente.isChecked
 
                 // Verificar si los valores son válidos
-                if (nombreModificado.isNotEmpty() && montoModificado > 0.0 && fechaModificada.isNotEmpty() && descripcionModificada.isNotEmpty()) {
+                if (ValidadorFormIngreso.esFormularioValido(
+                        nombreModificado,
+                        fechaModificada,
+                        montoModificado,
+                        descripcionModificada
+                    )
+                ) {
                     // Aquí debes obtener el ID del ingreso desde el Intent
                     val ingresoId = intent.getIntExtra("ingreso_id", -1)
 
@@ -162,7 +168,8 @@ class DetalleIngresoActivity : AppCompatActivity() {
         val ingresoRecurrente = intent.getBooleanExtra("ingreso_recurrente", false)
 
         //Obtener el nombre de la categoria a traves del ID
-        val categoriaNombre = dbHelper.obtenerNombreCategoriaPorId("categoria_ingreso", ingresoCategoria)
+        val categoriaNombre =
+            dbHelper.obtenerNombreCategoriaPorId("categoria_ingreso", ingresoCategoria)
 
         // Asignar los valores a los EditText
         edtNombre.setText(ingresoNombre)

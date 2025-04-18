@@ -93,7 +93,7 @@ class AddIngresoActivity : AppCompatActivity() {
         val descripcion = edtDesc.text.toString()
         val recurrente = chkRecurrente.isChecked
 
-        if (nombre.isEmpty() || fecha.isEmpty() || monto <= 0.0 || descripcion.isEmpty()) {
+        if (!ValidadorFormIngreso.esFormularioValido(nombre, fecha, monto, descripcion)) {
             Toast.makeText(this, "Por favor, complete todos los campos.", Toast.LENGTH_SHORT).show()
             return
         }

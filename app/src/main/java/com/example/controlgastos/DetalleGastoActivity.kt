@@ -50,21 +50,30 @@ class DetalleGastoActivity : AppCompatActivity() {
                     .setPositiveButton("Sí") { _, _ ->
                         val resultado = dbHelper.eliminarGasto(gastoId)
                         if (resultado > 0) {
-                            Toast.makeText(this, "Gasto eliminado correctamente", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "Gasto eliminado correctamente", Toast.LENGTH_LONG)
+                                .show()
 
                             // Verificar si quedan más gastos
-                            val gastosRestantes = dbHelper.gastosByUser(UsuarioLogueado.usuarioId) // Suponiendo usuario_id = 1
+                            val gastosRestantes =
+                                dbHelper.gastosByUser(UsuarioLogueado.usuarioId) // Suponiendo usuario_id = 1
 
                             val intent = if (gastosRestantes.isEmpty()) {
-                                Intent(this, GastosMenuActivity::class.java) // Si no hay gastos, ir a GastosMenuActivity
+                                Intent(
+                                    this,
+                                    GastosMenuActivity::class.java
+                                ) // Si no hay gastos, ir a GastosMenuActivity
                             } else {
-                                Intent(this, ListaGastosActivity::class.java) // Si hay gastos, ir a ListaGastosActivity
+                                Intent(
+                                    this,
+                                    ListaGastosActivity::class.java
+                                ) // Si hay gastos, ir a ListaGastosActivity
                             }
 
                             startActivity(intent)
                             finish()
                         } else {
-                            Toast.makeText(this, "Error al eliminar el gasto", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "Error al eliminar el gasto", Toast.LENGTH_LONG)
+                                .show()
                         }
                     }
                     .setNegativeButton("No", null)
