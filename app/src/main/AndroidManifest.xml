@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ControlGastos">
         <activity
+            android:name=".ui.MainActivity"
+            android:exported="false"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.ControlGastos" />
+        <activity
             android:name=".HomeActivity"
             android:exported="false" />
         <activity
@@ -25,8 +30,7 @@
             android:exported="false" />
         <activity
             android:name=".PruebasActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".IngresoActivity"
             android:exported="false" />
