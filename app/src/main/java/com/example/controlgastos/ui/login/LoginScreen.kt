@@ -51,7 +51,22 @@ fun Login(modifier: Modifier) {
 
 @Composable
 fun PasswordField() {
-    TODO("Not yet implemented")
+    TextField(
+        value = "", onValueChange = {},
+        placeholder = { Text(text = "Password") },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        singleLine = true,
+        maxLines = 1,
+        colors = TextFieldDefaults.colors(
+            focusedTextColor = Color(0xFF0E0E0E),
+            unfocusedTextColor = Color(0xFF0E0E0E),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedContainerColor = Color(0xFF2F2E2E),
+            unfocusedContainerColor = Color(0xFF2F2E2E)
+        )
+    )
 }
 
 @Composable
