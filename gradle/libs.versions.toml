@@ -12,7 +12,10 @@ constraintlayout = "2.2.0" #Eliminar al finalizar migracion a compose
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2024.04.01"
+navigationCompose = "2.8.2"
+kotlinxSerialization = "1.6.3"
 liveData = "1.6.7" #Vincular ViewMode a Screen
+
 detekt = "1.23.5" #analizador de código (buenas praticas)
 
 [libraries]
@@ -25,7 +28,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-#Para composoable
+#Para composable
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -37,8 +40,11 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-navigation-compose = {module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose"} #Dependencias para navegacon compose
+kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization"} #Serialization para navegacion
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrainsKotlinSerialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"} #Plugin para serialization (datos entre ventanas)
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
