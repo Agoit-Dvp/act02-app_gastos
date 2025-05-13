@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.controlgastos.ui.MainActivity as ComposeMainActivity
 
 class PruebasActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +23,7 @@ class PruebasActivity : AppCompatActivity() {
         val btnIngresos = findViewById<Button>(R.id.btnIngresos)
         val btnLoginTest = findViewById<Button>(R.id.btnLoginTest)
         val btnMain = findViewById<Button>(R.id.btnMain)
+        val btnMain2 = findViewById<Button>(R.id.btnMain2)
         val txNombreU = findViewById<TextView>(R.id.textNombreU)
         val txCorreo = findViewById<TextView>(R.id.textCorreo)
 
@@ -59,6 +61,11 @@ class PruebasActivity : AppCompatActivity() {
 
         btnMain.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnMain2.setOnClickListener{//Para llamar el MainActivity de JetPack Compose mientras no este el proyecto completo migrado
+            val intent = Intent(this, ComposeMainActivity::class.java)
             startActivity(intent)
         }
 
