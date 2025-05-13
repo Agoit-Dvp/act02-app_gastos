@@ -32,7 +32,7 @@ class LoginViewModel : ViewModel() {
     private fun isValidPassword(password: String): Boolean =
         password.length > 6 //Prueba sencilla para probar componente
 
-    suspend fun onLoginSelected() { //Coroutine, debe tenr el suspend
+    suspend fun onLoginSelected() { //Coroutine, debe tener el suspend
         _isLoading.value = true
         delay(4000)
         _isLoading.value = false

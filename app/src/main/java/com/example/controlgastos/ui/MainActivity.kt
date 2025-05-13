@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.example.controlgastos.navigation.NavigationWrapper
 import com.example.controlgastos.ui.login.LoginScreen
 import com.example.controlgastos.ui.login.LoginViewModel
 import com.example.controlgastos.ui.theme.ControlGastosTheme
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
             ControlGastosTheme {
                 Surface (modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background){
-                    LoginScreen(LoginViewModel())
+                    NavigationWrapper()
                 }
 
             }

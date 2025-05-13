@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,7 +22,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,12 +33,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.controlgastos.R
+import com.example.controlgastos.navigation.Home
 import com.example.controlgastos.ui.theme.ControlGastosTheme
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) { //Para poder acceder a los estados de LoginViewModel
+fun LoginScreen(viewModel: LoginViewModel, navigateToHome: () -> Unit) { //Para poder acceder a los estados de LoginViewModel
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Login(Modifier.align(Alignment.Center), viewModel) // Pasar los estados a todos los composes
+
+    }
+
+}
+// Solo para probar la pantalla, eliminar después
+@Composable
+fun LoginScreen2(viewModel: LoginViewModel) { //Para poder acceder a los estados de LoginViewModel
     Box(
         Modifier
             .fillMaxSize()
@@ -132,9 +147,9 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
 @Composable
 fun HeaderImage(modifier: Modifier) {
     Image(
-        painter = painterResource(id = R.drawable.ic_login_48),
+        painter = painterResource(id = R.drawable.login_logo),
         contentDescription = "Imagen de inicio de sesión", // ¡Un ContentDescription descriptivo es importante para la accesibilidad!
-        modifier = modifier
+        modifier = modifier.size(200.dp)
     )
 }
 
@@ -164,7 +179,7 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
 @Composable
 fun LoginPreview() {
     ControlGastosTheme {
-        LoginScreen(LoginViewModel())
+        LoginScreen2(LoginViewModel())
     }
 }
 
