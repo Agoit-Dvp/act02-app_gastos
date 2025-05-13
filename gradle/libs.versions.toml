@@ -45,8 +45,10 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-navigation-compose = {module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose"} #Dependencias para navegacon compose
 kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization"} #Serialization para navegacion
 #Firebase
-firebase-bom = {module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom"}
+firebase-bom = {module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom"} #Conjunto de librerias necesarias para firebase
 firebase-crashlytics = {module = "com.google.firebase:firebase-crashlytics"}
+firebase-auth = {module = "com.google.firebase:firebase-auth-ktx" }
+firebase-firestore = {module= "com.google.firebase:firebase-firestore"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
