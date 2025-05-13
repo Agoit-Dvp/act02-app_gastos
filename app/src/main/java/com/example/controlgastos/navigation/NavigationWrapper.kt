@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.controlgastos.ui.login.LoginScreen
 import androidx.navigation.compose.composable
+import com.example.controlgastos.ui.home.HomeScreen
 import com.example.controlgastos.ui.login.LoginViewModel
 
 
@@ -19,6 +20,10 @@ fun NavigationWrapper(){
                 viewModel { LoginViewModel() },
                 navigateToHome = { navController.navigate(Home) }
             )    //Pasamos el objeto Home de Screens.kt
+        }
+
+        composable<Home> {
+            HomeScreen()
         }
 
 

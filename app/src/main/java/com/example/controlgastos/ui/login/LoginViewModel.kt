@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.delay
 
+
 class LoginViewModel : ViewModel() {
 
     private val _email = MutableLiveData<String>() //Estado privado
@@ -19,6 +20,9 @@ class LoginViewModel : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _loginSuccess = MutableLiveData<Boolean>()
+    val loginSuccess: LiveData<Boolean> = _loginSuccess
 
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
@@ -36,6 +40,7 @@ class LoginViewModel : ViewModel() {
         _isLoading.value = true
         delay(4000)
         _isLoading.value = false
+        _loginSuccess.value = true
     }
 
 }

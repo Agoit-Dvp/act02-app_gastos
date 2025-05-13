@@ -40,6 +40,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, navigateToHome: () -> Unit) { //Para poder acceder a los estados de LoginViewModel
+    val loginSuccess: Boolean by viewModel.loginSuccess.observeAsState(initial = false)
+    if (loginSuccess) {
+        navigateToHome()
+    }
     Box(
         Modifier
             .fillMaxSize()
