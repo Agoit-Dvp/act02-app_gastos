@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.jetbrainsKotlinSerialization)
     alias(libs.plugins.googleServices)
+    alias(libs.plugins.crashlytics)
 }
 
 android {

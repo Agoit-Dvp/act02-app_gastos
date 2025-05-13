@@ -17,6 +17,7 @@ kotlinxSerialization = "1.6.3"
 liveData = "1.6.7" #Vincular ViewMode a Screen
 firebaseBom = "33.1.1" #Conjunto de librerías necesarias para firebase
 services = "4.4.2" #Para servicios de google
+crashlytics = "3.0.2" #Para registrar crashs de la app en el dashboard de firebase
 detekt = "1.23.5" #analizador de código (buenas praticas)
 
 [libraries]
@@ -52,4 +53,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrainsKotlinSerialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"} #Plugin para serialization (datos entre ventanas)
 googleServices = {id = "com.google.gms.google-services", version.ref = "services"}
+crashlytics = {id = "com.google.firebase.crashlytics", version.ref = "crashlytics"}
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

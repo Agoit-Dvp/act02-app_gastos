@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         if (dbHelper.hayUsuarios()) {
             // Si hay usuarios, abrir LoginActivity
             val intent = Intent(this, LoginActivity::class.java)
+
             startActivity(intent)
         } else {
             // Si no hay usuarios, abrir UsuarioActivity para crear uno
