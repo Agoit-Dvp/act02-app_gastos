@@ -26,4 +26,15 @@ class UsuarioRepository {
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { e -> onResult(false, e.message) }
     }
+
+    fun obtenerTodosLosUsuarios(onResult: (List<Usuario>?, String?) -> Unit) {
+        usuariosCollection.get()
+            .addOnSuccessListener { result ->
+                val usuarios = result.toObjects(Usuario::class.java)
+                onResult(usuarios, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(null, e.message)
+            }
+    }
 }

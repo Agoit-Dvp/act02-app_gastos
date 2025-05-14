@@ -38,6 +38,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(),
                onNavigateToIngresos: () -> Unit = {},
                onNavigateToGastos: () -> Unit = {},
                onNavigateToUsuarios: () -> Unit = {},
+               onNavigateToPerfil: () -> Unit = {},
                onLogout: () -> Unit = {}
 ) {
     val usuario by viewModel.usuario.observeAsState()
@@ -66,6 +67,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(),
                             .padding(end = 16.dp)
                             .size(40.dp)
                             .clip(CircleShape)
+                            .clickable{onNavigateToPerfil()}
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

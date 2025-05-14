@@ -20,6 +20,9 @@ object Gastos
 @Serializable
 object Usuarios
 
+@Serializable
+object Perfil
+
 
 //Pasar parametros, debemos usar dataclass
 @Serializable
