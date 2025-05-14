@@ -40,7 +40,7 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
         Patterns.EMAIL_ADDRESS.matcher(email).matches() //Confirmar si es un email valido
 
     private fun isValidPassword(password: String): Boolean =
-        password.length > 6 //Prueba sencilla para probar componente
+        password.length > 5 //Prueba sencilla para probar componente
 
     fun onLoginSelected() {
         val email = _email.value ?: return
