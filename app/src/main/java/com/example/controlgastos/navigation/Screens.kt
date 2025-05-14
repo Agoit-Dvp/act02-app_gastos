@@ -25,5 +25,5 @@ object Perfil
 
 
 //Pasar parametros, debemos usar dataclass
-@Serializable
-data class Detail(val name: String)
+//@Serializable
+//data class Detail(val name: String)

@@ -1,6 +1,5 @@
 package com.example.controlgastos.ui.usuario
 
-import android.R.attr.thickness
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items

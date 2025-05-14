@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import com.example.controlgastos.ui.gasto.GastosScreen
 import com.example.controlgastos.ui.home.HomeScreen
 import com.example.controlgastos.ui.ingreso.IngresosScreen
-import com.example.controlgastos.ui.login.LoginViewModel
 import com.example.controlgastos.ui.usuario.ListaUsuariosScreen
 import com.example.controlgastos.ui.usuario.UsuarioScreen
 import com.google.firebase.auth.FirebaseAuth
