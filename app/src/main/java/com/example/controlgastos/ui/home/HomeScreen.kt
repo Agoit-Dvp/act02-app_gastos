@@ -20,6 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -27,19 +30,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.controlgastos.ui.login.LoginViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: LoginViewModel = viewModel(),
+fun HomeScreen(viewModel: HomeViewModel = viewModel(),
                onNavigateToIngresos: () -> Unit = {},
                onNavigateToGastos: () -> Unit = {},
                onNavigateToUsuarios: () -> Unit = {},
                onLogout: () -> Unit = {}
 ) {
-    val userEmail = viewModel.email.value ?: "Usuario"
+    val usuario by viewModel.usuario.observeAsState()
     val context = LocalContext.current
+    // Cargar los datos del usuario al entrar
+    LaunchedEffect(Unit) {
+        viewModel.cargarUsuario()
+    }
 
     Scaffold(
         topBar = {
@@ -78,18 +84,18 @@ fun HomeScreen(viewModel: LoginViewModel = viewModel(),
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Bienvenido, $userEmail",
+                    text = "Bienvenido, ${usuario?.nombre ?: "Usuario"}",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Aquí puedes añadir más botones, tarjetas, gráficos, etc.
+                // Composables después del mensaje de bienvenida
                 DashboardGrid(
                     onIngresosClick = { onNavigateToIngresos() },
                     onGastosClick = { onNavigateToGastos() },
                     onUsuariosClick = { onNavigateToUsuarios() },
                     onLogoutClick = {
-                        viewModel.logout()
+                        viewModel.cerrarSesion()
                         Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
                         onLogout()
                     }
@@ -165,8 +171,4 @@ fun DashboardItem(
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = title, style = MaterialTheme.typography.bodyMedium)
     }
-}
-
-private fun LoginViewModel.logout() {
-    TODO("Not yet implemented")
 }
