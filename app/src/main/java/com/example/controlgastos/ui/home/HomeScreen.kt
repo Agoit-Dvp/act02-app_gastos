@@ -35,6 +35,7 @@ import com.example.controlgastos.ui.login.LoginViewModel
 fun HomeScreen(viewModel: LoginViewModel = viewModel(),
                onNavigateToIngresos: () -> Unit = {},
                onNavigateToGastos: () -> Unit = {},
+               onNavigateToUsuarios: () -> Unit = {},
                onLogout: () -> Unit = {}
 ) {
     val userEmail = viewModel.email.value ?: "Usuario"
@@ -86,7 +87,7 @@ fun HomeScreen(viewModel: LoginViewModel = viewModel(),
                 DashboardGrid(
                     onIngresosClick = { onNavigateToIngresos() },
                     onGastosClick = { onNavigateToGastos() },
-                    onUsuariosClick = { /* Navega a Usuarios */ },
+                    onUsuariosClick = { onNavigateToUsuarios() },
                     onLogoutClick = {
                         viewModel.logout()
                         Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()

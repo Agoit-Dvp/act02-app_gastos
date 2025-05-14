@@ -17,6 +17,9 @@ object Ingresos
 @Serializable
 object Gastos
 
+@Serializable
+object Usuarios
+
 
 //Pasar parametros, debemos usar dataclass
 @Serializable
