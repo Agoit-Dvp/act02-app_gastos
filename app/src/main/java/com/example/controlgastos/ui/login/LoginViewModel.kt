@@ -4,10 +4,13 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.controlgastos.data.AuthRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(private val authRepository: AuthRepository = AuthRepository()) : ViewModel() {
 
     private val _email = MutableLiveData<String>() //Estado privado
     val email: LiveData<String> = _email // Modificar el estado privado solo desde el loginViewModel
@@ -24,6 +27,9 @@ class LoginViewModel : ViewModel() {
     private val _loginSuccess = MutableLiveData<Boolean>()
     val loginSuccess: LiveData<Boolean> = _loginSuccess
 
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
+
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
         _password.value = password
@@ -36,11 +42,23 @@ class LoginViewModel : ViewModel() {
     private fun isValidPassword(password: String): Boolean =
         password.length > 6 //Prueba sencilla para probar componente
 
-    suspend fun onLoginSelected() { //Coroutine, debe tener el suspend
-        _isLoading.value = true
-        delay(4000)
-        _isLoading.value = false
-        _loginSuccess.value = true
+    fun onLoginSelected() {
+        val email = _email.value ?: return
+        val password = _password.value ?: return
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            authRepository.loginUser(email, password) { success, error ->
+                _isLoading.value = false
+                if (success) {
+                    _loginSuccess.value = true
+                    _errorMessage.value = null
+                } else {
+                    _loginSuccess.value = false
+                    _errorMessage.value = error
+                }
+            }
+        }
     }
 
 }

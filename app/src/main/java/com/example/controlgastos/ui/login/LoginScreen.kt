@@ -1,6 +1,7 @@
 package com.example.controlgastos.ui.login
 
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,16 +17,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,15 +39,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.controlgastos.R
 import com.example.controlgastos.navigation.Home
+import com.example.controlgastos.ui.theme.AppColors
 import com.example.controlgastos.ui.theme.ControlGastosTheme
 import kotlinx.coroutines.launch
 
-
+//Componente de la pantalla configuracion general
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, navigateToHome: () -> Unit) { //Para poder acceder a los estados de LoginViewModel
     val loginSuccess: Boolean by viewModel.loginSuccess.observeAsState(initial = false)
-    if (loginSuccess) {
+    val errorMessage: String? by viewModel.errorMessage.observeAsState()
+
+    if (loginSuccess && errorMessage == null) {
         navigateToHome()
+    }else{
+        val context = LocalContext.current //Saber el contexto actual de la UI para pasarlo a Toast
+
+        LaunchedEffect(errorMessage) { //Usamos LaunchedEffect mostrar el mensaje de error solo cuando haya cambios en errorMessage
+            errorMessage?.let {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            }
+        }
     }
     Box(
         Modifier
@@ -68,6 +84,7 @@ fun LoginScreen2(viewModel: LoginViewModel) { //Para poder acceder a los estados
 
 }
 
+//Componente que llamara a los demás componentes y les posiciona en la pantalla
 @Composable
 fun Login(modifier: Modifier, viewModel: LoginViewModel) {
 
@@ -100,6 +117,7 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel) {
 
 }
 
+//Componente boton de login
 @Composable
 fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
     Button(
@@ -107,16 +125,17 @@ fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
             .fillMaxWidth()
             .height(48.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF1329EC),
-            disabledContainerColor = Color(0xFF374BF5),
+            containerColor = AppColors.primary,
+            disabledContainerColor = AppColors.primary.copy(alpha = 0.5f),
             contentColor = Color.White,
-            disabledContentColor = Color.Black
+            disabledContentColor = Color.White.copy(alpha = 0.5f)
         ), enabled = loginEnable
     ) {
-        Text("LOGIN")
+        Text("LOGIN", color = MaterialTheme.colorScheme.onPrimary)
     }
 }
 
+//Componente ForgotPassword
 @Composable
 fun ForgotPassword(modifier: Modifier) {
     Text(
@@ -128,6 +147,7 @@ fun ForgotPassword(modifier: Modifier) {
     )
 }
 
+//Componente Password
 @Composable
 fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
     TextField(
@@ -138,16 +158,17 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
         singleLine = true,
         maxLines = 1,
         colors = TextFieldDefaults.colors(
-            focusedTextColor = Color(0xFF0E0E0E),
-            unfocusedTextColor = Color(0xFF0E0E0E),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = Color(0xFF2F2E2E),
-            unfocusedContainerColor = Color(0xFF2F2E2E)
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.DarkGray,
+            focusedIndicatorColor = AppColors.primary,
+            unfocusedIndicatorColor = AppColors.secondary,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color(0xFFF5F5F5)
         )
     )
 }
 
+//Componente Logo
 @Composable
 fun HeaderImage(modifier: Modifier) {
     Image(
@@ -157,6 +178,7 @@ fun HeaderImage(modifier: Modifier) {
     )
 }
 
+//Componente email
 @Composable
 fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
 
@@ -169,12 +191,12 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
         singleLine = true,
         maxLines = 1,
         colors = TextFieldDefaults.colors(
-            focusedTextColor = Color(0xFF0E0E0E),
-            unfocusedTextColor = Color(0xFF0E0E0E),
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = Color(0xFF2F2E2E),
-            unfocusedContainerColor = Color(0xFF2F2E2E)
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.DarkGray,
+            focusedIndicatorColor = AppColors.primary,
+            unfocusedIndicatorColor = AppColors.secondary,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color(0xFFF5F5F5)
         )
     )
 }

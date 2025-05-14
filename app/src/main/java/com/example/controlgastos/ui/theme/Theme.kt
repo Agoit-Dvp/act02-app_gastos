@@ -11,15 +11,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Green80,
+    secondary = GreyBlue80,
+    tertiary = Orange80
+//    primary = Purple80,
+//    secondary = PurpleGrey80,
+//    tertiary = Pink80
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Green40,
+    secondary = GreyBlue40,
+    tertiary = Orange40
+//    primary = Purple40,
+//    secondary = PurpleGrey40,
+//    tertiary = Pink40
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -36,7 +42,7 @@ private val LightColorScheme = lightColorScheme(
 fun ControlGastosTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, //Lo ponemos en false para que pille los colores personalizados
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

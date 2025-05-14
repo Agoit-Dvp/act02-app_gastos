@@ -18,7 +18,7 @@ fun NavigationWrapper(){
             //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
             LoginScreen(
                 viewModel { LoginViewModel() },
-                navigateToHome = { navController.navigate(Home) }
+                navigateToHome = { navController.navigate(Home){} }
             )    //Pasamos el objeto Home de Screens.kt
         }
 
