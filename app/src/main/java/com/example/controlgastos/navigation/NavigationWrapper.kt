@@ -11,12 +11,13 @@ import com.example.controlgastos.ui.home.HomeScreen
 import com.example.controlgastos.ui.ingreso.IngresosScreen
 import com.example.controlgastos.ui.login.LoginViewModel
 import com.example.controlgastos.ui.usuario.UsuarioScreen
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun NavigationWrapper(){
     val navController = rememberNavController() //Se encarga de controlar el flujo de navegacion entre todas la pantallas
-    NavHost(navController = navController, startDestination = Login){
+    NavHost(navController = navController, startDestination = if (FirebaseAuth.getInstance().currentUser != null) Home else Login){
         composable<Login>{
             //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
             LoginScreen(
