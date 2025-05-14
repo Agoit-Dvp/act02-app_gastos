@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.controlgastos.ui.gasto.GastosScreen
 import com.example.controlgastos.ui.home.HomeScreen
 import com.example.controlgastos.ui.ingreso.IngresosScreen
-import com.example.controlgastos.ui.login.LoginViewModel
+import com.example.controlgastos.ui.usuario.ListaUsuariosScreen
 import com.example.controlgastos.ui.usuario.UsuarioScreen
 import com.google.firebase.auth.FirebaseAuth
 
@@ -33,6 +33,7 @@ fun NavigationWrapper(){
                 onNavigateToIngresos = { navController.navigate(Ingresos) },
                 onNavigateToGastos = { navController.navigate(Gastos) },
                 onNavigateToUsuarios = { navController.navigate(Usuarios) },
+                onNavigateToPerfil = {navController.navigate(Perfil)},
                 onLogout = {
                     navController.navigate(Login) {
                         popUpTo(Home) { inclusive = true }
@@ -50,6 +51,10 @@ fun NavigationWrapper(){
         }
 
         composable<Usuarios> {
+            ListaUsuariosScreen()
+        }
+
+        composable<Perfil> {
             UsuarioScreen()
         }
 
