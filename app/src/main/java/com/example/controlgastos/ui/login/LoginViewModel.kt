@@ -5,8 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.controlgastos.data.AuthRepository
-import kotlinx.coroutines.delay
+import com.example.controlgastos.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
 

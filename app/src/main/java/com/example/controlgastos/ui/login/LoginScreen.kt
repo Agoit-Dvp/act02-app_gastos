@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,25 +36,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.controlgastos.R
-import com.example.controlgastos.navigation.Home
 import com.example.controlgastos.ui.theme.AppColors
 import com.example.controlgastos.ui.theme.ControlGastosTheme
 import kotlinx.coroutines.launch
 
 //Componente de la pantalla configuracion general
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, navigateToHome: () -> Unit) { //Para poder acceder a los estados de LoginViewModel
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    navigateToHome: () -> Unit
+) { //Para poder acceder a los estados de LoginViewModel
     val loginSuccess: Boolean by viewModel.loginSuccess.observeAsState(initial = false)
     val errorMessage: String? by viewModel.errorMessage.observeAsState()
+    val context = LocalContext.current //Saber el contexto actual de la UI para pasarlo a Toast
 
-    if (loginSuccess && errorMessage == null) {
-        navigateToHome()
-    }else{
-        val context = LocalContext.current //Saber el contexto actual de la UI para pasarlo a Toast
+    LaunchedEffect(loginSuccess, errorMessage) {
+        when {
+            loginSuccess == true && errorMessage == null -> {
+                navigateToHome()
+            }
 
-        LaunchedEffect(errorMessage) { //Usamos LaunchedEffect mostrar el mensaje de error solo cuando haya cambios en errorMessage
-            errorMessage?.let {
-                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            errorMessage != null -> {
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                // Opcional: limpiar el mensaje para no mostrarlo varias veces
+                //viewModel.clearError()
             }
         }
     }
@@ -70,6 +73,7 @@ fun LoginScreen(viewModel: LoginViewModel, navigateToHome: () -> Unit) { //Para 
     }
 
 }
+
 // Solo para probar la pantalla, eliminar después
 @Composable
 fun LoginScreen2(viewModel: LoginViewModel) { //Para poder acceder a los estados de LoginViewModel
@@ -172,7 +176,7 @@ fun PasswordField(password: String, onTextFieldChanged: (String) -> Unit) {
 @Composable
 fun HeaderImage(modifier: Modifier) {
     Image(
-        painter = painterResource(id = R.drawable.login_logo),
+        painter = painterResource(id = R.drawable.login_logo_plansave),
         contentDescription = "Imagen de inicio de sesión", // ¡Un ContentDescription descriptivo es importante para la accesibilidad!
         modifier = modifier.size(200.dp)
     )

@@ -6,7 +6,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.controlgastos.ui.login.LoginScreen
 import androidx.navigation.compose.composable
+import com.example.controlgastos.ui.gasto.GastosScreen
 import com.example.controlgastos.ui.home.HomeScreen
+import com.example.controlgastos.ui.ingreso.IngresosScreen
 import com.example.controlgastos.ui.login.LoginViewModel
 
 
@@ -17,13 +19,31 @@ fun NavigationWrapper(){
         composable<Login>{
             //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
             LoginScreen(
-                viewModel { LoginViewModel() },
-                navigateToHome = { navController.navigate(Home){} }
+                viewModel = viewModel (),
+                navigateToHome = { navController.navigate(Home){
+                    popUpTo(Login) { inclusive = true }
+                } }
             )    //Pasamos el objeto Home de Screens.kt
         }
 
         composable<Home> {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToIngresos = { navController.navigate(Ingresos) },
+                onNavigateToGastos = { navController.navigate(Gastos) },
+                onLogout = {
+                    navController.navigate(Login) {
+                        popUpTo(Home) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable<Gastos> {
+           GastosScreen()
+        }
+
+        composable<Ingresos> {
+            IngresosScreen()
         }
 
 

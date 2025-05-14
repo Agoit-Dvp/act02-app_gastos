@@ -1,4 +1,4 @@
-package com.example.controlgastos.data
+package com.example.controlgastos.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 

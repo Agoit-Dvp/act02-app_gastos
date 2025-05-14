@@ -11,6 +11,13 @@ object Login
 @Serializable
 object Home
 
+@Serializable
+object Ingresos
+
+@Serializable
+object Gastos
+
+
 //Pasar parametros, debemos usar dataclass
 @Serializable
 data class Detail(val name: String)
