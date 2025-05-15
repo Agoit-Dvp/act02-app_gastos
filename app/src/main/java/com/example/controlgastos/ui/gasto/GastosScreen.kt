@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import com.example.controlgastos.ui.gasto.components.AddGastoSheet
+import com.example.controlgastos.ui.gasto.components.EditGastoSheet
 import com.example.controlgastos.ui.gasto.components.GastosContent
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -28,6 +29,7 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
 
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
+    var gastoSeleccionado by remember { mutableStateOf<Gasto?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.cargarGastosUsuario()
@@ -55,6 +57,7 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
         GastosContent(
             gastos = gastos,
             error = error,
+            onGastoClick = { gastoSeleccionado = it },
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
@@ -69,6 +72,27 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
             AddGastoSheet(
                 onGastoGuardado = {
                     showSheet = false
+                    viewModel.cargarGastosUsuario()
+                }
+            )
+        }
+    }
+
+    //Editar desd la misma pantalla con Modal:
+    if (gastoSeleccionado != null) {
+        ModalBottomSheet(
+            onDismissRequest = { gastoSeleccionado = null },
+            sheetState = sheetState
+        ) {
+            EditGastoSheet(
+                gasto = gastoSeleccionado!!,
+                onDismiss = { gastoSeleccionado = null },
+                onGastoActualizado = {
+                    gastoSeleccionado = null
+                    viewModel.cargarGastosUsuario()
+                },
+                onGastoEliminado = {
+                    gastoSeleccionado = null
                     viewModel.cargarGastosUsuario()
                 }
             )

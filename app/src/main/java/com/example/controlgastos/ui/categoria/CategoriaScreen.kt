@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.controlgastos.R
 import com.example.controlgastos.data.model.Categoria
 import com.example.controlgastos.ui.categoria.components.AddCategoriaSheet
+import com.example.controlgastos.ui.categoria.components.EditCategoriaSheet
 import com.example.controlgastos.ui.categoria.components.getPainterByName
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -28,7 +29,9 @@ fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
     val categorias by viewModel.categorias.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
 
+
     var showAddSheet by remember { mutableStateOf(false) }
+    var categoriaSeleccionada by remember { mutableStateOf<Categoria?>(null) } //Controlar categoria seleccionada
     val sheetState = rememberModalBottomSheetState()
 
     // Cargar categorías al cambiar de tipo
@@ -79,7 +82,10 @@ fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(categorias) { categoria ->
-                        CategoriaItem(categoria = categoria)
+                        CategoriaItem(
+                            categoria = categoria,
+                            onEditar = { categoriaSeleccionada = it }
+                        )
                     }
 
                     // Botón "+"
@@ -93,6 +99,7 @@ fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
         }
     }
 
+// Add Sheet
     if (showAddSheet) {
         ModalBottomSheet(
             onDismissRequest = { showAddSheet = false },
@@ -107,22 +114,41 @@ fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
             )
         }
     }
+
+    // Edit Sheet
+    if (categoriaSeleccionada != null) {
+        ModalBottomSheet(
+            onDismissRequest = { categoriaSeleccionada = null },
+            sheetState = sheetState
+        ) {
+            EditCategoriaSheet(
+                categoria = categoriaSeleccionada!!,
+                onCategoriaActualizada = {
+                    categoriaSeleccionada = null
+                    viewModel.cargarCategorias(esIngreso)
+                },
+                onCategoriaEliminada = {
+                    categoriaSeleccionada = null
+                    viewModel.cargarCategorias(esIngreso)
+                }
+            )
+        }
+    }
 }
 
 @Composable
-fun CategoriaItem(categoria: Categoria) {
+fun CategoriaItem(categoria: Categoria, onEditar: (Categoria) -> Unit) {
     Surface(
         modifier = Modifier
             .aspectRatio(1f)
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium),
+            .clip(MaterialTheme.shapes.medium)
+            .clickable { onEditar(categoria) },
         tonalElevation = 1.dp,
         shadowElevation = 2.dp
     ) {
         Column(
-            modifier = Modifier
-                .clickable { /* puedes implementar editar */ }
-                .padding(8.dp),
+            modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

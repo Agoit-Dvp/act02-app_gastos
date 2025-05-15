@@ -30,22 +30,33 @@ class CategoriaRepository {
             .addOnFailureListener { e -> onResult(null, e.message) }
     }
 
-    fun eliminarCategoria(id: String, onResult: (Boolean, String?) -> Unit) {
+    fun obtenerCategoriaPorId(id: String, onResult: (Categoria?, String?) -> Unit) {
         categoriaCollection.document(id)
-            .delete()
-            .addOnSuccessListener { onResult(true, null) }
-            .addOnFailureListener { e -> onResult(false, e.message) }
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val categoria = document.toObject(Categoria::class.java)
+                    onResult(categoria, null)
+                } else {
+                    onResult(null, "Categoría no encontrada")
+                }
+            }
+            .addOnFailureListener { e ->
+                onResult(null, e.message)
+            }
     }
 
     fun actualizarCategoria(categoria: Categoria, onResult: (Boolean, String?) -> Unit) {
-        if (categoria.id.isBlank()) {
-            onResult(false, "ID de categoría vacío")
-            return
-        }
-
-        categoriaCollection.document(categoria.id)
+        firestore.collection("categorias").document(categoria.id)
             .set(categoria)
             .addOnSuccessListener { onResult(true, null) }
-            .addOnFailureListener { e -> onResult(false, e.message) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    fun eliminarCategoria(id: String, onResult: (Boolean, String?) -> Unit) {
+        firestore.collection("categorias").document(id)
+            .delete()
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
     }
 }

@@ -14,6 +14,7 @@ import com.example.controlgastos.data.model.Ingreso
 fun IngresosContent(
     ingresos: List<Ingreso>,
     error: String?,
+    onIngresoClick: (Ingreso) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -32,7 +33,7 @@ fun IngresosContent(
         } else {
             LazyColumn {
                 items(ingresos) { ingreso ->
-                    IngresoItem(ingreso)
+                    IngresoItem(ingreso = ingreso, onClick = { onIngresoClick(ingreso)  })
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 4.dp),
                         thickness = 1.dp,

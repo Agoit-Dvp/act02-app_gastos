@@ -1,5 +1,6 @@
 package com.example.controlgastos.ui.ingreso.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,11 +11,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun IngresoItem(ingreso: Ingreso) {
+fun IngresoItem(ingreso: Ingreso,  onClick: () -> Unit) {
     val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val fecha = formatter.format(ingreso.fecha)
 
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clickable { onClick() }
+        .padding(vertical = 8.dp)) {
         Text("Nombre: ${ingreso.nombre}")
         Text("Valor: $${ingreso.valor}")
         Text("Descripción: ${ingreso.descripcion}")

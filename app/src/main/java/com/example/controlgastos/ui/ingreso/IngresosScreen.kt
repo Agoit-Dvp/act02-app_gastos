@@ -18,6 +18,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import com.example.controlgastos.ui.ingreso.components.AddIngresoSheet
+import com.example.controlgastos.ui.ingreso.components.EditIngresoSheet
 import com.example.controlgastos.ui.ingreso.components.IngresosContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,8 +26,11 @@ import com.example.controlgastos.ui.ingreso.components.IngresosContent
 fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
     val ingresos by viewModel.ingresos.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
-    val sheetState = rememberModalBottomSheetState()
+
     var showSheet by remember { mutableStateOf(false) }
+
+    var ingresoSeleccionado by remember { mutableStateOf<Ingreso?>(null) }
+    val sheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(Unit) {
         viewModel.cargarIngresosUsuario()
@@ -55,7 +59,8 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
             error = error,
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(16.dp),
+            onIngresoClick = { ingresoSeleccionado = it }
         )
     }
 
@@ -67,6 +72,26 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
             AddIngresoSheet(
                 onIngresoGuardado = {
                     showSheet = false
+                    viewModel.cargarIngresosUsuario()
+                }
+            )
+        }
+    }
+    //Editar y modificar en IngresoScreen
+    if (ingresoSeleccionado != null) {
+        ModalBottomSheet(
+            onDismissRequest = { ingresoSeleccionado = null },
+            sheetState = sheetState
+        ) {
+            EditIngresoSheet(
+                ingreso = ingresoSeleccionado!!,
+                onDismiss = { ingresoSeleccionado = null },
+                onIngresoActualizado = {
+                    ingresoSeleccionado = null
+                    viewModel.cargarIngresosUsuario()
+                },
+                onIngresoEliminado = {
+                    ingresoSeleccionado = null
                     viewModel.cargarIngresosUsuario()
                 }
             )

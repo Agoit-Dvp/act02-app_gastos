@@ -14,6 +14,7 @@ import com.example.controlgastos.data.model.Gasto
 fun GastosContent(
     gastos: List<Gasto>,
     error: String?,
+    onGastoClick: (Gasto) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -32,7 +33,7 @@ fun GastosContent(
         } else {
             LazyColumn {
                 items(gastos) { gasto ->
-                    GastoItem(gasto)
+                    GastoItem(gasto = gasto, onClick = { onGastoClick(gasto) })
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 4.dp),
                         thickness = 1.dp,
