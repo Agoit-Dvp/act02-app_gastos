@@ -28,4 +28,32 @@ class GastoRepository {
                 onResult(null, it.message)
             }
     }
+
+    fun getGastoById(gastoId: String, onResult: (Gasto?, String?) -> Unit) {
+        gastosCollection.document(gastoId)
+            .get()
+            .addOnSuccessListener { doc ->
+                val gasto = doc.toObject(Gasto::class.java)
+                onResult(gasto, null)
+            }
+            .addOnFailureListener { e -> onResult(null, e.message) }
+    }
+
+    fun deleteGasto(gastoId: String, onResult: (Boolean, String?) -> Unit) {
+        gastosCollection.document(gastoId)
+            .delete()
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { e -> onResult(false, e.message) }
+    }
+
+    fun updateGasto(gasto: Gasto, onResult: (Boolean, String?) -> Unit) {
+        if (gasto.id.isBlank()) {
+            onResult(false, "ID del gasto vacío")
+            return
+        }
+
+        gastosCollection.document(gasto.id).set(gasto)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { e -> onResult(false, e.message) }
+    }
 }

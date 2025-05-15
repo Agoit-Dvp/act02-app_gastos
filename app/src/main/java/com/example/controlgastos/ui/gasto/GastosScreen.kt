@@ -13,6 +13,9 @@ import com.example.controlgastos.data.model.Gasto
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import com.example.controlgastos.ui.gasto.components.GastosContent
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,7 +23,6 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
     val gastos by viewModel.gastos.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
 
-    // Cargar gastos al entrar a la pantalla
     LaunchedEffect(Unit) {
         viewModel.cargarGastosUsuario()
     }
@@ -35,41 +37,13 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
             )
         }
     ) { padding ->
-        Column(
+        GastosContent(
+            gastos = gastos,
+            error = error,
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
                 .fillMaxSize()
-        ) {
-            if (error != null) {
-                Text(
-                    text = error ?: "",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            if (gastos.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay gastos registrados.")
-                }
-            } else {
-                LazyColumn {
-                    items(gastos) { gasto ->
-                        GastoItem(gasto)
-                        Divider()
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun GastoItem(gasto: Gasto) {
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        Text("Categoría: ${gasto.categoria}")
-        Text("Cantidad: $${gasto.cantidad}")
-        Text("Descripción: ${gasto.descripcion}")
+        )
     }
 }
