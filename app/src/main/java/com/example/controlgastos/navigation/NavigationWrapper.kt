@@ -6,25 +6,36 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.controlgastos.ui.login.LoginScreen
 import androidx.navigation.compose.composable
+import com.example.controlgastos.ui.categoria.CategoriaScreen
 import com.example.controlgastos.ui.gasto.GastosScreen
 import com.example.controlgastos.ui.home.HomeScreen
 import com.example.controlgastos.ui.ingreso.IngresosScreen
+import com.example.controlgastos.ui.signup.RegisterScreen
 import com.example.controlgastos.ui.usuario.ListaUsuariosScreen
 import com.example.controlgastos.ui.usuario.UsuarioScreen
 import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
-fun NavigationWrapper(){
-    val navController = rememberNavController() //Se encarga de controlar el flujo de navegacion entre todas la pantallas
-    NavHost(navController = navController, startDestination = if (FirebaseAuth.getInstance().currentUser != null) Home else Login){
-        composable<Login>{
+fun NavigationWrapper() {
+    val navController =
+        rememberNavController() //Se encarga de controlar el flujo de navegacion entre todas la pantallas
+    NavHost(
+        navController = navController,
+        startDestination = if (FirebaseAuth.getInstance().currentUser != null) Home else Login
+    ) {
+        composable<Login> {
             //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
             LoginScreen(
-                viewModel = viewModel (),
-                navigateToHome = { navController.navigate(Home){
-                    popUpTo(Login) { inclusive = true }
-                } }
+                viewModel = viewModel(),
+                navigateToRegister = {
+                    navController.navigate(Register)
+                },
+                navigateToHome = {
+                    navController.navigate(Home) {
+                        popUpTo(Login) { inclusive = true }
+                    }
+                }
             )    //Pasamos el objeto Home de Screens.kt
         }
 
@@ -33,7 +44,8 @@ fun NavigationWrapper(){
                 onNavigateToIngresos = { navController.navigate(Ingresos) },
                 onNavigateToGastos = { navController.navigate(Gastos) },
                 onNavigateToUsuarios = { navController.navigate(Usuarios) },
-                onNavigateToPerfil = {navController.navigate(Perfil)},
+                onNavigateToPerfil = { navController.navigate(Perfil) },
+                onNavigateToCategorias = { navController.navigate(Categorias) },
                 onLogout = {
                     navController.navigate(Login) {
                         popUpTo(Home) { inclusive = true }
@@ -43,7 +55,7 @@ fun NavigationWrapper(){
         }
 
         composable<Gastos> {
-           GastosScreen()
+            GastosScreen()
         }
 
         composable<Ingresos> {
@@ -56,6 +68,14 @@ fun NavigationWrapper(){
 
         composable<Perfil> {
             UsuarioScreen()
+        }
+
+        composable<Register> {
+            RegisterScreen(navigateToHome = { navController.navigate(Home) })
+        }
+
+        composable<Categorias> {
+            CategoriaScreen()
         }
 
 

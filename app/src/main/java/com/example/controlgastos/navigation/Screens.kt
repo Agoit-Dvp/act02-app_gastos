@@ -23,6 +23,11 @@ object Usuarios
 @Serializable
 object Perfil
 
+@Serializable
+object Register
+
+@Serializable
+object Categorias
 
 //Pasar parametros, debemos usar dataclass
 //@Serializable

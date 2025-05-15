@@ -17,7 +17,6 @@ fun IngresoItem(ingreso: Ingreso) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text("Nombre: ${ingreso.nombre}")
         Text("Valor: $${ingreso.valor}")
-        Text("Categoría: ${ingreso.categoria}")
         Text("Descripción: ${ingreso.descripcion}")
         Text("Fecha: $fecha")
         if (ingreso.recurrente) {

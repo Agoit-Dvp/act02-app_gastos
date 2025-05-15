@@ -34,12 +34,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel(),
-               onNavigateToIngresos: () -> Unit = {},
-               onNavigateToGastos: () -> Unit = {},
-               onNavigateToUsuarios: () -> Unit = {},
-               onNavigateToPerfil: () -> Unit = {},
-               onLogout: () -> Unit = {}
+fun HomeScreen(
+    viewModel: HomeViewModel = viewModel(),
+    onNavigateToIngresos: () -> Unit = {},
+    onNavigateToGastos: () -> Unit = {},
+    onNavigateToUsuarios: () -> Unit = {},
+    onNavigateToPerfil: () -> Unit = {},
+    onNavigateToCategorias: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     val usuario by viewModel.usuario.observeAsState()
     val context = LocalContext.current
@@ -67,7 +69,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(),
                             .padding(end = 16.dp)
                             .size(40.dp)
                             .clip(CircleShape)
-                            .clickable{onNavigateToPerfil()}
+                            .clickable { onNavigateToPerfil() }
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -96,6 +98,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(),
                     onIngresosClick = { onNavigateToIngresos() },
                     onGastosClick = { onNavigateToGastos() },
                     onUsuariosClick = { onNavigateToUsuarios() },
+                    onCategoriasClick = {onNavigateToCategorias()},
                     onLogoutClick = {
                         viewModel.cerrarSesion()
                         Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
@@ -112,6 +115,7 @@ fun DashboardGrid(
     onIngresosClick: () -> Unit,
     onGastosClick: () -> Unit,
     onUsuariosClick: () -> Unit,
+    onCategoriasClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -139,12 +143,21 @@ fun DashboardGrid(
                 modifier = Modifier.weight(1f)
             )
             DashboardItem(
+                title = "Categorías", // ✅ nuevo botón
+                iconRes = R.drawable.ic_categories_24, // asegúrate de tener este ícono en drawable
+                onClick = onCategoriasClick,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            DashboardItem(
                 title = "Salir",
                 iconRes = R.drawable.ic_logout_24,
                 onClick = onLogoutClick,
                 modifier = Modifier.weight(1f)
             )
         }
+
     }
 }
 

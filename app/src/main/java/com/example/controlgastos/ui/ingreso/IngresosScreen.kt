@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +17,7 @@ import com.example.controlgastos.data.model.Ingreso
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import com.example.controlgastos.ui.ingreso.components.AddIngresoSheet
 import com.example.controlgastos.ui.ingreso.components.IngresosContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,6 +25,8 @@ import com.example.controlgastos.ui.ingreso.components.IngresosContent
 fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
     val ingresos by viewModel.ingresos.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
+    val sheetState = rememberModalBottomSheetState()
+    var showSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.cargarIngresosUsuario()
@@ -35,6 +40,14 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showSheet = true},
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar ingreso")
+            }
         }
     ) { padding ->
         IngresosContent(
@@ -45,4 +58,19 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
                 .padding(16.dp)
         )
     }
+
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState
+        ) {
+            AddIngresoSheet(
+                onIngresoGuardado = {
+                    showSheet = false
+                    viewModel.cargarIngresosUsuario()
+                }
+            )
+        }
+    }
 }
+

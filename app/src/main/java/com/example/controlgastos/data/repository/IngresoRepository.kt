@@ -28,4 +28,32 @@ class IngresoRepository {
                 onResult(null, it.message)
             }
     }
+
+    fun getIngresoById(ingresoId: String, onResult: (Ingreso?, String?) -> Unit) {
+        ingresosCollection.document(ingresoId)
+            .get()
+            .addOnSuccessListener { doc ->
+                val ingreso = doc.toObject(Ingreso::class.java)
+                onResult(ingreso, null)
+            }
+            .addOnFailureListener { e -> onResult(null, e.message) }
+    }
+
+    fun deleteIngreso(id: String, onResult: (Boolean, String?) -> Unit) {
+        ingresosCollection.document(id)
+            .delete()
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    fun updateIngreso(ingreso: Ingreso, onResult: (Boolean, String?) -> Unit) {
+        if (ingreso.id.isBlank()) {
+            onResult(false, "ID vacío")
+            return
+        }
+        ingresosCollection.document(ingreso.id)
+            .set(ingreso)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
 }

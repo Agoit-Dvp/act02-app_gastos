@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
+    navigateToRegister: () -> Unit,
     navigateToHome: () -> Unit
 ) { //Para poder acceder a los estados de LoginViewModel
     val loginSuccess: Boolean by viewModel.loginSuccess.observeAsState(initial = false)
@@ -68,21 +70,7 @@ fun LoginScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Login(Modifier.align(Alignment.Center), viewModel) // Pasar los estados a todos los composes
-
-    }
-
-}
-
-// Solo para probar la pantalla, eliminar después
-@Composable
-fun LoginScreen2(viewModel: LoginViewModel) { //Para poder acceder a los estados de LoginViewModel
-    Box(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Login(Modifier.align(Alignment.Center), viewModel) // Pasar los estados a todos los composes
+        Login(Modifier.align(Alignment.Center), viewModel, navigateToRegister) // Pasar los estados a todos los composes
 
     }
 
@@ -90,7 +78,7 @@ fun LoginScreen2(viewModel: LoginViewModel) { //Para poder acceder a los estados
 
 //Componente que llamara a los demás componentes y les posiciona en la pantalla
 @Composable
-fun Login(modifier: Modifier, viewModel: LoginViewModel) {
+fun Login(modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: () -> Unit) {
 
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
@@ -115,6 +103,8 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel) {
             LoginButton(loginEnable) {
                 coroutineScope.launch { viewModel.onLoginSelected() }
             }
+            Spacer(modifier = Modifier.padding(16.dp))
+            RegisterButton(onRegisterClick = navigateToRegister)
         }
 
     }
@@ -137,6 +127,21 @@ fun LoginButton(loginEnable: Boolean, onLoginSelected: () -> Unit) {
     ) {
         Text("LOGIN", color = MaterialTheme.colorScheme.onPrimary)
     }
+}
+//Componente de boton de registro
+@Composable
+fun RegisterButton(onRegisterClick: () -> Unit) {
+    Text(
+        text = "¿No tienes cuenta? Regístrate",
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onRegisterClick() }
+            .padding(vertical = 8.dp),
+        color = AppColors.primary,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center
+    )
 }
 
 //Componente ForgotPassword
@@ -204,14 +209,3 @@ fun EmailField(email: String, onTextFieldChanged: (String) -> Unit) {
         )
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun LoginPreview() {
-    ControlGastosTheme {
-        LoginScreen2(LoginViewModel())
-    }
-}
-
-
-
