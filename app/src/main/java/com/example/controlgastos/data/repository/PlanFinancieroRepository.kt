@@ -63,4 +63,28 @@ class PlanFinancieroRepository(
                 }
         }
     }
+    //Obtener planes por id
+    fun obtenerPlanesPorIds(
+        ids: List<String>,
+        onResult: (List<PlanFinanciero>) -> Unit
+    ) {
+        if (ids.isEmpty()) {
+            onResult(emptyList())
+            return
+        }
+
+        db.collection(coleccionPlanes)
+            .whereIn("id", ids)
+            .get()
+            .addOnSuccessListener { result ->
+                val planes = result.documents.mapNotNull {
+                    it.toObject(PlanFinanciero::class.java)
+                }
+                onResult(planes)
+            }
+            .addOnFailureListener {
+                Log.e("Firestore", "Error al obtener planes por IDs", it)
+                onResult(emptyList())
+            }
+    }
 }

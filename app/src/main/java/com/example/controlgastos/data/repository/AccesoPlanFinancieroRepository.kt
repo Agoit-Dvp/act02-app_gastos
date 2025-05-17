@@ -3,6 +3,7 @@ package com.example.controlgastos.data.repository
 import android.util.Log
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 
 class AccesoPlanFinancieroRepository {
@@ -14,7 +15,7 @@ class AccesoPlanFinancieroRepository {
         val docId = "${acceso.usuarioId}_${acceso.planId}"
         db.collection(coleccion)
             .document(docId)
-            .set(acceso)
+            .set(acceso, SetOptions.merge()) // ✅ Aquí el cambio
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener {
                 Log.e("Firestore", "Error al guardar acceso", it)
