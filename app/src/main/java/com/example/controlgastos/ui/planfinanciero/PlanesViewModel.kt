@@ -14,6 +14,15 @@ class PlanesViewModel : ViewModel() {
 
     val planesUsuario = mutableStateListOf<PlanFinanciero>()
     val accesosUsuario = mutableStateListOf<AccesoPlanFinanciero>()
+    val invitacionesPendientes = mutableStateListOf<AccesoPlanFinanciero>()
+
+    //Cargar invitaciones pendientes
+    fun cargarInvitacionesPendientes(usuarioId: String) {
+        repoAccesos.obtenerInvitacionesPendientes(usuarioId) {
+            invitacionesPendientes.clear()
+            invitacionesPendientes.addAll(it)
+        }
+    }
 
     // Cargar los accesos y luego los planes
     fun cargarPlanesDelUsuario(usuarioId: String) {
@@ -43,6 +52,23 @@ class PlanesViewModel : ViewModel() {
     fun eliminarAcceso(usuarioId: String, planId: String) {
         repoAccesos.eliminarAcceso(usuarioId, planId) { exito ->
             if (exito) cargarPlanesDelUsuario(usuarioId)
+        }
+    }
+
+    fun aceptarInvitacion(planId: String, usuarioId: String) {
+        repoAccesos.actualizarEstado(usuarioId, planId, "aceptado") { exito ->
+            if (exito) {
+                cargarPlanesDelUsuario(usuarioId)
+                cargarInvitacionesPendientes(usuarioId)
+            }
+        }
+    }
+
+    fun rechazarInvitacion(planId: String, usuarioId: String) {
+        repoAccesos.actualizarEstado(usuarioId, planId, "rechazado") { exito ->
+            if (exito) {
+                cargarInvitacionesPendientes(usuarioId)
+            }
         }
     }
 }
