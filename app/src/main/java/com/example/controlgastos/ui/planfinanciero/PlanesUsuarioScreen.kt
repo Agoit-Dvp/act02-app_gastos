@@ -9,18 +9,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
+import com.example.controlgastos.ui.theme.GreenButton
+import com.example.controlgastos.ui.theme.RedButton
 
 @Composable
 fun PlanesUsuarioScreen(
@@ -28,74 +33,86 @@ fun PlanesUsuarioScreen(
     usuarioId: String
 ) {
     val planes = viewModel.planesUsuario
-    val invitaciones = remember { mutableStateListOf<AccesoPlanFinanciero>() }
+    val invitaciones = viewModel.invitacionesPendientes
 
-    // Cargar planes y invitaciones al iniciar
     LaunchedEffect(usuarioId) {
         viewModel.cargarPlanesDelUsuario(usuarioId)
         viewModel.cargarInvitacionesPendientes(usuarioId)
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    Scaffold { paddingValues -> // ✅ Usa Scaffold para manejar el espacio de sistema
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues) // ✅ Respeta padding del sistema
+                .padding(16.dp)
+        ) {
+            Text("Tus planes", style = MaterialTheme.typography.titleLarge)
 
-        Text("Tus planes", style = MaterialTheme.typography.titleLarge)
-
-        if (planes.isEmpty()) {
-            Text("No tienes planes aceptados aún.")
-        } else {
-            planes.forEach { plan ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    elevation = CardDefaults.cardElevation()
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(plan.nombre, style = MaterialTheme.typography.titleMedium)
-                        Text(plan.descripcion, style = MaterialTheme.typography.bodyMedium)
+            if (planes.isEmpty()) {
+                Text("No tienes planes aceptados aún.")
+            } else {
+                planes.forEach { plan ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        elevation = CardDefaults.cardElevation()
+                    ) {
+                        Column(Modifier.padding(16.dp)) {
+                            Text(plan.nombre, style = MaterialTheme.typography.titleMedium)
+                            Text(plan.descripcion, style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Invitaciones pendientes", style = MaterialTheme.typography.titleLarge)
+            Text("Invitaciones pendientes", style = MaterialTheme.typography.titleLarge)
 
-        if (invitaciones.isEmpty()) {
-            Text("No tienes invitaciones por aceptar.")
-        } else {
-            invitaciones.forEach { acceso ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    elevation = CardDefaults.cardElevation()
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Invitación a plan: ${acceso.planId}", style = MaterialTheme.typography.bodyLarge)
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Button(
-                                onClick = {
-                                    viewModel.aceptarInvitacion(acceso.planId, usuarioId)
-                                    //invitaciones.remove(acceso)
-                                }
+            if (invitaciones.isEmpty()) {
+                Text("No tienes invitaciones por aceptar.")
+            } else {
+                invitaciones.forEach { acceso ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        elevation = CardDefaults.cardElevation()
+                    ) {
+                        Column(Modifier.padding(16.dp)) {
+                            Text(
+                                "Invitación a: ${viewModel.getNombrePlan(acceso.planId)}",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text("Aceptar")
-                            }
-                            OutlinedButton(
-                                onClick = {
-                                    viewModel.rechazarInvitacion(acceso.planId, usuarioId)
-                                    //invitaciones.remove(acceso)
+                                Button(
+                                    onClick = {
+                                        viewModel.aceptarInvitacion(acceso.planId, usuarioId)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = GreenButton,
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Text("Aceptar")
                                 }
-                            ) {
-                                Text("Rechazar")
+
+                                Button(
+                                    onClick = {
+                                        viewModel.rechazarInvitacion(acceso.planId, usuarioId)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = RedButton,
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Text("Rechazar")
+                                }
                             }
                         }
                     }

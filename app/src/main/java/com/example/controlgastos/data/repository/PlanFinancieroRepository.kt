@@ -23,11 +23,14 @@ class PlanFinancieroRepository(
         ref.set(planConId)
             .addOnSuccessListener {
                 val acceso = AccesoPlanFinanciero(
+
                     planId = planConId.id,
                     usuarioId = planConId.creadorId,
                     rol = "administrador",
-                    esPropietario = true
+                    esPropietario = true,
+                    estado = "aceptado"
                 )
+                Log.d("Planes", "Creando acceso para planId=${planConId.id}, usuarioId=${planConId.creadorId}")
                 accesoRepo.guardarAcceso(acceso, onComplete)
             }
             .addOnFailureListener {

@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.controlgastos.navigation.PlanesUsuario
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,6 +42,7 @@ fun HomeScreen(
     onNavigateToUsuarios: () -> Unit = {},
     onNavigateToPerfil: () -> Unit = {},
     onNavigateToCategorias: () -> Unit = {},
+    onNavigateToPlanesUsuario : () -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
     val usuario by viewModel.usuario.observeAsState()
@@ -99,6 +101,7 @@ fun HomeScreen(
                     onGastosClick = { onNavigateToGastos() },
                     onUsuariosClick = { onNavigateToUsuarios() },
                     onCategoriasClick = {onNavigateToCategorias()},
+                    onPlanesUsuarioClick = {onNavigateToPlanesUsuario()},
                     onLogoutClick = {
                         viewModel.cerrarSesion()
                         Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
@@ -116,6 +119,7 @@ fun DashboardGrid(
     onGastosClick: () -> Unit,
     onUsuariosClick: () -> Unit,
     onCategoriasClick: () -> Unit,
+    onPlanesUsuarioClick: () -> Unit,//Probar pantalla invitaciones
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -150,6 +154,14 @@ fun DashboardGrid(
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            //
+            DashboardItem(
+                title = "Planes",
+                iconRes = R.drawable.ic_planesuser_24,
+                onClick = onPlanesUsuarioClick,
+                modifier = Modifier.weight(1f)
+            )
+            //
             DashboardItem(
                 title = "Salir",
                 iconRes = R.drawable.ic_logout_24,

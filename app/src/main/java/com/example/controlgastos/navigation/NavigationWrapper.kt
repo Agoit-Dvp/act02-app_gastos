@@ -1,15 +1,21 @@
 package com.example.controlgastos.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.controlgastos.ui.login.LoginScreen
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.example.controlgastos.ui.categoria.CategoriaScreen
 import com.example.controlgastos.ui.gasto.GastosScreen
 import com.example.controlgastos.ui.home.HomeScreen
 import com.example.controlgastos.ui.ingreso.IngresosScreen
+import com.example.controlgastos.ui.planfinanciero.PlanesListadoEntryPoint
+import com.example.controlgastos.ui.planfinanciero.PlanesListadoScreen
+import com.example.controlgastos.ui.planfinanciero.PlanesUsuarioScreen
+import com.example.controlgastos.ui.planfinanciero.PlanesViewModel
 import com.example.controlgastos.ui.signup.RegisterScreen
 import com.example.controlgastos.ui.usuario.ListaUsuariosScreen
 import com.example.controlgastos.ui.usuario.UsuarioScreen
@@ -46,6 +52,9 @@ fun NavigationWrapper() {
                 onNavigateToUsuarios = { navController.navigate(Usuarios) },
                 onNavigateToPerfil = { navController.navigate(Perfil) },
                 onNavigateToCategorias = { navController.navigate(Categorias) },
+                onNavigateToPlanesUsuario = {
+                    navController.navigate(PlanesListado)
+                },
                 onLogout = {
                     navController.navigate(Login) {
                         popUpTo(Home) { inclusive = true }
@@ -76,6 +85,16 @@ fun NavigationWrapper() {
 
         composable<Categorias> {
             CategoriaScreen()
+        }
+
+        composable<PlanesUsuario> {backStackEntry -> //Recebir el parametro que devuelve esta función
+            val planesUsuario = backStackEntry.toRoute<PlanesUsuario>()
+            PlanesUsuarioScreen( viewModel = viewModel(), planesUsuario.usuarioId)
+        }
+
+        composable<PlanesListado> {
+            val usuarioId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+            PlanesListadoEntryPoint(usuarioId)
         }
 
 

@@ -29,6 +29,12 @@ object Register
 @Serializable
 object Categorias
 
+@Serializable
+object PlanesListado
+
+@Serializable
+data class PlanesUsuario(val usuarioId: String)
+
 //Pasar parametros, debemos usar dataclass
 //@Serializable
 //data class Detail(val name: String)

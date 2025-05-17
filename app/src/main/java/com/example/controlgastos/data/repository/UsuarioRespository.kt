@@ -1,5 +1,6 @@
 package com.example.controlgastos.data.repository
 
+import android.util.Log
 import com.example.controlgastos.data.model.Usuario
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -35,6 +36,22 @@ class UsuarioRepository {
             }
             .addOnFailureListener { e ->
                 onResult(null, e.message)
+            }
+    }
+
+    //Obtener usuario por id
+    fun obtenerNombrePorUid(uid: String, onResult: (String?) -> Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("usuarios")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                val nombre = doc.getString("nombre")
+                onResult(nombre)
+            }
+            .addOnFailureListener {
+                Log.e("Firestore", "Error al obtener nombre del usuario", it)
+                onResult(null)
             }
     }
 }
