@@ -1,9 +1,8 @@
 package com.example.controlgastos.ui.planfinanciero
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.data.model.PlanFinanciero
@@ -15,92 +14,90 @@ class PlanesViewModel : ViewModel() {
 
     private val repoPlanes = PlanFinancieroRepository()
     private val repoAccesos = AccesoPlanFinancieroRepository()
+    private val repoUsuarios = UsuarioRepository()
 
-    val planesUsuario = mutableStateListOf<PlanFinanciero>()
-    val accesosUsuario = mutableStateListOf<AccesoPlanFinanciero>()
-    val invitacionesPendientes = mutableStateListOf<AccesoPlanFinanciero>()
-    val planesInvitados = mutableStateMapOf<String, PlanFinanciero>()
-    val nombresCreadores = mutableStateMapOf<String, String>() // uid -> nombre
-    val isLoading = mutableStateOf(false)
+    private val _planes = MutableLiveData<List<PlanFinanciero>>(emptyList())
+    val planes: LiveData<List<PlanFinanciero>> = _planes
 
+    private val _accesos = MutableLiveData<List<AccesoPlanFinanciero>>(emptyList())
+    val accesos: LiveData<List<AccesoPlanFinanciero>> = _accesos
 
-    //Obtener el nombre del plan desde el mapa (para UI)
-    fun getNombrePlan(planId: String): String {
-        return planesInvitados[planId]?.nombre ?: "Plan ID: $planId"
-    }
+    private val _invitaciones = MutableLiveData<List<AccesoPlanFinanciero>>(emptyList())
+    val invitaciones: LiveData<List<AccesoPlanFinanciero>> = _invitaciones
 
+    private val _nombresCreadores = MutableLiveData<Map<String, String>>(emptyMap())
+    val nombresCreadores: LiveData<Map<String, String>> = _nombresCreadores
 
-    //Cargar invitaciones pendientes y planes
-    fun cargarInvitacionesPendientes(usuarioId: String) {
-        repoAccesos.obtenerInvitacionesPendientes(usuarioId) { accesos ->
-            invitacionesPendientes.clear()
-            invitacionesPendientes.addAll(accesos)
-
-            val planIds = accesos.map { it.planId }.distinct()
-            if (planIds.isEmpty()) return@obtenerInvitacionesPendientes
-
-            repoPlanes.obtenerPlanesPorIds(planIds) { planes ->
-                planesInvitados.clear()
-                planes.forEach { plan ->
-                    planesInvitados[plan.id] = plan
-                }
-            }
-        }
-    }
-
-
-    // Cargar accesos y los planes aceptados
-    fun cargarPlanesDelUsuario(usuarioId: String) {
-        isLoading.value = true
-        repoAccesos.obtenerAccesosDeUsuario(usuarioId) { accesos ->
-            accesosUsuario.clear()
-            accesosUsuario.addAll(accesos)
-
-            val ids = accesos.map { it.planId }
-            Log.d("Planes", "Accesos encontrados: ${ids.size}")
-            if (ids.isEmpty()) {
-                planesUsuario.clear()
-                return@obtenerAccesosDeUsuario
-            }
-
-            repoPlanes.obtenerPlanesPorIds(ids) { planes ->
-                Log.d("Planes", "Accesos encontrados: ${ids.size}")
-                planesUsuario.clear()
-                planesUsuario.addAll(planes)
-                cargarNombresCreadores()
-            }
-        }
-    }
-
-    fun cargarNombresCreadores() {
-        val uids = planesUsuario.map { it.creadorId }.distinct().filter { it.isNotBlank() }
-
-        uids.forEach { uid ->
-            if (!nombresCreadores.containsKey(uid)) {
-                UsuarioRepository().obtenerNombrePorUid(uid) { nombre ->
-                    if (nombre != null) {
-                        nombresCreadores[uid] = nombre
-                    }
-                }
-            }
-        }
-    }
+    private val _isLoading = MutableLiveData<Boolean>(false)
+    val isLoading: LiveData<Boolean> = _isLoading
 
     fun cargarDatos(usuarioId: String) {
         cargarPlanesDelUsuario(usuarioId)
-        // talvez carga de invitaciones también:
-        // cargarInvitacionesPendientes(usuarioId)
+        cargarInvitacionesPendientes(usuarioId)
+    }
+
+    fun cargarPlanesDelUsuario(usuarioId: String) {
+        _isLoading.value = true
+
+        repoAccesos.obtenerAccesosDeUsuario(usuarioId) { accesosList ->
+            _accesos.value = accesosList
+
+            val ids = accesosList.map { it.planId }
+            if (ids.isEmpty()) {
+                _planes.value = emptyList()
+                _isLoading.value = false
+                return@obtenerAccesosDeUsuario
+            }
+
+            repoPlanes.obtenerPlanesPorIds(ids) { planesList ->
+                _planes.value = planesList
+                cargarNombresCreadores(planesList)
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun cargarNombresCreadores(planes: List<PlanFinanciero>) {
+        val actuales = _nombresCreadores.value?.toMutableMap() ?: mutableMapOf()
+
+        val uidsFaltantes = planes.map { it.creadorId }
+            .distinct()
+            .filter { !actuales.containsKey(it) && it.isNotBlank() }
+
+        if (uidsFaltantes.isEmpty()) return
+
+        uidsFaltantes.forEach { uid ->
+            repoUsuarios.obtenerNombrePorUid(uid) { nombre ->
+                if (nombre != null) {
+                    actuales[uid] = nombre
+                    _nombresCreadores.postValue(actuales)
+                }
+            }
+        }
+    }
+
+    fun cargarInvitacionesPendientes(usuarioId: String) {
+        repoAccesos.obtenerInvitacionesPendientes(usuarioId) { accesosList ->
+            _invitaciones.value = accesosList
+        }
     }
 
     fun crearNuevoPlan(plan: PlanFinanciero) {
+        _isLoading.value = true
         repoPlanes.crearPlan(plan) { exito ->
-            if (exito) cargarPlanesDelUsuario(plan.creadorId)
+            if (exito) {
+                cargarPlanesDelUsuario(plan.creadorId)
+            } else {
+                _isLoading.value = false
+            }
         }
     }
 
     fun eliminarAcceso(usuarioId: String, planId: String) {
+        _isLoading.value = true
         repoAccesos.eliminarAcceso(usuarioId, planId) { exito ->
             if (exito) cargarPlanesDelUsuario(usuarioId)
+            else _isLoading.value = false
         }
     }
 
@@ -115,8 +112,18 @@ class PlanesViewModel : ViewModel() {
 
     fun rechazarInvitacion(planId: String, usuarioId: String) {
         repoAccesos.actualizarEstado(usuarioId, planId, "rechazado") { exito ->
+            if (exito) cargarInvitacionesPendientes(usuarioId)
+        }
+    }
+
+    //Actualizar plan
+    fun actualizarPlan(plan: PlanFinanciero) {
+        _isLoading.value = true
+        repoPlanes.actualizarPlan(plan) { exito ->
             if (exito) {
-                cargarInvitacionesPendientes(usuarioId)
+                cargarPlanesDelUsuario(plan.creadorId)
+            } else {
+                _isLoading.value = false
             }
         }
     }

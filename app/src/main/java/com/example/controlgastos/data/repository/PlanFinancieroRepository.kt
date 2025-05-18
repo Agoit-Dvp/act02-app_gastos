@@ -90,4 +90,22 @@ class PlanFinancieroRepository(
                 onResult(emptyList())
             }
     }
+
+    //Actualizar Plan desde PlanListadoSreen
+    fun actualizarPlan(plan: PlanFinanciero, onResult: (Boolean) -> Unit) {
+        if (plan.id.isBlank()) {
+            onResult(false)
+            return
+        }
+
+        FirebaseFirestore.getInstance()
+            .collection("planes_financieros")
+            .document(plan.id)
+            .set(plan)
+            .addOnSuccessListener { onResult(true) }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error al actualizar plan", e)
+                onResult(false)
+            }
+    }
 }
