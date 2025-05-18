@@ -1,6 +1,7 @@
 package com.example.controlgastos.ui.planfinanciero
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,14 +13,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -32,36 +37,48 @@ fun PlanesUsuarioScreen(
     viewModel: PlanesViewModel,
     usuarioId: String
 ) {
-    val planes = viewModel.planesUsuario
-    val invitaciones = viewModel.invitacionesPendientes
+    val planes by viewModel.planes.observeAsState(emptyList())
+    val invitaciones by viewModel.invitaciones.observeAsState(emptyList())
+    val nombresCreadores by viewModel.nombresCreadores.observeAsState(emptyMap())
+    val isLoading by viewModel.isLoading.observeAsState(false)
 
     LaunchedEffect(usuarioId) {
         viewModel.cargarPlanesDelUsuario(usuarioId)
         viewModel.cargarInvitacionesPendientes(usuarioId)
     }
 
-    Scaffold { paddingValues -> // ✅ Usa Scaffold para manejar el espacio de sistema
+    Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // ✅ Respeta padding del sistema
+                .padding(paddingValues)
                 .padding(16.dp)
         ) {
             Text("Tus planes", style = MaterialTheme.typography.titleLarge)
 
-            if (planes.isEmpty()) {
-                Text("No tienes planes aceptados aún.")
-            } else {
-                planes.forEach { plan ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation()
-                    ) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text(plan.nombre, style = MaterialTheme.typography.titleMedium)
-                            Text(plan.descripcion, style = MaterialTheme.typography.bodyMedium)
+            when {
+                isLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                planes.isEmpty() -> {
+                    Text("No tienes planes aceptados aún.")
+                }
+
+                else -> {
+                    planes.forEach { plan ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            elevation = CardDefaults.cardElevation()
+                        ) {
+                            Column(Modifier.padding(16.dp)) {
+                                Text(plan.nombre, style = MaterialTheme.typography.titleMedium)
+                                Text(plan.descripcion, style = MaterialTheme.typography.bodyMedium)
+                            }
                         }
                     }
                 }
@@ -83,9 +100,10 @@ fun PlanesUsuarioScreen(
                     ) {
                         Column(Modifier.padding(16.dp)) {
                             Text(
-                                "Invitación a: ${viewModel.getNombrePlan(acceso.planId)}",
+                                "Invitación a: ${nombresCreadores[acceso.usuarioId] ?: "Plan ID: ${acceso.planId}"}",
                                 style = MaterialTheme.typography.bodyLarge
                             )
+
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
