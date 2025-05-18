@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
@@ -19,7 +20,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.controlgastos.ui.theme.GreenButton
 
 
 @Composable
@@ -29,11 +32,12 @@ fun AddPlanSheet(
 ) {
     var nombre by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+    var isSaving by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Nuevo plan financiero", style = MaterialTheme.typography.titleMedium)
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
             value = nombre,
@@ -42,7 +46,7 @@ fun AddPlanSheet(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = descripcion,
@@ -51,22 +55,41 @@ fun AddPlanSheet(
             modifier = Modifier.fillMaxWidth()
         )
 
+        if (!errorMessage.isNullOrEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(errorMessage ?: "", color = MaterialTheme.colorScheme.error)
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
         ) {
-            TextButton(onClick = onCancelar) {
+            TextButton(onClick = { if (!isSaving) onCancelar() }) {
                 Text("Cancelar")
             }
+
             Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = {
-                if (nombre.isNotBlank()) {
+
+            Button(
+                onClick = {
+                    if (nombre.isBlank()) {
+                        errorMessage = "El nombre es obligatorio"
+                        return@Button
+                    }
+                    isSaving = true
+                    errorMessage = null
                     onCrear(nombre, descripcion)
-                }
-            }) {
-                Text("Crear")
+                    isSaving = false
+                },
+                enabled = !isSaving,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = GreenButton,
+                    contentColor = Color.White
+                )
+            ) {
+                Text(if (isSaving) "Creando..." else "Crear")
             }
         }
     }
