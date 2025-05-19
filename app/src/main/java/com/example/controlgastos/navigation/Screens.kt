@@ -9,7 +9,10 @@ import kotlinx.serialization.Serializable
 object Login
 
 @Serializable
-object Home
+data class Home(val planId: String)
+
+/*@Serializable
+object Home()*/ //Sin pasar id
 
 @Serializable
 object Ingresos

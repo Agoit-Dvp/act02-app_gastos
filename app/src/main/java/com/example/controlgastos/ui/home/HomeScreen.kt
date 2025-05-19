@@ -36,6 +36,7 @@ import com.example.controlgastos.navigation.PlanesUsuario
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    planId: String, //Se agrega id del plan
     viewModel: HomeViewModel = viewModel(),
     onNavigateToIngresos: () -> Unit = {},
     onNavigateToGastos: () -> Unit = {},
@@ -46,10 +47,12 @@ fun HomeScreen(
     onLogout: () -> Unit = {}
 ) {
     val usuario by viewModel.usuario.observeAsState()
+    val planSeleccionado by viewModel.planSeleccionado.observeAsState() //para el plan seleccionado
     val context = LocalContext.current
-    // Cargar los datos del usuario al entrar
+    // Cargar los datos del usuario al entrar y el plan actual
     LaunchedEffect(Unit) {
         viewModel.cargarUsuario()
+        viewModel.cargarPlanSeleccionado(planId)
     }
 
     Scaffold(
@@ -94,6 +97,21 @@ fun HomeScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
+                //Confirmar que recebimos el plan
+                Text(
+                    text = "Plan actual: ${planSeleccionado?.nombre ?: "No seleccionado"}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                if (!planSeleccionado?.descripcion.isNullOrBlank()) {
+                    Text(
+                        text = planSeleccionado!!.descripcion,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
 
                 // Composables después del mensaje de bienvenida
                 DashboardGrid(

@@ -30,7 +30,10 @@ class PlanFinancieroRepository(
                     esPropietario = true,
                     estado = "aceptado"
                 )
-                Log.d("Planes", "Creando acceso para planId=${planConId.id}, usuarioId=${planConId.creadorId}")
+                Log.d(
+                    "Planes",
+                    "Creando acceso para planId=${planConId.id}, usuarioId=${planConId.creadorId}"
+                )
                 accesoRepo.guardarAcceso(acceso, onComplete)
             }
             .addOnFailureListener {
@@ -66,6 +69,7 @@ class PlanFinancieroRepository(
                 }
         }
     }
+
     //Obtener planes por id
     fun obtenerPlanesPorIds(
         ids: List<String>,
@@ -90,6 +94,34 @@ class PlanFinancieroRepository(
                 onResult(emptyList())
             }
     }
+
+    //Obtener un solo plan por id
+    fun obtenerPlanPorId(
+        planId: String,
+        onResult: (PlanFinanciero?, String?) -> Unit
+    ) {
+        if (planId.isBlank()) {
+            onResult(null, "ID del plan vacío")
+            return
+        }
+
+        db.collection(coleccionPlanes)
+            .document(planId)
+            .get()
+            .addOnSuccessListener { doc ->
+                if (doc.exists()) {
+                    val plan = doc.toObject(PlanFinanciero::class.java)?.copy(id = doc.id)
+                    onResult(plan, null)
+                } else {
+                    onResult(null, "El plan no existe")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error al obtener plan por ID", e)
+                onResult(null, e.message ?: "Error desconocido")
+            }
+    }
+
 
     //Actualizar Plan desde PlanListadoSreen
     fun actualizarPlan(plan: PlanFinanciero, onResult: (Boolean) -> Unit) {

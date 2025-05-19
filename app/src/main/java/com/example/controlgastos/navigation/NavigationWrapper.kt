@@ -28,9 +28,9 @@ fun NavigationWrapper() {
         rememberNavController() //Se encarga de controlar el flujo de navegacion entre todas la pantallas
     NavHost(
         navController = navController,
-        startDestination = if (FirebaseAuth.getInstance().currentUser != null) Home else Login
+        startDestination = if (FirebaseAuth.getInstance().currentUser != null) Home("3GOA7c0N0f5yV70aOQct") else Login
     ) {
-        composable<Login> {
+/*        composable<Login> { //Version sin id
             //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
             LoginScreen(
                 viewModel = viewModel(),
@@ -38,15 +38,33 @@ fun NavigationWrapper() {
                     navController.navigate(Register)
                 },
                 navigateToHome = {
-                    navController.navigate(Home) {
+                    navController.navigate(Home) {//Pasamos el objeto Home de Screens.kt
                         popUpTo(Login) { inclusive = true }
                     }
                 }
-            )    //Pasamos el objeto Home de Screens.kt
+            )
+        }*/
+
+        composable<Login> { //Version sin id
+            //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
+            LoginScreen(
+                viewModel = viewModel(),
+                navigateToRegister = {
+                    navController.navigate(Register)
+                },
+                navigateToHome = {
+                    val planId = "3GOA7c0N0f5yV70aOQct" //Solo para probar, lo correcto es obtenerlo
+                    navController.navigate(Home(planId)) {//Pasamos data class Home con argumento
+                        popUpTo(Login) { inclusive = true }
+                    }
+                }
+            )
         }
 
-        composable<Home> {
+        composable<Home> {backStackEntry ->
+            val args = backStackEntry.toRoute<Home>()
             HomeScreen(
+                planId = args.planId, //pasando parametro de id del plan
                 onNavigateToIngresos = { navController.navigate(Ingresos) },
                 onNavigateToGastos = { navController.navigate(Gastos) },
                 onNavigateToUsuarios = { navController.navigate(Usuarios) },
