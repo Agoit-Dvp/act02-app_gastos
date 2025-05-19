@@ -25,9 +25,10 @@ class FirestoreInitializer(private val usuarioId: String) {
                 )
 
                 val batch = db.batch()
-                categorias.forEach {
+                categorias.forEach { categoria ->
                     val docRef = db.collection("categorias").document()
-                    batch.set(docRef, it)
+                    val categoriaConId = categoria.copy(id = docRef.id)
+                    batch.set(docRef, categoriaConId)
                 }
                 batch.commit().addOnSuccessListener {
                     Log.d("Init", "Categorías por defecto creadas")

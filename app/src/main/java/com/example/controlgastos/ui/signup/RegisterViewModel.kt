@@ -3,6 +3,7 @@ package com.example.controlgastos.ui.signup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.controlgastos.data.initializer.FirestoreInitializer
 import com.example.controlgastos.data.model.PlanFinanciero
 import com.example.controlgastos.data.model.Usuario
 import com.example.controlgastos.data.repository.PlanFinancieroRepository
@@ -55,9 +56,11 @@ class RegisterViewModel(
                             descripcion = "Plan creado automáticamente",
                             creadorId = uid
                         )
-                        planRepository.crearPlan(nuevoPlan) { creado, _ ->
-                            if (creado) {
-                                _registerSuccess.value = true
+                        planRepository.crearPlan(nuevoPlan) { creado, planId ->
+                            if (creado && planId != null) {
+                                FirestoreInitializer(uid).inicializarCategoriasPorDefecto(planId) {
+                                    _registerSuccess.value = true
+                                }
                             } else {
                                 _errorMessage.value = "Error al crear el plan financiero"
                             }
