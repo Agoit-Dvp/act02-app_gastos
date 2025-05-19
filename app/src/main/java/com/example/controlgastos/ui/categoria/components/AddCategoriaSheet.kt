@@ -63,6 +63,7 @@ fun AddCategoriaSheet(
                     nombre = nombre.trim(),
                     esIngreso = esIngreso,
                     iconName = selectedIcon,
+                    usuarioId = usuarioId,
                     planId = planId
                 )
 
