@@ -1,25 +1,16 @@
 package com.example.controlgastos.ui.gasto
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.controlgastos.data.model.Gasto
+import com.example.controlgastos.ui.gasto.components.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import com.example.controlgastos.ui.gasto.components.AddGastoSheet
-import com.example.controlgastos.ui.gasto.components.EditGastoSheet
-import com.example.controlgastos.ui.gasto.components.GastosContent
-import java.text.SimpleDateFormat
-import java.util.Locale
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,9 +18,9 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
     val gastos by viewModel.gastos.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
 
-    val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
     var gastoSeleccionado by remember { mutableStateOf<Gasto?>(null) }
+    val sheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(Unit) {
         viewModel.cargarGastosUsuario()
@@ -52,7 +43,6 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar gasto")
             }
         }
-
     ) { padding ->
         GastosContent(
             gastos = gastos,
@@ -61,13 +51,14 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
-                .fillMaxSize()
         )
     }
+
     if (showSheet) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
-            sheetState = sheetState
+            sheetState = sheetState,
+            modifier = Modifier.fillMaxHeight(0.85f)
         ) {
             AddGastoSheet(
                 onGastoGuardado = {
@@ -78,11 +69,11 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
         }
     }
 
-    //Editar desd la misma pantalla con Modal:
     if (gastoSeleccionado != null) {
         ModalBottomSheet(
             onDismissRequest = { gastoSeleccionado = null },
-            sheetState = sheetState
+            sheetState = sheetState,
+            modifier = Modifier.fillMaxHeight(0.85f)
         ) {
             EditGastoSheet(
                 gasto = gastoSeleccionado!!,

@@ -83,19 +83,27 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
             onDismissRequest = { ingresoSeleccionado = null },
             sheetState = sheetState
         ) {
-            EditIngresoSheet(
-                ingreso = ingresoSeleccionado!!,
-                onDismiss = { ingresoSeleccionado = null },
-                onIngresoActualizado = {
-                    ingresoSeleccionado = null
-                    viewModel.cargarIngresosUsuario()
-                },
-                onIngresoEliminado = {
-                    ingresoSeleccionado = null
-                    viewModel.cargarIngresosUsuario()
-                }
-            )
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.70f)
+                    .padding(bottom = 16.dp)
+            ) {
+                EditIngresoSheet(
+                    ingreso = ingresoSeleccionado!!,
+                    onDismiss = { ingresoSeleccionado = null },
+                    onIngresoActualizado = {
+                        ingresoSeleccionado = null
+                        viewModel.cargarIngresosUsuario()
+                    },
+                    onIngresoEliminado = {
+                        ingresoSeleccionado = null
+                        viewModel.cargarIngresosUsuario()
+                    }
+                )
+            }
         }
     }
+
 }
 

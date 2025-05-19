@@ -17,7 +17,7 @@ fun GastosContent(
     onGastoClick: (Gasto) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.fillMaxSize()) {
         if (!error.isNullOrBlank()) {
             Text(
                 text = error,

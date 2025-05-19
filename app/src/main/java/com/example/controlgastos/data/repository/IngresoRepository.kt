@@ -56,4 +56,18 @@ class IngresoRepository {
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
+
+    fun getCategoriasIngreso(onResult: (List<String>) -> Unit) {
+        val categoriasRef = FirebaseFirestore.getInstance().collection("categoriasIngreso")
+
+        categoriasRef.get()
+            .addOnSuccessListener { result ->
+                val categorias = result.mapNotNull { it.getString("nombre") }
+                onResult(categorias)
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+    }
+
 }

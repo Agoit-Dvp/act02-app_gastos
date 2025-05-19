@@ -1,31 +1,17 @@
 package com.example.controlgastos.ui.ingreso.components
 
-import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.controlgastos.data.model.Ingreso
 import com.example.controlgastos.data.repository.IngresoRepository
-import com.example.controlgastos.ui.theme.AppColors
+import java.text.SimpleDateFormat
+import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditIngresoSheet(
     ingreso: Ingreso,
@@ -37,8 +23,20 @@ fun EditIngresoSheet(
     var nombre by remember { mutableStateOf(ingreso.nombre) }
     var valor by remember { mutableStateOf(ingreso.valor.toString()) }
     var descripcion by remember { mutableStateOf(ingreso.descripcion) }
-    var isSaving by remember { mutableStateOf(false) }
+    var categoriaSeleccionada by remember { mutableStateOf(ingreso.categoriaId) }
+    var categorias by remember { mutableStateOf(listOf<String>()) }
+    var recurrente by remember { mutableStateOf(ingreso.recurrente) }
+    var iconoSeleccionado by remember { mutableStateOf(ingreso.icono) }
+    var fecha by remember {
+        mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(ingreso.fecha))
+    }
     var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        ingresoRepository.getCategoriasIngreso {
+            categorias = it
+        }
+    }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Editar Ingreso", style = MaterialTheme.typography.titleMedium)
@@ -47,53 +45,83 @@ fun EditIngresoSheet(
         TextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
         Spacer(Modifier.height(8.dp))
 
-        TextField(
-            value = valor,
-            onValueChange = { valor = it },
-            label = { Text("Valor") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
+        TextField(value = valor, onValueChange = { valor = it }, label = { Text("Valor") })
         Spacer(Modifier.height(8.dp))
 
-        TextField(
-            value = descripcion,
-            onValueChange = { descripcion = it },
-            label = { Text("Descripción") }
-        )
-        Spacer(Modifier.height(16.dp))
+        TextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
+        Spacer(Modifier.height(8.dp))
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        TextField(value = fecha, onValueChange = { fecha = it }, label = { Text("Fecha (dd/MM/yyyy)") })
+        Spacer(Modifier.height(8.dp))
+
+        if (categorias.isNotEmpty()) {
+            ExposedDropdownMenuBox(expanded = false, onExpandedChange = {}) {
+                TextField(
+                    value = categoriaSeleccionada,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Categoría") },
+                    trailingIcon = {
+                        DropdownMenu(expanded = true, onDismissRequest = {}) {
+                            categorias.forEach {
+                                DropdownMenuItem(text = { Text(it) }, onClick = {
+                                    categoriaSeleccionada = it
+                                })
+                            }
+                        }
+                    }
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+
+        Text("Selecciona un icono", style = MaterialTheme.typography.labelLarge)
+        IconSelectorIngreso(
+            selectedIcon = iconoSeleccionado,
+            onIconSelected = { iconoSeleccionado = it }
+        )
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = recurrente, onCheckedChange = { recurrente = it })
+            Text("Recurrente")
+        }
+
+        Spacer(Modifier.height(16.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             OutlinedButton(onClick = {
-                ingresoRepository.deleteIngreso(ingreso.id) { success, errorMsg ->
-                    if (success) onIngresoEliminado() else error = errorMsg
+                ingresoRepository.deleteIngreso(ingreso.id) { success, msg ->
+                    if (success) onIngresoEliminado() else error = msg
                 }
             }) {
                 Text("Eliminar")
             }
 
-            Button(
-                onClick = {
-                    if (nombre.isBlank() || valor.toDoubleOrNull() == null) {
-                        error = "Datos inválidos"
-                        return@Button
-                    }
+            Button(onClick = {
+                if (nombre.isBlank() || valor.toDoubleOrNull() == null) {
+                    error = "Revisa los campos"
+                    return@Button
+                }
 
-                    val actualizado = ingreso.copy(
-                        nombre = nombre.trim(),
-                        valor = valor.toDoubleOrNull() ?: 0.0,
-                        descripcion = descripcion.trim()
-                    )
+                val parsedDate = try {
+                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fecha)
+                } catch (e: Exception) {
+                    Date()
+                }
 
-                    ingresoRepository.updateIngreso(actualizado) { success, errorMsg ->
-                        if (success) onIngresoActualizado()
-                        else error = errorMsg
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.primary)
-            ) {
+                val actualizado = ingreso.copy(
+                    nombre = nombre,
+                    valor = valor.toDouble(),
+                    descripcion = descripcion,
+                    categoriaId = categoriaSeleccionada,
+                    recurrente = recurrente,
+                    icono = iconoSeleccionado,
+                    fecha = parsedDate ?: Date()
+                )
+
+                ingresoRepository.updateIngreso(actualizado) { success, msg ->
+                    if (success) onIngresoActualizado() else error = msg
+                }
+            }) {
                 Text("Guardar")
             }
         }
@@ -104,3 +132,4 @@ fun EditIngresoSheet(
         }
     }
 }
+

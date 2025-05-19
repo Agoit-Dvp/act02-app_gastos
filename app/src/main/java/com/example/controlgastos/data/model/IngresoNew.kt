@@ -10,5 +10,6 @@ data class Ingreso(
     val fecha: Date = Date(),
     val recurrente: Boolean = false,
     val categoriaId: String = "",
-    val usuarioId: String = ""
+    val usuarioId: String = "",
+    val icono: String = ""
 )

@@ -33,12 +33,8 @@ fun IngresosContent(
         } else {
             LazyColumn {
                 items(ingresos) { ingreso ->
-                    IngresoItem(ingreso = ingreso, onClick = { onIngresoClick(ingreso)  })
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 4.dp),
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+                    IngresoItem(ingreso = ingreso, onClick = { onIngresoClick(ingreso) })
+                    Divider(Modifier.padding(vertical = 4.dp))
                 }
             }
         }
