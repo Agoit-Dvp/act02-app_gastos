@@ -59,5 +59,8 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
             }
         }
     }
-
+    //Restablecer a false para evitar fallos de navegacion
+    fun clearLoginSuccess() {
+        _loginSuccess.value = false
+    }
 }

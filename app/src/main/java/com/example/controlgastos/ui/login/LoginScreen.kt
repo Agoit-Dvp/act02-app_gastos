@@ -45,26 +45,27 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
+    planId: String?,
     navigateToRegister: () -> Unit,
-    navigateToHome: () -> Unit
+    navigateToHome: (String) -> Unit
 ) { //Para poder acceder a los estados de LoginViewModel
     val loginSuccess: Boolean by viewModel.loginSuccess.observeAsState(initial = false)
     val errorMessage: String? by viewModel.errorMessage.observeAsState()
     val context = LocalContext.current //Saber el contexto actual de la UI para pasarlo a Toast
 
-    LaunchedEffect(loginSuccess, errorMessage) {
-        when {
-            loginSuccess == true && errorMessage == null -> {
-                navigateToHome()
-            }
-
-            errorMessage != null -> {
-                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-                // Opcional: limpiar el mensaje para no mostrarlo varias veces
-                //viewModel.clearError()
-            }
+    LaunchedEffect(loginSuccess, planId) {
+        if (loginSuccess && planId != null) {
+            navigateToHome(planId)
+            viewModel.clearLoginSuccess()
         }
     }
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
+
     Box(
         Modifier
             .fillMaxSize()

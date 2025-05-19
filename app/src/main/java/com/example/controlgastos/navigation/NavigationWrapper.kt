@@ -61,14 +61,14 @@ fun NavigationWrapper() {
             //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
             LoginScreen(
                 viewModel = viewModel(),
+                planId = planId,
                 navigateToRegister = {
                     navController.navigate(Register)
                 },
-                navigateToHome = {
-                    planId?.let {
-                        navController.navigate(Home(it)) {
-                            popUpTo(Login) { inclusive = true }
-                        }
+                navigateToHome = { id ->
+                    navController.navigate(Home(id)) {
+                        popUpTo(Login) { inclusive = true }
+                        launchSingleTop = true
                     }
                 }
 
