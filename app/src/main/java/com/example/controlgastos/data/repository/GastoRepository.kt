@@ -17,8 +17,14 @@ class GastoRepository {
             .addOnFailureListener { onResult(false, it.message) }
     }
 
-    fun getGastosByUser(userId: String, onResult: (List<Gasto>?, String?) -> Unit) {
-        gastosCollection.whereEqualTo("usuarioId", userId)
+    fun getGastosByUserAndPlan(
+        userId: String,
+        planId: String,
+        onResult: (List<Gasto>?, String?) -> Unit
+    ) {
+        gastosCollection
+            .whereEqualTo("usuarioId", userId)
+            .whereEqualTo("planId", planId) // 👈 nuevo filtro
             .get()
             .addOnSuccessListener { result ->
                 val gastos = result.toObjects(Gasto::class.java)

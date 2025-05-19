@@ -23,7 +23,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
+fun GastosScreen(viewModel: GastosViewModel = viewModel(), planId: String) {
     val gastos by viewModel.gastos.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
 
@@ -32,7 +32,7 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
     var gastoSeleccionado by remember { mutableStateOf<Gasto?>(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.cargarGastosUsuario()
+        viewModel.cargarGastosDePlan(planId)
     }
 
     Scaffold(
@@ -72,7 +72,7 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
             AddGastoSheet(
                 onGastoGuardado = {
                     showSheet = false
-                    viewModel.cargarGastosUsuario()
+                    viewModel.cargarGastosDePlan(planId)
                 }
             )
         }
@@ -89,11 +89,11 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel()) {
                 onDismiss = { gastoSeleccionado = null },
                 onGastoActualizado = {
                     gastoSeleccionado = null
-                    viewModel.cargarGastosUsuario()
+                    viewModel.cargarGastosDePlan(planId)
                 },
                 onGastoEliminado = {
                     gastoSeleccionado = null
-                    viewModel.cargarGastosUsuario()
+                    viewModel.cargarGastosDePlan(planId)
                 }
             )
         }

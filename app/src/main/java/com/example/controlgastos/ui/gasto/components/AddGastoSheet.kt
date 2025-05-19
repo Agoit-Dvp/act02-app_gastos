@@ -1,8 +1,6 @@
 package com.example.controlgastos.ui.gasto.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,6 +12,7 @@ import java.util.*
 
 @Composable
 fun AddGastoSheet(
+    planId: String,
     onGastoGuardado: () -> Unit,
     gastoRepository: GastoRepository = GastoRepository()
 ) {
@@ -70,7 +69,8 @@ fun AddGastoSheet(
                     estado = "Pagado",
                     notas = descripcion,
                     recurrente = false,
-                    usuarioId = uid
+                    usuarioId = uid,
+                    planId = planId,
                 )
 
                 gastoRepository.addGasto(nuevoGasto) { success, error ->

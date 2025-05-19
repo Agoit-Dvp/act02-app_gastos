@@ -18,7 +18,7 @@ object Home()*/ //Sin pasar id
 object Ingresos
 
 @Serializable
-object Gastos
+data class Gastos(val planId: String)
 
 @Serializable
 object Usuarios
