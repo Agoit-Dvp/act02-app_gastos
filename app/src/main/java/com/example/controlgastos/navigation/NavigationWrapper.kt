@@ -72,9 +72,10 @@ fun NavigationWrapper() {
                     navController.navigate(Register)
                 },
                 navigateToHome = {
-                    // ✅ Regenerar el grafo y usar planId cargado
-                    navController.navigate(Home(planId!!)) {
-                        popUpTo(Login) { inclusive = true }
+                    planId?.let {
+                        navController.navigate(Home(it)) {
+                            popUpTo(Login) { inclusive = true }
+                        }
                     }
                 }
 
@@ -140,7 +141,7 @@ fun NavigationWrapper() {
 
         composable<PlanesListado> {
             val usuarioId = user?.uid.orEmpty()
-            PlanesListadoEntryPoint(usuarioId)
+            PlanesListadoEntryPoint(usuarioId, navController = navController)
         }
 
     }

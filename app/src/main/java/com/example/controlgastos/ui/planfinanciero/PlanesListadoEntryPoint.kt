@@ -6,11 +6,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.controlgastos.data.model.PlanFinanciero
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
+import com.example.controlgastos.navigation.Home
+import com.example.controlgastos.navigation.PlanesListado
 
 //import com.example.controlgastos.viewmodel.PlanesViewModel
 
 @Composable
-fun PlanesListadoEntryPoint(usuarioId: String) {
+fun PlanesListadoEntryPoint(usuarioId: String,
+                            navController: NavController) {
     val viewModel: PlanesViewModel = viewModel()
 
     // Recolectar LiveData como estado Compose
@@ -41,7 +45,9 @@ fun PlanesListadoEntryPoint(usuarioId: String) {
             viewModel.actualizarPlan(plan)
         },
         onSeleccionar = { plan ->
-            // TODO: navegar a detalles o usuarios invitados
+            navController.navigate(Home(plan.id)) {
+                popUpTo(PlanesListado) { inclusive = true }
+            }
         }
     )
 }
