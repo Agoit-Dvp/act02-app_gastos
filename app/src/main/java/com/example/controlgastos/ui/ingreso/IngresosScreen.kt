@@ -31,17 +31,20 @@ import com.example.controlgastos.ui.ingreso.components.IngresosContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
+fun IngresosScreen(
+    planId: String,
+    viewModel: IngresosViewModel = viewModel()
+) {
     val ingresos by viewModel.ingresos.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
 
     var showSheet by remember { mutableStateOf(false) }
-
     var ingresoSeleccionado by remember { mutableStateOf<Ingreso?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
-    LaunchedEffect(Unit) {
-        viewModel.cargarIngresosUsuario()
+    // ✅ Cargar ingresos del plan actual
+    LaunchedEffect(planId) {
+        viewModel.cargarIngresosDePlan(planId)
     }
 
     Scaffold(
@@ -78,14 +81,15 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
             sheetState = sheetState
         ) {
             AddIngresoSheet(
+                planId = planId, // ✅ pasar planId
                 onIngresoGuardado = {
                     showSheet = false
-                    viewModel.cargarIngresosUsuario()
+                    viewModel.cargarIngresosDePlan(planId)
                 }
             )
         }
     }
-    //Editar y modificar en IngresoScreen
+
     if (ingresoSeleccionado != null) {
         ModalBottomSheet(
             onDismissRequest = { ingresoSeleccionado = null },
@@ -96,14 +100,13 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
                 onDismiss = { ingresoSeleccionado = null },
                 onIngresoActualizado = {
                     ingresoSeleccionado = null
-                    viewModel.cargarIngresosUsuario()
+                    viewModel.cargarIngresosDePlan(planId)
                 },
                 onIngresoEliminado = {
                     ingresoSeleccionado = null
-                    viewModel.cargarIngresosUsuario()
+                    viewModel.cargarIngresosDePlan(planId)
                 }
             )
         }
     }
 }
-

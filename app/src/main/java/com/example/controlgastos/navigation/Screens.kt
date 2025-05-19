@@ -15,7 +15,7 @@ data class Home(val planId: String)
 object Home()*/ //Sin pasar id
 
 @Serializable
-object Ingresos
+data class Ingresos(val planId: String)
 
 @Serializable
 data class Gastos(val planId: String)

@@ -66,9 +66,10 @@ fun AddGastoSheet(
                     fecha = Date(),
                     categoriaId = categoriaId,
                     metodoPago = metodoPago,
-                    estado = "Pagado",
+                    //estado = estado,
                     notas = descripcion,
                     recurrente = false,
+                    //frecuencia = frequencia,
                     usuarioId = uid,
                     planId = planId,
                 )

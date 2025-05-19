@@ -23,12 +23,14 @@ import java.util.*
 
 @Composable
 fun AddIngresoSheet(
+    planId: String,
     onIngresoGuardado: () -> Unit,
     ingresoRepository: IngresoRepository = IngresoRepository()
 ) {
     var nombre by remember { mutableStateOf("") }
     var valor by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+    var categoriaId by remember { mutableStateOf("") }
     var isSaving by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -43,6 +45,10 @@ fun AddIngresoSheet(
         Spacer(Modifier.height(8.dp))
 
         TextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
+        Spacer(Modifier.height(8.dp))
+
+        TextField(value = categoriaId, onValueChange = { categoriaId = it }, label = { Text("Categoría") })
+        Spacer(Modifier.height(16.dp))
 
         if (!errorMessage.isNullOrEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -56,7 +62,7 @@ fun AddIngresoSheet(
                 val valorDouble = valor.toDoubleOrNull()
 
                 if (uid.isNullOrBlank() || nombre.isBlank() || valorDouble == null) {
-                    errorMessage = "Verifica que los campos sean válidos"
+                    errorMessage = "Completa los campos correctamente"
                     return@Button
                 }
 
@@ -67,8 +73,9 @@ fun AddIngresoSheet(
                     descripcion = descripcion,
                     fecha = Date(),
                     recurrente = false,
-                    categoriaId = "", // si lo gestionas después
-                    usuarioId = uid
+                    categoriaId = categoriaId, // si lo gestionas después
+                    usuarioId = uid,
+                    planId = planId
                 )
 
                 ingresoRepository.addIngreso(nuevoIngreso) { success, error ->

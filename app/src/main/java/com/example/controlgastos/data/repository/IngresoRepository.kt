@@ -28,6 +28,24 @@ class IngresoRepository {
                 onResult(null, it.message)
             }
     }
+    //Funcion para obtener ingresos por usuario y plan
+    fun getIngresosByUserAndPlan(
+        userId: String,
+        planId: String,
+        onResult: (List<Ingreso>?, String?) -> Unit
+    ) {
+        ingresosCollection
+            .whereEqualTo("usuarioId", userId)
+            .whereEqualTo("planId", planId) // 👈 nuevo filtro
+            .get()
+            .addOnSuccessListener { result ->
+                val ingresos = result.toObjects(Ingreso::class.java)
+                onResult(ingresos, null)
+            }
+            .addOnFailureListener {
+                onResult(null, it.message)
+            }
+    }
 
     fun getIngresoById(ingresoId: String, onResult: (Ingreso?, String?) -> Unit) {
         ingresosCollection.document(ingresoId)

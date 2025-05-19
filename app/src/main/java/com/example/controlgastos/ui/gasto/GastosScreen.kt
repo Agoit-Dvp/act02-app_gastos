@@ -70,6 +70,7 @@ fun GastosScreen(viewModel: GastosViewModel = viewModel(), planId: String) {
             sheetState = sheetState
         ) {
             AddGastoSheet(
+                planId = planId,
                 onGastoGuardado = {
                     showSheet = false
                     viewModel.cargarGastosDePlan(planId)

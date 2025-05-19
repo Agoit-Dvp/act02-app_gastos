@@ -13,9 +13,21 @@ class PlanFinancieroRepository(
     private val accesoRepo = AccesoPlanFinancieroRepository()
 
     // 1. Crear plan + acceso propietario
+    /**
+     * Crea un nuevo plan financiero y registra automáticamente el acceso del creador.
+     *
+     * @param plan El plan a crear (sin ID asignado).
+     * @param onComplete Callback que devuelve:
+     *   - [Boolean]: `true` si el plan y el acceso se crearon correctamente.
+     *   - [String?]: El ID del plan creado (null si falló).
+     *
+     * Nota: Aunque actualmente algunos consumidores solo usan el valor booleano,
+     * mantener el planId permite mayor flexibilidad para flujos futuros (como
+     * navegación directa a Home con el plan recién creado).
+     */
     fun crearPlan(
         plan: PlanFinanciero,
-        onComplete: (Boolean) -> Unit
+        onComplete: (Boolean, String?) -> Unit
     ) {
         val ref = db.collection(coleccionPlanes).document()
         val planConId = plan.copy(id = ref.id)
@@ -34,11 +46,17 @@ class PlanFinancieroRepository(
                     "Planes",
                     "Creando acceso para planId=${planConId.id}, usuarioId=${planConId.creadorId}"
                 )
-                accesoRepo.guardarAcceso(acceso, onComplete)
+                accesoRepo.guardarAcceso(acceso) { accesoOk ->
+                    if (accesoOk) {
+                        onComplete(true, planConId.id) // ✅ Devuelve también el ID
+                    } else {
+                        onComplete(false, null)
+                    }
+                }
             }
             .addOnFailureListener {
                 Log.e("Firestore", "Error al crear plan", it)
-                onComplete(false)
+                onComplete(false, null)
             }
     }
 

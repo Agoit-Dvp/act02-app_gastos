@@ -3,13 +3,16 @@ package com.example.controlgastos.ui.signup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.controlgastos.data.model.PlanFinanciero
 import com.example.controlgastos.data.model.Usuario
+import com.example.controlgastos.data.repository.PlanFinancieroRepository
 import com.example.controlgastos.data.repository.UsuarioRepository
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
 class RegisterViewModel(
-    private val usuarioRepository: UsuarioRepository = UsuarioRepository()
+    private val usuarioRepository: UsuarioRepository = UsuarioRepository(),
+    private val planRepository: PlanFinancieroRepository = PlanFinancieroRepository()
 ) : ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -46,8 +49,22 @@ class RegisterViewModel(
                 )
 
                 usuarioRepository.guardarUsuario(usuario) { success, error ->
-                    if (success) _registerSuccess.value = true
-                    else _errorMessage.value = error
+                    if (success) {
+                        val nuevoPlan = PlanFinanciero(
+                            nombre = "Mi primer plan",
+                            descripcion = "Plan creado automáticamente",
+                            creadorId = uid
+                        )
+                        planRepository.crearPlan(nuevoPlan) { creado, _ ->
+                            if (creado) {
+                                _registerSuccess.value = true
+                            } else {
+                                _errorMessage.value = "Error al crear el plan financiero"
+                            }
+                        }
+                    } else {
+                        _errorMessage.value = error
+                    }
                 }
             }
             .addOnFailureListener {

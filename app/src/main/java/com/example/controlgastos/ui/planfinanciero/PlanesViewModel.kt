@@ -84,7 +84,7 @@ class PlanesViewModel : ViewModel() {
 
     fun crearNuevoPlan(plan: PlanFinanciero) {
         _isLoading.value = true
-        repoPlanes.crearPlan(plan) { exito ->
+        repoPlanes.crearPlan(plan) { exito, _ ->
             if (exito) {
                 cargarPlanesDelUsuario(plan.creadorId)
             } else {

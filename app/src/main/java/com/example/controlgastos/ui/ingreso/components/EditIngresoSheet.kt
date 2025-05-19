@@ -37,6 +37,8 @@ fun EditIngresoSheet(
     var nombre by remember { mutableStateOf(ingreso.nombre) }
     var valor by remember { mutableStateOf(ingreso.valor.toString()) }
     var descripcion by remember { mutableStateOf(ingreso.descripcion) }
+    var categoriaId by remember { mutableStateOf(ingreso.categoriaId) }
+
     var isSaving by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -62,6 +64,10 @@ fun EditIngresoSheet(
         )
         Spacer(Modifier.height(16.dp))
 
+        TextField(value = categoriaId, onValueChange = { categoriaId = it }, label = { Text("Categoría") })
+        Spacer(Modifier.height(16.dp))
+
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
@@ -77,17 +83,21 @@ fun EditIngresoSheet(
             Button(
                 onClick = {
                     if (nombre.isBlank() || valor.toDoubleOrNull() == null) {
-                        error = "Datos inválidos"
+                        error = "Completa los campos correctamente"
                         return@Button
                     }
+
+                    isSaving = true
 
                     val actualizado = ingreso.copy(
                         nombre = nombre.trim(),
                         valor = valor.toDoubleOrNull() ?: 0.0,
-                        descripcion = descripcion.trim()
+                        descripcion = descripcion.trim(),
+                        categoriaId = categoriaId
                     )
 
                     ingresoRepository.updateIngreso(actualizado) { success, errorMsg ->
+                        isSaving = false
                         if (success) onIngresoActualizado()
                         else error = errorMsg
                     }
