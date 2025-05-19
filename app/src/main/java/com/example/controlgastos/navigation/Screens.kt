@@ -30,7 +30,7 @@ object Perfil
 object Register
 
 @Serializable
-object Categorias
+data class Categorias(val planId: String)
 
 @Serializable
 object PlanesListado

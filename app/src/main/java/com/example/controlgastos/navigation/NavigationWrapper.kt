@@ -48,13 +48,6 @@ fun NavigationWrapper() {
 
     val planId = planIdState.value
 
-    if (user != null && planId == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-        return
-    }
-
     NavHost(
         navController = navController,
         startDestination =  when {
@@ -92,7 +85,7 @@ fun NavigationWrapper() {
                 )) },
                 onNavigateToUsuarios = { navController.navigate(Usuarios) },
                 onNavigateToPerfil = { navController.navigate(Perfil) },
-                onNavigateToCategorias = { navController.navigate(Categorias) },
+                onNavigateToCategorias = { navController.navigate(Categorias(planId = args.planId)) },
                 onNavigateToPlanesUsuario = {
                     navController.navigate(PlanesListado)
                 },
@@ -130,8 +123,9 @@ fun NavigationWrapper() {
             })
         }
 
-        composable<Categorias> {
-            CategoriaScreen()
+        composable<Categorias> { backStackEntry ->
+            val categorias = backStackEntry.toRoute<Categorias>()
+            CategoriaScreen(planId = categorias.planId)
         }
 
         composable<PlanesUsuario> {backStackEntry -> //Recebir el parametro que devuelve esta función
