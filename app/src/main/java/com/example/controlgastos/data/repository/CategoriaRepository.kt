@@ -46,6 +46,24 @@ class CategoriaRepository {
             }
     }
 
+    fun obtenerCategoriasDePlan(
+        planId: String,
+        esIngreso: Boolean = false,
+        onResult: (List<Categoria>) -> Unit
+    ) {
+        categoriaCollection
+            .whereEqualTo("planId", planId)
+            .whereEqualTo("esIngreso", esIngreso)
+            .get()
+            .addOnSuccessListener { result ->
+                val categorias = result.toObjects(Categoria::class.java)
+                onResult(categorias)
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+    }
+
     fun actualizarCategoria(categoria: Categoria, onResult: (Boolean, String?) -> Unit) {
         firestore.collection("categorias").document(categoria.id)
             .set(categoria)

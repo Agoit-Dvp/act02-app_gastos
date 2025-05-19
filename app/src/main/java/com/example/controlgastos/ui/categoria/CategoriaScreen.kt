@@ -21,13 +21,15 @@ import com.example.controlgastos.data.model.Categoria
 import com.example.controlgastos.ui.categoria.components.AddCategoriaSheet
 import com.example.controlgastos.ui.categoria.components.EditCategoriaSheet
 import com.example.controlgastos.ui.categoria.components.getPainterByName
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
+fun CategoriaScreen(planId: String, viewModel: CategoriaViewModel = viewModel()) {
     var esIngreso by remember { mutableStateOf(true) }
     val categorias by viewModel.categorias.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
 
     var showAddSheet by remember { mutableStateOf(false) }
@@ -35,8 +37,8 @@ fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
     val sheetState = rememberModalBottomSheetState()
 
     // Cargar categorías al cambiar de tipo
-    LaunchedEffect(esIngreso) {
-        viewModel.cargarCategorias(esIngreso)
+    LaunchedEffect(planId, esIngreso) {
+        viewModel.cargarCategorias(planId = planId, esIngreso = esIngreso)
     }
 
     Scaffold(
@@ -107,9 +109,12 @@ fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
         ) {
             AddCategoriaSheet(
                 esIngreso = esIngreso,
+                usuarioId = usuarioId,
+                planId = planId,
+                viewModel = viewModel,
                 onCategoriaCreada = {
                     showAddSheet = false
-                    viewModel.cargarCategorias(esIngreso)
+                    viewModel.cargarCategorias(planId, esIngreso)
                 }
             )
         }
@@ -123,13 +128,14 @@ fun CategoriaScreen(viewModel: CategoriaViewModel = viewModel()) {
         ) {
             EditCategoriaSheet(
                 categoria = categoriaSeleccionada!!,
+                viewModel = viewModel,
                 onCategoriaActualizada = {
                     categoriaSeleccionada = null
-                    viewModel.cargarCategorias(esIngreso)
+                    viewModel.cargarCategorias(planId, esIngreso)
                 },
                 onCategoriaEliminada = {
                     categoriaSeleccionada = null
-                    viewModel.cargarCategorias(esIngreso)
+                    viewModel.cargarCategorias(planId, esIngreso)
                 }
             )
         }

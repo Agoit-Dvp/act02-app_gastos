@@ -22,14 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.controlgastos.data.model.Categoria
 import com.example.controlgastos.data.repository.CategoriaRepository
+import com.example.controlgastos.ui.categoria.CategoriaViewModel
 import com.example.controlgastos.ui.theme.AppColors
 
 @Composable
 fun EditCategoriaSheet(
     categoria: Categoria,
+    viewModel: CategoriaViewModel,
     onCategoriaActualizada: () -> Unit,
-    onCategoriaEliminada: () -> Unit,
-    categoriaRepository: CategoriaRepository = CategoriaRepository()
+    onCategoriaEliminada: () -> Unit
 ) {
     var nombre by remember { mutableStateOf(categoria.nombre) }
     var selectedIcon by remember { mutableStateOf(categoria.iconName) }
@@ -59,12 +60,16 @@ fun EditCategoriaSheet(
         ) {
             OutlinedButton(
                 onClick = {
-                    categoriaRepository.eliminarCategoria(categoria.id) { success, errorMsg ->
+                    viewModel.eliminarCategoria(
+                        id = categoria.id,
+                        planId = categoria.planId,
+                        esIngreso = categoria.esIngreso
+                    ) { success, errorMsg ->
                         if (success) onCategoriaEliminada()
                         else error = errorMsg
                     }
                 }
-            ) {
+            )  {
                 Text("Eliminar")
             }
 
@@ -75,12 +80,29 @@ fun EditCategoriaSheet(
                         return@Button
                     }
 
+                    val nombreLimpio = nombre.trim()
+
+                    // Validación: evitar duplicados excepto si es la misma categoría
+                    val nombreDuplicado = viewModel
+                        .categorias
+                        .value
+                        ?.any {
+                            it.nombre.equals(nombreLimpio, ignoreCase = true)
+                                    && it.esIngreso == categoria.esIngreso
+                                    && it.id != categoria.id // excluye a sí misma
+                        } ?: false
+
+                    if (nombreDuplicado) {
+                        error = "Ya existe otra categoría con ese nombre"
+                        return@Button
+                    }
+
                     val actualizada = categoria.copy(
-                        nombre = nombre.trim(),
+                        nombre = nombreLimpio,
                         iconName = selectedIcon
                     )
 
-                    categoriaRepository.actualizarCategoria(actualizada) { success, errorMsg ->
+                    viewModel.actualizarCategoria(actualizada) { success, errorMsg ->
                         if (success) onCategoriaActualizada()
                         else error = errorMsg
                     }
