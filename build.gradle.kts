@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.googleServices)  apply false
     alias(libs.plugins.crashlytics) apply false
+    alias(libs.plugins.compose.compiler) apply true
 }
