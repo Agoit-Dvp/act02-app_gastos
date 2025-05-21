@@ -1,15 +1,21 @@
 package com.example.controlgastos.ui.gasto.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.controlgastos.data.model.Categoria
 import com.example.controlgastos.data.model.Gasto
+import com.example.controlgastos.data.repository.CategoriaRepository
 import com.example.controlgastos.data.repository.GastoRepository
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddGastoSheet(
     planId: String,
@@ -18,7 +24,30 @@ fun AddGastoSheet(
 ) {
     var nombre by remember { mutableStateOf("") }
     var valor by remember { mutableStateOf("") }
-    var categoriaId by remember { mutableStateOf("") }
+
+    //-------Para dropdown con opciones de categoria
+    val categoriaRepository = CategoriaRepository()
+    var categorias by remember { mutableStateOf<List<Categoria>>(emptyList()) }
+    var categoriaSeleccionada by remember { mutableStateOf<Categoria?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(planId) {
+        categoriaRepository.obtenerCategoriasDePlan(planId, esIngreso = false) { lista ->
+            categorias = lista
+            if (categoriaSeleccionada == null && lista.isNotEmpty()) {
+                categoriaSeleccionada = lista[0] // selección por defecto opcional
+            }
+        }
+    }
+    //-------Para dropdown con opciones de categoria
+
+    //----- Para dropdown con opciones de pago
+    val metodosPago = listOf("Tarjeta", "Efectivo", "Transferencia")
+    var metodoPagoSeleccionado by remember { mutableStateOf(metodosPago[0]) }
+    var expandedPago by remember { mutableStateOf(false) }
+    //----- Para dropdown con opciones de pago
+
+
     var descripcion by remember { mutableStateOf("") }
     var metodoPago by remember { mutableStateOf("") }
 
@@ -35,10 +64,71 @@ fun AddGastoSheet(
         TextField(value = valor, onValueChange = { valor = it }, label = { Text("Valor") })
         Spacer(Modifier.height(8.dp))
 
-        TextField(value = categoriaId, onValueChange = { categoriaId = it }, label = { Text("Categoría") })
+        Text("Categoría", style = MaterialTheme.typography.labelLarge)
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                readOnly = true,
+                value = categoriaSeleccionada?.nombre ?: "Selecciona una categoría",
+                onValueChange = {},
+                label = { Text("Categoría") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                categorias.forEach { categoria ->
+                    DropdownMenuItem(
+                        text = { Text(categoria.nombre) },
+                        onClick = {
+                            categoriaSeleccionada = categoria
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
         Spacer(Modifier.height(8.dp))
 
-        TextField(value = metodoPago, onValueChange = { metodoPago = it }, label = { Text("Método de pago") })
+        //Despliegable metodo de pago
+        ExposedDropdownMenuBox(
+            expanded = expandedPago,
+            onExpandedChange = { expandedPago = !expandedPago }
+        ) {
+            OutlinedTextField(
+                readOnly = true,
+                value = metodoPagoSeleccionado,
+                onValueChange = {},
+                label = { Text("Método de pago") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedPago) },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expandedPago,
+                onDismissRequest = { expandedPago = false }
+            ) {
+                metodosPago.forEach { metodo ->
+                    DropdownMenuItem(
+                        text = { Text(metodo) },
+                        onClick = {
+                            metodoPagoSeleccionado = metodo
+                            expandedPago = false
+                        }
+                    )
+                }
+            }
+        }
         Spacer(Modifier.height(8.dp))
 
         TextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
@@ -64,7 +154,7 @@ fun AddGastoSheet(
                     nombre = nombre,
                     valor = valorDouble,
                     fecha = Date(),
-                    categoriaId = categoriaId,
+                    categoriaId = categoriaSeleccionada?.id ?: "",
                     metodoPago = metodoPago,
                     //estado = estado,
                     notas = descripcion,
