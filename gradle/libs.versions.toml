@@ -1,7 +1,7 @@
 [versions]
-agp = "8.9.1"
-kotlin = "1.9.0"
-coreKtx = "1.15.0"
+agp = "8.10.0"
+kotlin = "2.0.21"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -9,15 +9,15 @@ appcompat = "1.7.0" #Eliminar al finalizar migracion a compose
 material = "1.12.0" #Eliminar al finalizar migracion a compose
 activity = "1.9.3" #Eliminar al finalizar migracion a compose
 constraintlayout = "2.2.0" #Eliminar al finalizar migracion a compose
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2024.04.01"
-navigationCompose = "2.8.2"
-kotlinxSerialization = "1.6.3"
-liveData = "1.6.7" #Vincular ViewMode a Screen
-firebaseBom = "33.1.1" #Conjunto de librerías necesarias para firebase
+composeBom = "2025.05.01"
+navigationCompose = "2.9.0"
+kotlinxSerialization = "1.7.3"
+liveData = "1.8.2" #Vincular ViewMode a Screen
+firebaseBom = "33.14.0" #Conjunto de librerías necesarias para firebase
 services = "4.4.2" #Para servicios de google
-crashlytics = "3.0.2" #Para registrar crashs de la app en el dashboard de firebase
+crashlytics = "3.0.3" #Para registrar crashs de la app en el dashboard de firebase
 detekt = "1.23.5" #analizador de código (buenas praticas)
 
 [libraries]
@@ -57,3 +57,4 @@ jetbrainsKotlinSerialization = {id = "org.jetbrains.kotlin.plugin.serialization"
 googleServices = {id = "com.google.gms.google-services", version.ref = "services"}
 crashlytics = {id = "com.google.firebase.crashlytics", version.ref = "crashlytics"}
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+compose-compiler = {id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin"}
