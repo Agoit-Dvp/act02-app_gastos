@@ -1,13 +1,14 @@
 package com.example.controlgastos.data.repository
 
 import com.example.controlgastos.data.model.Gasto
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
 class GastoRepository {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val gastosCollection = firestore.collection("gastos")
+    //Crear conexión con la base de datos
+    private val db = FirebaseFirestore.getInstance()
+    //Indicar la colección de firestore donde se realizara: Add, Get, Update, Delete
+    private val gastosCollection = db.collection("gastos")
 
     fun addGasto(gasto: Gasto, onResult: (Boolean, String?) -> Unit) {
         val id = UUID.randomUUID().toString()
