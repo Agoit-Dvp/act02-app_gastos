@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -78,4 +79,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    //HILT (inyeccion de dependencias)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 }
