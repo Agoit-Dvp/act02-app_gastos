@@ -50,10 +50,10 @@ fun NavigationWrapper() {
 
     NavHost(
         navController = navController,
-        startDestination =  when {
-            user == null -> Login
-            planId != null -> Home(planId)
-            else -> Login // fallback seguro en caso de que el usuario no tenga planes
+        // fallback seguro en caso de que el usuario no tenga planes
+        startDestination = when (user) {
+            null -> Login
+            else -> PlanesListado
         } // Ir home con el primer planId del usuario
     ) {
 
