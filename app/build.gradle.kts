@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.googleServices)
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -45,6 +46,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    composeCompiler{
+
     }
 }
 
