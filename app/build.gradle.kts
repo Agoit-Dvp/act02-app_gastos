@@ -48,7 +48,8 @@ android {
         }
     }
     composeCompiler{
-
+        reportsDestination = file("build/outputs/compose-reports")
+        metricsDestination = file("build/outputs/metrics")
     }
 }
 
