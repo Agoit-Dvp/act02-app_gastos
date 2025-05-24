@@ -3,6 +3,7 @@ package com.example.controlgastos.data.repository
 import android.util.Log
 import com.example.controlgastos.data.model.Usuario
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class UsuarioRepository {
 
@@ -53,5 +54,43 @@ class UsuarioRepository {
                 Log.e("Firestore", "Error al obtener nombre del usuario", it)
                 onResult(null)
             }
+    }
+
+    //Funciones suspendidas
+    suspend fun guardarUsuarioSuspendido(usuario: Usuario) {
+        FirebaseFirestore.getInstance()
+            .collection("usuarios")
+            .document(usuario.uid)
+            .set(usuario)
+            .await()
+    }
+
+    suspend fun obtenerUsuarioSuspendido(uid: String): Usuario? {
+        val snapshot = FirebaseFirestore.getInstance()
+            .collection("usuarios")
+            .document(uid)
+            .get()
+            .await()
+
+        return snapshot.toObject(Usuario::class.java)
+    }
+
+    suspend fun obtenerTodosLosUsuariosSuspendido(): List<Usuario> {
+        val snapshot = FirebaseFirestore.getInstance()
+            .collection("usuarios")
+            .get()
+            .await()
+
+        return snapshot.toObjects(Usuario::class.java)
+    }
+
+    suspend fun obtenerNombrePorUidSuspendido(uid: String): String? {
+        val snapshot = FirebaseFirestore.getInstance()
+            .collection("usuarios")
+            .document(uid)
+            .get()
+            .await()
+
+        return snapshot.getString("nombre")
     }
 }
