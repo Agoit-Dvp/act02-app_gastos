@@ -61,6 +61,34 @@ class PlanFinancieroRepository(
             }
     }
 
+    //Crear Plan suspendida
+    suspend fun crearPlanSuspendido(plan: PlanFinanciero): String {
+        val ref = db.collection(coleccionPlanes).document()
+        val planConId = plan.copy(id = ref.id)
+
+        try {
+            // Guardar el plan
+            ref.set(planConId).await()
+
+            // Crear acceso como propietario
+            val acceso = AccesoPlanFinanciero(
+                planId = planConId.id,
+                usuarioId = planConId.creadorId,
+                rol = "administrador",
+                esPropietario = true,
+                estado = "aceptado"
+            )
+
+            accesoRepo.guardarAccesoSuspendido(acceso) // 🔁 Requiere que la conviertas también
+
+            return planConId.id
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en crearPlanSuspendido", e)
+            throw e
+        }
+    }
+
     // 2. Obtener planes completos a los que tiene acceso el usuario
     fun obtenerPlanesDeUsuario(
         usuarioId: String,

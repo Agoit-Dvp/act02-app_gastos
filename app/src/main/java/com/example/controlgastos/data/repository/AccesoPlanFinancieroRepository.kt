@@ -28,6 +28,17 @@ class AccesoPlanFinancieroRepository {
                 onComplete(false)
             }
     }
+    //Version suspendida guardarAcceso
+    suspend fun guardarAccesoSuspendido(acceso: AccesoPlanFinanciero) {
+        val docId = "${acceso.usuarioId}_${acceso.planId}"
+
+        FirebaseFirestore.getInstance()
+            .collection("acceso_plan_financiero")
+            .document(docId)
+            .set(acceso)
+            .await()
+    }
+
 
     fun actualizarEstado(
         usuarioId: String,

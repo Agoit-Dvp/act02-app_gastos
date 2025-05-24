@@ -4,20 +4,22 @@ import android.util.Log
 import com.example.controlgastos.R
 import com.example.controlgastos.data.model.Categoria
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class FirestoreInitializer(private val usuarioId: String) {
 
     private val db = FirebaseFirestore.getInstance()
 
-    fun inicializarCategoriasPorDefecto(planId: String, onComplete: () -> Unit) {
+    suspend fun inicializarCategoriasSuspend(planId: String) {
         val ref = db.collection("categorias")
             .whereEqualTo("usuarioId", usuarioId)
             .whereEqualTo("planId", planId)
 
-        ref.get().addOnSuccessListener { snapshot ->
+        try {
+            val snapshot = ref.get().await()
+
             if (snapshot.isEmpty) {
                 val categorias = listOf(
-
                     Categoria(nombre = "Salario", esIngreso = true, iconName = "sueldo", usuarioId = usuarioId, planId = planId),
                     Categoria(nombre = "Otros ingresos", esIngreso = true, iconName = "otra", usuarioId = usuarioId, planId = planId),
                     Categoria(nombre = "Comida", esIngreso = false, iconName = "comida", usuarioId = usuarioId, planId = planId),
@@ -30,7 +32,6 @@ class FirestoreInitializer(private val usuarioId: String) {
                     Categoria(nombre = "Suministros", esIngreso = false, iconName = "suministros", usuarioId = usuarioId, planId = planId),
                     Categoria(nombre = "Regalos", esIngreso = true, iconName = "regalos", usuarioId = usuarioId, planId = planId),
                     Categoria(nombre = "Otros gastos", esIngreso = false, iconName = "otra", usuarioId = usuarioId, planId = planId),
-
                 )
 
                 val batch = db.batch()
@@ -39,19 +40,16 @@ class FirestoreInitializer(private val usuarioId: String) {
                     val categoriaConId = categoria.copy(id = docRef.id)
                     batch.set(docRef, categoriaConId)
                 }
-                batch.commit().addOnSuccessListener {
-                    Log.d("Init", "Categorías por defecto creadas")
-                    onComplete()
-                }.addOnFailureListener {
-                    Log.e("Init", "Error al crear categorías", it)
-                    onComplete()
-                }
+
+                batch.commit().await()
+                Log.d("Init", "Categorías por defecto creadas")
             } else {
-                onComplete()
+                Log.d("Init", "Ya existían categorías por defecto para este plan")
             }
-        }.addOnFailureListener {
-            Log.e("Init", "Error al consultar categorías", it)
-            onComplete()
+
+        } catch (e: Exception) {
+            Log.e("Init", "Error al inicializar categorías", e)
+            throw e
         }
     }
 }
