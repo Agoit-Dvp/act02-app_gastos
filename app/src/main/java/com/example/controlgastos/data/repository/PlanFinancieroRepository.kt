@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.data.model.PlanFinanciero
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class PlanFinancieroRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -88,6 +89,42 @@ class PlanFinancieroRepository(
         }
     }
 
+    //Obtener planes por usuario suspend
+    suspend fun obtenerPlanesDeUsuarioSuspend(usuarioId: String): List<PlanFinanciero> {
+        return try {
+            val accesosSnapshot = FirebaseFirestore.getInstance()
+                .collection("acceso_plan_financiero")
+                .whereEqualTo("usuarioId", usuarioId)
+                .whereEqualTo("estado", "aceptado")
+                .get()
+                .await()
+
+            val accesos = accesosSnapshot.documents.mapNotNull {
+                it.toObject(AccesoPlanFinanciero::class.java)
+            }
+
+            val planIds = accesos.map { it.planId }
+            Log.d("PlanesRepo", "Accesos encontrados: ${accesos.size}")
+            Log.d("PlanesRepo", "IDs de planes: $planIds")
+
+            if (planIds.isEmpty()) return emptyList()
+
+            val planesSnapshot = FirebaseFirestore.getInstance()
+                .collection("planes_financieros")
+                .whereIn("id", planIds)
+                .get()
+                .await()
+
+            return planesSnapshot.documents.mapNotNull {
+                it.toObject(PlanFinanciero::class.java)
+            }
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error al obtener planes suspendidos", e)
+            emptyList()
+        }
+    }
+
     //Obtener planes por id
     fun obtenerPlanesPorIds(
         ids: List<String>,
@@ -158,4 +195,5 @@ class PlanFinancieroRepository(
                 onResult(false)
             }
     }
+
 }
