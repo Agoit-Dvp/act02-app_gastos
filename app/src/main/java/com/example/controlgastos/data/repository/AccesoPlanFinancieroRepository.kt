@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.tasks.await
 import java.util.Date
 
 
@@ -44,6 +45,18 @@ class AccesoPlanFinancieroRepository {
                 Log.e("Firestore", "Error al actualizar estado", it)
                 onComplete(false)
             }
+    }
+
+    suspend fun obtenerPrimerPlanIdDeUsuario(uid: String): String? {
+        val snapshot = FirebaseFirestore.getInstance()
+            .collection("acceso_plan_financiero")
+            .whereEqualTo("usuarioId", uid)
+            .whereEqualTo("estado", "aceptado")
+            .limit(1)
+            .get()
+            .await()
+
+        return snapshot.documents.firstOrNull()?.getString("planId")
     }
 
     fun obtenerAccesosDeUsuario(
