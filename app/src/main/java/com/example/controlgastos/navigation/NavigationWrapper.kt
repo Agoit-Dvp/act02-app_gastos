@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.controlgastos.ui.login.LoginScreen
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
 import com.example.controlgastos.data.repository.PlanFinancieroRepository
 import com.example.controlgastos.ui.categoria.CategoriaScreen
 import com.example.controlgastos.ui.gasto.GastosScreen
@@ -34,27 +35,35 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun NavigationWrapper() {
     val navController = rememberNavController() //controlar el flujo de navegacion entre pantallas
-    val planRepo = remember { PlanFinancieroRepository() }
+    val accesoRepo = remember { AccesoPlanFinancieroRepository() }
 
     val user = FirebaseAuth.getInstance().currentUser
 
+
+
     val planIdState = produceState<String?>(initialValue = null, user) {
         if (user != null) {
-            planRepo.obtenerPlanesDeUsuario(user.uid) { planes ->
-                value = planes.firstOrNull()?.id
-            }
+            value = accesoRepo.obtenerPrimerPlanIdDeUsuario(user.uid)
         }
     }
 
     val planId = planIdState.value
 
+    if (user != null && planId == null) {
+        Box(Modifier.fillMaxSize()) {
+            CircularProgressIndicator(Modifier.align(Alignment.Center))
+        }
+        return
+    }
+
     NavHost(
         navController = navController,
         // fallback seguro en caso de que el usuario no tenga planes
-        startDestination = when (user) {
-            null -> Login
+        startDestination = when {
+            user == null -> Login
+            planId != null -> Home(planId)
             else -> PlanesListado
-        } // Ir home con el primer planId del usuario
+        }
     ) {
 
         composable<Login> {
