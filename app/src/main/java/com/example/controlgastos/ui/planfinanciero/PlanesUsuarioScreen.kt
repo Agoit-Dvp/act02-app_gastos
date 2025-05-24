@@ -20,7 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -37,10 +37,10 @@ fun PlanesUsuarioScreen(
     viewModel: PlanesViewModel,
     usuarioId: String
 ) {
-    val planes by viewModel.planes.observeAsState(emptyList())
-    val invitaciones by viewModel.invitaciones.observeAsState(emptyList())
-    val nombresCreadores by viewModel.nombresCreadores.observeAsState(emptyMap())
-    val isLoading by viewModel.isLoading.observeAsState(false)
+    val planes by viewModel.planes.collectAsState()
+    val invitaciones by viewModel.invitaciones.collectAsState()
+    val nombresCreadores by viewModel.nombresCreadores.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     LaunchedEffect(usuarioId) {
         viewModel.cargarPlanesDelUsuario(usuarioId)
