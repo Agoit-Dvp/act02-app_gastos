@@ -147,11 +147,12 @@ class PlanesViewModel : ViewModel() {
     }
 
     //Limpiar estados
-    fun limpiar() {
+    //Quitarlo si no se usa
+/*    fun limpiar() {
         _planes.value = emptyList()
         _accesos.value = emptyList()
         _invitaciones.value = emptyList()
         _nombresCreadores.value = emptyMap()
         _isLoading.value = false
-    }
+    }*/
 }
