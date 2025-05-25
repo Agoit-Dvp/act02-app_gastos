@@ -53,7 +53,7 @@ fun UsuarioScreen(viewModel: UsuarioViewModel = viewModel()) {
 @Composable
 fun UsuarioInfo(usuario: Usuario) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("UID: ${usuario.uid}")
+        Text("UID: ${usuario.uid}")//Eliminar después de pruebas todo
         Text("Nombre: ${usuario.nombre}")
         Text("Email: ${usuario.email}")
         Text("Registrado: ${usuario.fechaRegistro}")

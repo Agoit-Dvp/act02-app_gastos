@@ -91,35 +91,8 @@ class PlanFinancieroRepository(
     }
 
     // 2. Obtener planes completos a los que tiene acceso el usuario
-    fun obtenerPlanesDeUsuario(
-        usuarioId: String,
-        onResult: (List<PlanFinanciero>) -> Unit
-    ) {
-        accesoRepo.obtenerAccesosDeUsuario(usuarioId) { accesos ->
-            if (accesos.isEmpty()) {
-                onResult(emptyList())
-                return@obtenerAccesosDeUsuario
-            }
-
-            val planIds = accesos.map { it.planId }
-            db.collection(coleccionPlanes)
-                .whereIn("id", planIds)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    val planes = snapshot.documents.mapNotNull {
-                        it.toObject(PlanFinanciero::class.java)
-                    }
-                    onResult(planes)
-                }
-                .addOnFailureListener {
-                    Log.e("Firestore", "Error al obtener planes", it)
-                    onResult(emptyList())
-                }
-        }
-    }
-
     //Obtener planes por usuario suspend
-    suspend fun obtenerPlanesDeUsuarioSuspend(usuarioId: String): List<PlanFinanciero> {
+    suspend fun obtenerPlanesDeUsuario(usuarioId: String): List<PlanFinanciero> {
         return try {
             val accesosSnapshot = FirebaseFirestore.getInstance()
                 .collection("acceso_plan_financiero")

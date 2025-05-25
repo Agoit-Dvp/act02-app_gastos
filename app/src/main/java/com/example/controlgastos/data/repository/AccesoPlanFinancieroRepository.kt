@@ -70,29 +70,22 @@ class AccesoPlanFinancieroRepository {
         return snapshot.documents.firstOrNull()?.getString("planId")
     }
 
-    fun obtenerAccesosDeUsuario(
-        usuarioId: String,
-        soloAceptados: Boolean = true,
-        onResult: (List<AccesoPlanFinanciero>) -> Unit
-    ) {
-        var query = db.collection(coleccion)
-            .whereEqualTo("usuarioId", usuarioId)
+    suspend fun obtenerAccesosDeUsuario(usuarioId: String): List<AccesoPlanFinanciero> {
+        return try {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("acceso_plan_financiero")
+                .whereEqualTo("usuarioId", usuarioId)
+                .whereEqualTo("estado", "aceptado")
+                .get()
+                .await()
 
-        if (soloAceptados) {
-            query = query.whereEqualTo("estado", "aceptado")
+            snapshot.documents.mapNotNull {
+                it.toObject(AccesoPlanFinanciero::class.java)
+            }
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error al obtener accesos suspendido", e)
+            emptyList()
         }
-
-        query.get()
-            .addOnSuccessListener { result ->
-                val accesos = result.documents.mapNotNull {
-                    it.toObject(AccesoPlanFinanciero::class.java)
-                }
-                onResult(accesos)
-            }
-            .addOnFailureListener {
-                Log.e("Firestore", "Error al obtener accesos", it)
-                onResult(emptyList())
-            }
     }
 
     fun obtenerInvitacionesPendientes(

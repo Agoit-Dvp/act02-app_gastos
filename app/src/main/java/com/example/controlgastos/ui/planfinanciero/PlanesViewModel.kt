@@ -49,16 +49,10 @@ class PlanesViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             Log.d("PlanesVM", "Planes cargados:")
-            val planesList = repoPlanes.obtenerPlanesDeUsuarioSuspend(currentUserId) // ✅ Nuevo uso de función suspend
+            val planesList = repoPlanes.obtenerPlanesDeUsuario(currentUserId) // ✅ Nuevo uso de función suspend
             _planes.value = planesList
 
-            val accesos = planesList.map {
-                AccesoPlanFinanciero(
-                    planId = it.id,
-                    usuarioId = currentUserId,
-                    estado = "aceptado"
-                )
-            }
+            val accesos = repoAccesos.obtenerAccesosDeUsuario(currentUserId)
             _accesos.value = accesos // ✅ Puedes mantener esto si necesitas saber qué accesos tiene
 
             cargarNombresCreadores(planesList)
