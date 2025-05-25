@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
@@ -21,7 +23,10 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaUsuariosScreen(planId: String, viewModel: UsuariosViewModel = viewModel()) {
+fun ListaUsuariosScreen(
+    planId: String, viewModel: UsuariosViewModel = viewModel(),
+    onInvitarUsuario: () -> Unit
+) {
     val usuarios by viewModel.usuarios.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
 
@@ -38,6 +43,14 @@ fun ListaUsuariosScreen(planId: String, viewModel: UsuariosViewModel = viewModel
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onInvitarUsuario,
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Default.Person, contentDescription = "Invitar usuario")
+            }
         }
     ) { padding ->
         Column(
