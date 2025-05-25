@@ -98,7 +98,7 @@ class PlanesViewModel : ViewModel() {
                 )
 
                 // Usamos la versión suspendida aquí
-                repoPlanes.crearPlanSuspendido(nuevoPlan)
+                repoPlanes.crearPlan(nuevoPlan)
 
                 // Recargar planes tras crear
                 cargarPlanesDelUsuario()
