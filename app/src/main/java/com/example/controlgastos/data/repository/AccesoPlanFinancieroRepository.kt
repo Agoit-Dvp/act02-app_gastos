@@ -121,67 +121,37 @@ class AccesoPlanFinancieroRepository {
     }
 
     //Invitar usuarios a planes
-    fun invitarUsuarioAPlan(
-        usuarioId: String,
-        planId: String,
-        rol: String = "lector",
-        onComplete: (Boolean) -> Unit
-    ) {
+    suspend fun invitarUsuarioAPlan(usuarioId: String, planId: String): Boolean {
         val docId = "${usuarioId}_${planId}"
+        val ref = FirebaseFirestore.getInstance()
+            .collection("acceso_plan_financiero")
+            .document(docId)
+
+        val snapshot = ref.get().await()
+        if (snapshot.exists()) return false
+
         val acceso = AccesoPlanFinanciero(
             planId = planId,
             usuarioId = usuarioId,
-            rol = rol,
+            rol = "lector",
             esPropietario = false,
             estado = "pendiente",
             fechaAcceso = Date()
         )
-
-        db.collection(coleccion)
-            .document(docId)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    Log.d("Firestore", "El usuario ya fue invitado a este plan.")
-                    onComplete(false) // Ya existe, no sobrescribimos
-                } else {
-                    db.collection(coleccion)
-                        .document(docId)
-                        .set(acceso)
-                        .addOnSuccessListener {
-                            Log.d("Firestore", "Invitación enviada a $usuarioId para plan $planId")
-                            onComplete(true)
-                        }
-                        .addOnFailureListener {
-                            Log.e("Firestore", "Error al invitar usuario", it)
-                            onComplete(false)
-                        }
-                }
-            }
-            .addOnFailureListener {
-                Log.e("Firestore", "Error al verificar invitación existente", it)
-                onComplete(false)
-            }
+        ref.set(acceso).await()
+        return true
     }
 
     //Buscar por correo
-    fun buscarUsuarioPorEmail(
-        email: String,
-        onResult: (String?) -> Unit
-    ) {
-        FirebaseFirestore.getInstance().collection("usuarios")
+    suspend fun buscarUsuarioPorEmail(email: String): String? {
+        val snapshot = FirebaseFirestore.getInstance()
+            .collection("usuarios")
             .whereEqualTo("email", email)
             .limit(1)
             .get()
-            .addOnSuccessListener { result ->
-                val usuario = result.documents.firstOrNull()
-                val uid = usuario?.getString("uid")
-                onResult(uid)
-            }
-            .addOnFailureListener {
-                Log.e("Firestore", "Error al buscar usuario por email", it)
-                onResult(null)
-            }
+            .await()
+
+        return snapshot.documents.firstOrNull()?.getString("uid")
     }
 
     suspend fun obtenerAccesosPorPlan(planId: String): List<AccesoPlanFinanciero> {

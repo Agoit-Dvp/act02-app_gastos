@@ -20,7 +20,10 @@ class UsuariosViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    fun cargarUsuarios() {
+    private val _mensaje = MutableLiveData<String?>()
+    val mensaje: LiveData<String?> = _mensaje
+
+/*    fun cargarUsuarios() {
         repository.obtenerTodosLosUsuarios { lista, errorMsg ->
             if (errorMsg != null) {
                 _error.value = errorMsg
@@ -28,7 +31,7 @@ class UsuariosViewModel(
                 _usuarios.value = lista ?: emptyList()
             }
         }
-    }
+    }*/
 
     fun cargarUsuariosDelPlan(planId: String) {
         viewModelScope.launch {
@@ -42,7 +45,7 @@ class UsuariosViewModel(
                 }
 
                 val lista =
-                    repository.obtenerUsuariosPorIdsSuspend(uids) // ✅ Esta función debe ser suspendida también
+                    repository.obtenerUsuariosPorIds(uids) // ✅ Esta función debe ser suspendida también
 
                 _usuarios.value = lista
 
@@ -50,5 +53,37 @@ class UsuariosViewModel(
                 _error.value = e.message ?: "Error al cargar usuarios del plan"
             }
         }
+    }
+
+    fun invitarUsuario(email: String, planId: String) {
+        viewModelScope.launch {
+            try {
+                val usuarioId = accesoRepository.buscarUsuarioPorEmail(email)
+
+                if (usuarioId == null) {
+                    _error.value = "No se encontró ningún usuario con ese correo electrónico."
+                    _mensaje.value = "No se encontró ningún usuario con ese correo electrónico."
+                    return@launch
+                }
+
+                val exito = accesoRepository.invitarUsuarioAPlan(usuarioId, planId)
+
+                if (exito) {
+                    cargarUsuariosDelPlan(planId)
+                    _mensaje.value = "Usuario invitado correctamente"
+                } else {
+                    _error.value = "Este usuario ya ha sido invitado o ya pertenece al plan."
+                    _mensaje.value = "Usuario invitado correctamente"
+                }
+
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Error al invitar usuario al plan."
+            }
+        }
+    }
+
+    //funciones auxiliares
+    fun limpiarMensaje() {
+        _mensaje.value = null
     }
 }

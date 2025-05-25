@@ -46,6 +46,7 @@ fun InvitarUsuarioDialog(
         },
         confirmButton = {
             TextButton(onClick = {
+                val input = email.trim() //Evitar que el campo email tenga algo
                 if (email.isBlank()) {
                     error = "El correo no puede estar vacío"
                 } else {

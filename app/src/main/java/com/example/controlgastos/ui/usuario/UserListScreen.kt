@@ -18,17 +18,30 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.controlgastos.data.model.Usuario
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.controlgastos.ui.usuario.components.InvitarUsuarioDialog
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaUsuariosScreen(
-    planId: String, viewModel: UsuariosViewModel = viewModel(),
-    onInvitarUsuario: () -> Unit
+    planId: String, viewModel: UsuariosViewModel = viewModel()
 ) {
     val usuarios by viewModel.usuarios.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
+    val mensaje by viewModel.mensaje.observeAsState() //Mostrar mensaje de éxito/error invitación
+
+    var showDialogInvitacion by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Mostrar el mensaje si existe
+    LaunchedEffect(mensaje) {
+        if (!mensaje.isNullOrEmpty()) {
+            snackbarHostState.showSnackbar(mensaje!!)
+            viewModel.limpiarMensaje()
+        }
+    }
 
     // Cargar usuarios al entrar a la pantalla
     LaunchedEffect(planId) {
@@ -46,7 +59,7 @@ fun ListaUsuariosScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onInvitarUsuario,
+                onClick = { showDialogInvitacion = true },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(Icons.Default.Person, contentDescription = "Invitar usuario")
@@ -85,6 +98,20 @@ fun ListaUsuariosScreen(
             }
         }
     }
+
+    // Mostrar el diálogo de invitación
+    if (showDialogInvitacion) {
+        InvitarUsuarioDialog(
+            planId = planId,
+            onInvitar = { email ->
+                viewModel.invitarUsuario(email, planId)
+                showDialogInvitacion = false
+            },
+            onDismiss = { showDialogInvitacion = false }
+        )
+    }
+
+
 }
 
 @Composable

@@ -94,7 +94,7 @@ class UsuarioRepository {
         return snapshot.getString("nombre")
     }
 
-    suspend fun obtenerUsuariosPorIdsSuspend(uids: List<String>): List<Usuario> {
+    suspend fun obtenerUsuariosPorIds(uids: List<String>): List<Usuario> {
         return try {
             if (uids.isEmpty()) return emptyList()
 
