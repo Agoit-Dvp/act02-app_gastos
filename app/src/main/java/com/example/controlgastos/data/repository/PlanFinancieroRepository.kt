@@ -32,6 +32,7 @@ class PlanFinancieroRepository(
     ) {
         val ref = db.collection(coleccionPlanes).document()
         val planConId = plan.copy(id = ref.id)
+        Log.d("PlanRepo", "Creando plan con creadorId=${planConId.creadorId}")
 
         ref.set(planConId)
             .addOnSuccessListener {
