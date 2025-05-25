@@ -1,49 +1,38 @@
-package com.example.controlgastos.ui.planfinanciero
+package com.example.controlgastos.ui.invitaciones
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.controlgastos.data.model.AccesoPlanFinanciero
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.controlgastos.ui.planfinanciero.PlanesViewModel
 import com.example.controlgastos.ui.theme.GreenButton
 import com.example.controlgastos.ui.theme.RedButton
 
 @Composable
-fun PlanesUsuarioScreen(
-    viewModel: PlanesViewModel,
-    usuarioId: String
-) {
-    val planes by viewModel.planes.collectAsState()
+fun InvitacionesScreen(viewModel: PlanesViewModel = viewModel()) {
     val invitaciones by viewModel.invitaciones.collectAsState()
     val nombresCreadores by viewModel.nombresCreadores.collectAsState()
+    val planesInvitaciones by viewModel.planesInvitaciones.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    LaunchedEffect(usuarioId) {
-        viewModel.cargarPlanesDelUsuario()
+    LaunchedEffect(Unit) {
         viewModel.cargarInvitacionesPendientes()
     }
 
@@ -54,44 +43,15 @@ fun PlanesUsuarioScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Text("Tus planes", style = MaterialTheme.typography.titleLarge)
-
-            when {
-                isLoading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-
-                planes.isEmpty() -> {
-                    Text("No tienes planes aceptados aún.")
-                }
-
-                else -> {
-                    planes.forEach { plan ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            elevation = CardDefaults.cardElevation()
-                        ) {
-                            Column(Modifier.padding(16.dp)) {
-                                Text(plan.nombre, style = MaterialTheme.typography.titleMedium)
-                                Text(plan.descripcion, style = MaterialTheme.typography.bodyMedium)
-                            }
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
             Text("Invitaciones pendientes", style = MaterialTheme.typography.titleLarge)
 
             if (invitaciones.isEmpty()) {
                 Text("No tienes invitaciones por aceptar.")
             } else {
                 invitaciones.forEach { acceso ->
+                    val plan = planesInvitaciones.find { it.id == acceso.planId }
+                    val nombrePlan = plan?.nombre ?: "Plan desconocido"
+                    val nombreCreador = nombresCreadores[plan?.creadorId] ?: "Desconocido"
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -99,10 +59,8 @@ fun PlanesUsuarioScreen(
                         elevation = CardDefaults.cardElevation()
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            Text(
-                                "Invitación a: ${nombresCreadores[acceso.usuarioId] ?: "Plan ID: ${acceso.planId}"}",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
+                            Text("Invitación a: $nombrePlan", style = MaterialTheme.typography.bodyLarge)
+                            Text("Invitado por: $nombreCreador", style = MaterialTheme.typography.bodySmall)
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),

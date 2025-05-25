@@ -36,7 +36,7 @@ data class Categorias(val planId: String)
 object PlanesListado
 
 @Serializable
-data class PlanesUsuario(val usuarioId: String)
+object Invitaciones
 
 //Pasar parametros, debemos usar dataclass
 //@Serializable

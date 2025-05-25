@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.controlgastos.navigation.PlanesUsuario
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +42,8 @@ fun HomeScreen(
     onNavigateToUsuarios: () -> Unit = {},
     onNavigateToPerfil: () -> Unit = {},
     onNavigateToCategorias: () -> Unit = {},
-    onNavigateToPlanesUsuario : () -> Unit = {},
+    onNavigateToPlanesUsuario: () -> Unit = {},
+    onNavigateToInvitaciones: () -> Unit,
     onLogout: () -> Unit = {}
 ) {
     val usuario by viewModel.usuario.observeAsState()
@@ -118,8 +118,8 @@ fun HomeScreen(
                     onIngresosClick = { onNavigateToIngresos() },
                     onGastosClick = { onNavigateToGastos() },
                     onUsuariosClick = { onNavigateToUsuarios() },
-                    onCategoriasClick = {onNavigateToCategorias()},
-                    onPlanesUsuarioClick = {onNavigateToPlanesUsuario()},
+                    onCategoriasClick = { onNavigateToCategorias() },
+                    onPlanesUsuarioClick = { onNavigateToPlanesUsuario() },
                     onLogoutClick = {
                         viewModel.cerrarSesion()
                         Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()

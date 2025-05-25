@@ -23,7 +23,8 @@ import com.example.controlgastos.ui.gasto.GastosScreen
 import com.example.controlgastos.ui.home.HomeScreen
 import com.example.controlgastos.ui.ingreso.IngresosScreen
 import com.example.controlgastos.ui.planfinanciero.PlanesListadoEntryPoint
-import com.example.controlgastos.ui.planfinanciero.PlanesUsuarioScreen
+import com.example.controlgastos.ui.invitaciones.InvitacionesScreen
+import com.example.controlgastos.ui.planfinanciero.PlanesListadoScreen
 import com.example.controlgastos.ui.signup.RegisterScreen
 import com.example.controlgastos.ui.usuario.ListaUsuariosScreen
 import com.example.controlgastos.ui.usuario.UsuarioScreen
@@ -93,6 +94,7 @@ fun NavigationWrapper() {
                 onNavigateToPlanesUsuario = {
                     navController.navigate(PlanesListado)
                 },
+                onNavigateToInvitaciones = { navController.navigate(Invitaciones)},
                 onLogout = {
                     navController.navigate(Login) {
                         popUpTo(Login) { inclusive = true }
@@ -133,9 +135,8 @@ fun NavigationWrapper() {
             CategoriaScreen(planId = categorias.planId)
         }
 
-        composable<PlanesUsuario> {backStackEntry -> //Recebir el parametro que devuelve esta función
-            val planesUsuario = backStackEntry.toRoute<PlanesUsuario>()
-            PlanesUsuarioScreen( viewModel = viewModel(), planesUsuario.usuarioId)
+        composable<Invitaciones> {
+            InvitacionesScreen()
         }
 
         composable<PlanesListado> {

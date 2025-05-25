@@ -25,6 +25,9 @@ class PlanesViewModel : ViewModel() {
     private val _planes = MutableStateFlow<List<PlanFinanciero>>(emptyList())
     val planes: StateFlow<List<PlanFinanciero>> = _planes
 
+    private val _planesInvitaciones = MutableStateFlow<List<PlanFinanciero>>(emptyList())
+    val planesInvitaciones: StateFlow<List<PlanFinanciero>> = _planesInvitaciones
+
     private val _accesos = MutableStateFlow<List<AccesoPlanFinanciero>>(emptyList())
     val accesos: StateFlow<List<AccesoPlanFinanciero>> = _accesos
 
@@ -83,6 +86,20 @@ class PlanesViewModel : ViewModel() {
     fun cargarInvitacionesPendientes() {
         repoAccesos.obtenerInvitacionesPendientes(currentUserId) { accesosList ->
             _invitaciones.value = accesosList
+
+            // Cargar los planes de las invitaciones
+            val planIds = accesosList.map { it.planId }.distinct()
+            if (planIds.isEmpty()) return@obtenerInvitacionesPendientes
+
+            viewModelScope.launch {
+                try {
+                    val planes = repoPlanes.obtenerPlanesPorIds(planIds)
+                    _planesInvitaciones.value = planes
+                    cargarNombresCreadores(planes)
+                } catch (e: Exception) {
+                    Log.e("PlanesVM", "Error al cargar nombres de creadores de invitaciones", e)
+                }
+            }
         }
     }
 

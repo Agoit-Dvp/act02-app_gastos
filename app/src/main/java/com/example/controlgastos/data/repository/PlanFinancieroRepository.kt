@@ -80,28 +80,18 @@ class PlanFinancieroRepository(
     }
 
     //Obtener planes por id
-    fun obtenerPlanesPorIds(
-        ids: List<String>,
-        onResult: (List<PlanFinanciero>) -> Unit
-    ) {
-        if (ids.isEmpty()) {
-            onResult(emptyList())
-            return
-        }
+    suspend fun obtenerPlanesPorIds(planIds: List<String>): List<PlanFinanciero> {
+        if (planIds.isEmpty()) return emptyList()
 
-        db.collection(coleccionPlanes)
-            .whereIn("id", ids)
+        val snapshot = FirebaseFirestore.getInstance()
+            .collection("planes_financieros")
+            .whereIn("id", planIds)
             .get()
-            .addOnSuccessListener { result ->
-                val planes = result.documents.mapNotNull {
-                    it.toObject(PlanFinanciero::class.java)
-                }
-                onResult(planes)
-            }
-            .addOnFailureListener {
-                Log.e("Firestore", "Error al obtener planes por IDs", it)
-                onResult(emptyList())
-            }
+            .await()
+
+        return snapshot.documents.mapNotNull {
+            it.toObject(PlanFinanciero::class.java)
+        }
     }
 
     //Obtener un solo plan por id
