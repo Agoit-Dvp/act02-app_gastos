@@ -10,9 +10,11 @@ import com.example.controlgastos.data.model.PlanFinanciero
 import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
 import com.example.controlgastos.data.repository.PlanFinancieroRepository
 import com.example.controlgastos.data.repository.UsuarioRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class PlanesViewModel : ViewModel() {
 
@@ -35,22 +37,25 @@ class PlanesViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun cargarDatos(usuarioId: String) {
-        cargarPlanesDelUsuario(usuarioId)
-        cargarInvitacionesPendientes(usuarioId)
+    private val currentUserId: String
+        get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+
+    fun cargarDatos() {
+        cargarPlanesDelUsuario()
+        cargarInvitacionesPendientes()
     }
 
-    fun cargarPlanesDelUsuario(usuarioId: String) {
+    fun cargarPlanesDelUsuario() {
         viewModelScope.launch {
             _isLoading.value = true
-
-            val planesList = repoPlanes.obtenerPlanesDeUsuarioSuspend(usuarioId) // ✅ Nuevo uso de función suspend
+            Log.d("PlanesVM", "Planes cargados:")
+            val planesList = repoPlanes.obtenerPlanesDeUsuarioSuspend(currentUserId) // ✅ Nuevo uso de función suspend
             _planes.value = planesList
 
             val accesos = planesList.map {
                 AccesoPlanFinanciero(
                     planId = it.id,
-                    usuarioId = usuarioId,
+                    usuarioId = currentUserId,
                     estado = "aceptado"
                 )
             }
@@ -81,18 +86,32 @@ class PlanesViewModel : ViewModel() {
         }
     }
 
-    fun cargarInvitacionesPendientes(usuarioId: String) {
-        repoAccesos.obtenerInvitacionesPendientes(usuarioId) { accesosList ->
+    fun cargarInvitacionesPendientes() {
+        repoAccesos.obtenerInvitacionesPendientes(currentUserId) { accesosList ->
             _invitaciones.value = accesosList
         }
     }
 
-    fun crearNuevoPlan(plan: PlanFinanciero) {
-        _isLoading.value = true
-        repoPlanes.crearPlan(plan) { exito, _ ->
-            if (exito) {
-                cargarPlanesDelUsuario(plan.creadorId)
-            } else {
+    fun crearNuevoPlan(nombre: String, descripcion: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val nuevoPlan = PlanFinanciero(
+                    nombre = nombre,
+                    descripcion = descripcion,
+                    creadorId = currentUserId,
+                    fechaCreacion = Date()
+                )
+
+                // Usamos la versión suspendida aquí
+                repoPlanes.crearPlanSuspendido(nuevoPlan)
+
+                // Recargar planes tras crear
+                cargarPlanesDelUsuario()
+
+            } catch (e: Exception) {
+                Log.e("PlanesVM", "Error al crear plan", e)
+            } finally {
                 _isLoading.value = false
             }
         }
@@ -101,23 +120,23 @@ class PlanesViewModel : ViewModel() {
     fun eliminarAcceso(usuarioId: String, planId: String) {
         _isLoading.value = true
         repoAccesos.eliminarAcceso(usuarioId, planId) { exito ->
-            if (exito) cargarPlanesDelUsuario(usuarioId)
+            if (exito) cargarPlanesDelUsuario()
             else _isLoading.value = false
         }
     }
 
-    fun aceptarInvitacion(planId: String, usuarioId: String) {
-        repoAccesos.actualizarEstado(usuarioId, planId, "aceptado") { exito ->
+    fun aceptarInvitacion(planId: String) {
+        repoAccesos.actualizarEstado(currentUserId, planId, "aceptado") { exito ->
             if (exito) {
-                cargarPlanesDelUsuario(usuarioId)
-                cargarInvitacionesPendientes(usuarioId)
+                cargarPlanesDelUsuario()
+                cargarInvitacionesPendientes()
             }
         }
     }
 
-    fun rechazarInvitacion(planId: String, usuarioId: String) {
-        repoAccesos.actualizarEstado(usuarioId, planId, "rechazado") { exito ->
-            if (exito) cargarInvitacionesPendientes(usuarioId)
+    fun rechazarInvitacion(planId: String) {
+        repoAccesos.actualizarEstado(currentUserId, planId, "rechazado") { exito ->
+            if (exito) cargarInvitacionesPendientes()
         }
     }
 
@@ -126,10 +145,19 @@ class PlanesViewModel : ViewModel() {
         _isLoading.value = true
         repoPlanes.actualizarPlan(plan) { exito ->
             if (exito) {
-                cargarPlanesDelUsuario(plan.creadorId)
+                cargarPlanesDelUsuario()
             } else {
                 _isLoading.value = false
             }
         }
+    }
+
+    //Limpiar estados
+    fun limpiar() {
+        _planes.value = emptyList()
+        _accesos.value = emptyList()
+        _invitaciones.value = emptyList()
+        _nombresCreadores.value = emptyMap()
+        _isLoading.value = false
     }
 }

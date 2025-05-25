@@ -9,10 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import com.example.controlgastos.navigation.Home
 import com.example.controlgastos.navigation.PlanesListado
+import android.util.Log
+import androidx.compose.material3.Text
 
 @Composable
 fun PlanesListadoEntryPoint(
-    usuarioId: String,
     navController: NavController
 ) {
     val viewModel: PlanesViewModel = viewModel()
@@ -24,8 +25,8 @@ fun PlanesListadoEntryPoint(
     val isLoading by viewModel.isLoading.collectAsState()
 
     // Cargar datos al entrar
-    LaunchedEffect(usuarioId) {
-        viewModel.cargarDatos(usuarioId)
+    LaunchedEffect(true) {
+        viewModel.cargarDatos()
     }
 
     PlanesListadoScreen(
@@ -34,12 +35,7 @@ fun PlanesListadoEntryPoint(
         nombresCreadores = nombresCreadores,
         isLoading = isLoading,
         onCrearNuevo = { nombre, descripcion ->
-            val plan = PlanFinanciero(
-                nombre = nombre,
-                descripcion = descripcion,
-                creadorId = usuarioId
-            )
-            viewModel.crearNuevoPlan(plan)
+            viewModel.crearNuevoPlan(nombre, descripcion)
         },
         onActualizarPlan = { plan ->
             viewModel.actualizarPlan(plan)

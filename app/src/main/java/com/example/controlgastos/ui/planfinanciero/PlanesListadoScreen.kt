@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.ui.planfinanciero.components.AddPlanSheet
 import com.example.controlgastos.ui.planfinanciero.components.EditPlanSheet
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -57,6 +58,7 @@ fun PlanesListadoScreen(
 ) {
     var mostrarSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
 
     var planSeleccionado by remember { mutableStateOf<PlanFinanciero?>(null) }
 

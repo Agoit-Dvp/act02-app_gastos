@@ -43,8 +43,8 @@ fun PlanesUsuarioScreen(
     val isLoading by viewModel.isLoading.collectAsState()
 
     LaunchedEffect(usuarioId) {
-        viewModel.cargarPlanesDelUsuario(usuarioId)
-        viewModel.cargarInvitacionesPendientes(usuarioId)
+        viewModel.cargarPlanesDelUsuario()
+        viewModel.cargarInvitacionesPendientes()
     }
 
     Scaffold { paddingValues ->
@@ -110,7 +110,7 @@ fun PlanesUsuarioScreen(
                             ) {
                                 Button(
                                     onClick = {
-                                        viewModel.aceptarInvitacion(acceso.planId, usuarioId)
+                                        viewModel.aceptarInvitacion(acceso.planId)
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = GreenButton,
@@ -122,7 +122,7 @@ fun PlanesUsuarioScreen(
 
                                 Button(
                                     onClick = {
-                                        viewModel.rechazarInvitacion(acceso.planId, usuarioId)
+                                        viewModel.rechazarInvitacion(acceso.planId)
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = RedButton,
