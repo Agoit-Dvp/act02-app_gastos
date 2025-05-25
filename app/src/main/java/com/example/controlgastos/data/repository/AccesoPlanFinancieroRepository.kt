@@ -190,4 +190,21 @@ class AccesoPlanFinancieroRepository {
                 onResult(null)
             }
     }
+
+    suspend fun obtenerAccesosPorPlan(planId: String): List<AccesoPlanFinanciero> {
+        return try {
+            val snapshot = db.collection(coleccion)
+                .whereEqualTo("planId", planId)
+                .whereEqualTo("estado", "aceptado")
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull {
+                it.toObject(AccesoPlanFinanciero::class.java)
+            }
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error al obtener accesos por plan (suspend)", e)
+            emptyList()
+        }
+    }
 }

@@ -21,13 +21,13 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaUsuariosScreen(viewModel: UsuariosViewModel = viewModel()) {
+fun ListaUsuariosScreen(planId: String, viewModel: UsuariosViewModel = viewModel()) {
     val usuarios by viewModel.usuarios.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
 
     // Cargar usuarios al entrar a la pantalla
-    LaunchedEffect(Unit) {
-        viewModel.cargarUsuarios()
+    LaunchedEffect(planId) {
+        viewModel.cargarUsuariosDelPlan(planId)
     }
 
     Scaffold(

@@ -21,7 +21,7 @@ data class Ingresos(val planId: String)
 data class Gastos(val planId: String)
 
 @Serializable
-object Usuarios
+data class Usuarios(val planId: String)
 
 @Serializable
 object Perfil

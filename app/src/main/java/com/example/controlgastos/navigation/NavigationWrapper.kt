@@ -87,7 +87,7 @@ fun NavigationWrapper() {
                 onNavigateToGastos = { navController.navigate(Gastos(
                     planId = args.planId
                 )) },
-                onNavigateToUsuarios = { navController.navigate(Usuarios) },
+                onNavigateToUsuarios = { navController.navigate(Usuarios(planId = args.planId)) },
                 onNavigateToPerfil = { navController.navigate(Perfil) },
                 onNavigateToCategorias = { navController.navigate(Categorias(planId = args.planId)) },
                 onNavigateToPlanesUsuario = {
@@ -111,8 +111,9 @@ fun NavigationWrapper() {
             IngresosScreen(planId = ingresos.planId)
         }
 
-        composable<Usuarios> {
-            ListaUsuariosScreen()
+        composable<Usuarios> { backStackEntry ->
+            val args = backStackEntry.toRoute<Usuarios>()
+            ListaUsuariosScreen(planId = args.planId)
         }
 
         composable<Perfil> {

@@ -93,4 +93,21 @@ class UsuarioRepository {
 
         return snapshot.getString("nombre")
     }
+
+    suspend fun obtenerUsuariosPorIdsSuspend(uids: List<String>): List<Usuario> {
+        return try {
+            if (uids.isEmpty()) return emptyList()
+
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .whereIn("uid", uids)
+                .get()
+                .await()
+
+            snapshot.toObjects(Usuario::class.java)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error al obtener usuarios por IDs", e)
+            emptyList()
+        }
+    }
 }
