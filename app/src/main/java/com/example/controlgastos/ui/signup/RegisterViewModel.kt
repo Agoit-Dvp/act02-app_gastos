@@ -64,7 +64,7 @@ class RegisterViewModel(
                     descripcion = "Plan creado automáticamente",
                     creadorId = uid
                 )
-                val planId = planRepository.crearPlanSuspendido(nuevoPlan)
+                val planId = planRepository.crearPlan(nuevoPlan)
 
                 // Inicializar categorías por defecto
                 FirestoreInitializer(uid).inicializarCategoriasSuspend(planId)
