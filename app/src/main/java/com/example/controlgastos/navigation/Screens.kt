@@ -35,9 +35,6 @@ data class Categorias(val planId: String)
 @Serializable
 object PlanesListado
 
-@Serializable
-object Invitaciones
-
 //Pasar parametros, debemos usar dataclass
 //@Serializable
 //data class Detail(val name: String)

@@ -43,7 +43,6 @@ fun HomeScreen(
     onNavigateToPerfil: () -> Unit = {},
     onNavigateToCategorias: () -> Unit = {},
     onNavigateToPlanesUsuario: () -> Unit = {},
-    onNavigateToInvitaciones: () -> Unit,
     onLogout: () -> Unit = {}
 ) {
     val usuario by viewModel.usuario.observeAsState()

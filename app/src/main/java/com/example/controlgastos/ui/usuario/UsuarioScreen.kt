@@ -1,6 +1,14 @@
 package com.example.controlgastos.ui.usuario
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -10,6 +18,10 @@ import com.example.controlgastos.data.model.Usuario
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.LayoutDirection
+import com.example.controlgastos.ui.invitaciones.InvitacionesScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -17,36 +29,77 @@ fun UsuarioScreen(viewModel: UsuarioViewModel = viewModel()) {
     val usuario by viewModel.usuario.observeAsState()
     val error by viewModel.error.observeAsState()
 
+    var showInvitaciones by remember { mutableStateOf(false) }
+
+    var topBarPadding by remember { mutableStateOf(0.dp) } //Calcular limite altura animación pantalla invitaciones
+
     // Cargar datos al entrar
     LaunchedEffect(Unit) {
         viewModel.cargarDatosUsuario()
     }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Perfil de Usuario") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+    Box(modifier = Modifier.fillMaxSize()) { //Permite usar  en su contenido modifer align
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Perfil de Usuario") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    actions = {
+                        IconButton(onClick = { showInvitaciones = !showInvitaciones }) {
+                            Icon(Icons.Default.MailOutline, contentDescription = "Ver invitaciones")
+                        }
+                    }
                 )
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            if (error != null) {
-                Text(text = error ?: "Error", color = MaterialTheme.colorScheme.error)
-            } else if (usuario == null) {
-                Text("No se encontró el usuario.")
-            } else {
-                UsuarioInfo(usuario!!)
+            }
+        ) { padding ->
+            topBarPadding = padding.calculateTopPadding() //almacernamos el padding para animación
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                if (error != null) {
+                    Text(text = error ?: "Error", color = MaterialTheme.colorScheme.error)
+                } else if (usuario == null) {
+                    Text("No se encontró el usuario.")
+                } else {
+                    UsuarioInfo(usuario!!)
+                }
             }
         }
+
+        //Ventana retráctil dede el lado derecho
+        //Para InvitacionesScreen
+            AnimatedVisibility(
+                visible = showInvitaciones,
+                enter =  slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }),
+                exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = topBarPadding.value.dp, start = 60.dp)
+                        .align(Alignment.TopEnd) // ahora se aplica dentro del contenido visible
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                            RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
+                        )
+                        .shadow(8.dp)
+                ) {
+                    InvitacionesScreen()
+                    IconButton(
+                        onClick = { showInvitaciones = false },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar invitaciones")
+                    }
+                }
+            }
     }
 }
 

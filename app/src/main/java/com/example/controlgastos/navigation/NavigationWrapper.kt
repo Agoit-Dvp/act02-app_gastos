@@ -94,7 +94,6 @@ fun NavigationWrapper() {
                 onNavigateToPlanesUsuario = {
                     navController.navigate(PlanesListado)
                 },
-                onNavigateToInvitaciones = { navController.navigate(Invitaciones)},
                 onLogout = {
                     navController.navigate(Login) {
                         popUpTo(Login) { inclusive = true }
@@ -133,10 +132,6 @@ fun NavigationWrapper() {
         composable<Categorias> { backStackEntry ->
             val categorias = backStackEntry.toRoute<Categorias>()
             CategoriaScreen(planId = categorias.planId)
-        }
-
-        composable<Invitaciones> {
-            InvitacionesScreen()
         }
 
         composable<PlanesListado> {
