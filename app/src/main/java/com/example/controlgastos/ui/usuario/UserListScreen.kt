@@ -1,13 +1,17 @@
 package com.example.controlgastos.ui.usuario
 
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
@@ -30,7 +34,8 @@ fun ListaUsuariosScreen(
     val usuarios by viewModel.usuarios.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
     val mensaje by viewModel.mensaje.observeAsState() //Mostrar mensaje de éxito/error invitación
-
+    val rolActual by viewModel.rolUsuarioActual.observeAsState()
+    val usuarioActualId by viewModel.currentUserId.observeAsState()
     var showDialogInvitacion by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -87,7 +92,14 @@ fun ListaUsuariosScreen(
             } else {
                 LazyColumn {
                     items(usuarios) { usuario ->
-                        UsuarioItem(usuario)
+                        UsuarioItem(
+                            usuario = usuario,
+                            usuarioActualId = usuarioActualId.toString(),
+                            rolActual = rolActual,
+                            onEliminarUsuario = { uid ->
+                                viewModel.eliminarAcceso(uid, planId)
+                            }
+                        )
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 4.dp),
                             thickness = 1.dp,
@@ -115,14 +127,34 @@ fun ListaUsuariosScreen(
 }
 
 @Composable
-fun UsuarioItem(usuario: Usuario) {
+fun UsuarioItem(
+    usuario: Usuario,
+    usuarioActualId: String,
+    rolActual: String?,
+    onEliminarUsuario: (String) -> Unit
+) {
     val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val fecha = formato.format(usuario.fechaRegistro)
 
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        Text("Nombre: ${usuario.nombre}")
-        Text("Email: ${usuario.email}")
-        Text("Teléfono: ${usuario.telefono}")
-        Text("Registrado: $fecha")
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text("Nombre: ${usuario.nombre}")
+            Text("Email: ${usuario.email}")
+            Text("Teléfono: ${usuario.telefono}")
+            Text("Registrado: $fecha")
+        }
+
+        // Mostrar botón si el usuario actual es admin y no está viendo su propio acceso
+        if (rolActual == "administrador" && usuario.uid != usuarioActualId) {
+            IconButton(onClick = { onEliminarUsuario(usuario.uid) }) {
+                Icon(Icons.Default.Delete, contentDescription = "Eliminar usuario")
+            }
+        }
     }
 }

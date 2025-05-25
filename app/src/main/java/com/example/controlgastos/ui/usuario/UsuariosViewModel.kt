@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.data.model.Usuario
 import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
 import com.example.controlgastos.data.repository.UsuarioRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class UsuariosViewModel(
@@ -22,6 +24,16 @@ class UsuariosViewModel(
 
     private val _mensaje = MutableLiveData<String?>()
     val mensaje: LiveData<String?> = _mensaje
+
+    private val _accesos = MutableLiveData<List<AccesoPlanFinanciero>>()
+    val accesos: LiveData<List<AccesoPlanFinanciero>> = _accesos
+
+    private val _currentUserId: String
+        get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    val currentUserId: LiveData<String> = MutableLiveData(_currentUserId)
+
+    private val _rolUsuarioActual = MutableLiveData<String>()
+    val rolUsuarioActual: LiveData<String> = _rolUsuarioActual
 
 /*    fun cargarUsuarios() {
         repository.obtenerTodosLosUsuarios { lista, errorMsg ->
@@ -43,11 +55,16 @@ class UsuariosViewModel(
                     _usuarios.value = emptyList()
                     return@launch
                 }
-
+                //Usuarios vinculados al plan
                 val lista =
                     repository.obtenerUsuariosPorIds(uids) // ✅ Esta función debe ser suspendida también
 
                 _usuarios.value = lista
+
+                // Guardar el rol del usuario actual (para saber si puede eliminar)
+                val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+                val accesoPropio = accesos.find { it.usuarioId == currentUserId }
+                _rolUsuarioActual.value = accesoPropio?.rol
 
             } catch (e: Exception) {
                 _error.value = e.message ?: "Error al cargar usuarios del plan"
@@ -78,6 +95,29 @@ class UsuariosViewModel(
 
             } catch (e: Exception) {
                 _error.value = e.message ?: "Error al invitar usuario al plan."
+            }
+        }
+    }
+
+    fun cargarAccesosDelPlan(planId: String) {
+        viewModelScope.launch {
+            try {
+                val accesos = accesoRepository.obtenerAccesosPorPlan(planId)
+                _accesos.value = accesos
+            } catch (e: Exception) {
+                _error.value = "Error al obtener accesos"
+            }
+        }
+    }
+
+    fun eliminarAcceso(usuarioId: String, planId: String) {
+        viewModelScope.launch {
+            try {
+                accesoRepository.eliminarAcceso(usuarioId, planId)
+                cargarUsuariosDelPlan(planId)
+                _mensaje.value = "Acceso eliminado correctamente."
+            } catch (e: Exception) {
+                _error.value = "Error al eliminar acceso: ${e.message}"
             }
         }
     }

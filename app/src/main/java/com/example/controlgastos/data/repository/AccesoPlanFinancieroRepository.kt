@@ -108,16 +108,18 @@ class AccesoPlanFinancieroRepository {
             }
     }
 
-    fun eliminarAcceso(usuarioId: String, planId: String, onComplete: (Boolean) -> Unit) {
-        val docId = "${usuarioId}_${planId}"
-        db.collection(coleccion)
-            .document(docId)
-            .delete()
-            .addOnSuccessListener { onComplete(true) }
-            .addOnFailureListener {
-                Log.e("Firestore", "Error al eliminar acceso", it)
-                onComplete(false)
-            }
+    suspend fun eliminarAcceso(usuarioId: String, planId: String): Boolean {
+        return try {
+            val docId = "${usuarioId}_${planId}"
+            db.collection(coleccion)
+                .document(docId)
+                .delete()
+                .await()
+            true
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error al eliminar acceso", e)
+            false
+        }
     }
 
     //Invitar usuarios a planes

@@ -20,7 +20,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.unit.LayoutDirection
 import com.example.controlgastos.ui.invitaciones.InvitacionesScreen
 
 @OptIn(ExperimentalMaterial3Api::class)

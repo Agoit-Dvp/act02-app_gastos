@@ -1,8 +1,6 @@
 package com.example.controlgastos.ui.planfinanciero
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
@@ -129,10 +127,14 @@ class PlanesViewModel : ViewModel() {
     }
 
     fun eliminarAcceso(usuarioId: String, planId: String) {
-        _isLoading.value = true
-        repoAccesos.eliminarAcceso(usuarioId, planId) { exito ->
-            if (exito) cargarPlanesDelUsuario()
-            else _isLoading.value = false
+        viewModelScope.launch {
+            _isLoading.value = true
+            val exito = repoAccesos.eliminarAcceso(usuarioId, planId)
+            if (exito) {
+                cargarPlanesDelUsuario()
+            } else {
+                _isLoading.value = false
+            }
         }
     }
 
