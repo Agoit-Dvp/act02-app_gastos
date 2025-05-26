@@ -11,6 +11,8 @@ class PlanFinancieroRepository(
 ) {
 
     private val coleccionPlanes = "planes_financieros"
+    private val coleccionAccesos = "acceso_plan_financiero"
+
     private val accesoRepo = AccesoPlanFinancieroRepository()
 
     // 1. Crear plan + acceso propietario
@@ -46,8 +48,7 @@ class PlanFinancieroRepository(
     //Obtener planes por usuario suspend
     suspend fun obtenerPlanesDeUsuario(usuarioId: String): List<PlanFinanciero> {
         return try {
-            val accesosSnapshot = FirebaseFirestore.getInstance()
-                .collection("acceso_plan_financiero")
+            val accesosSnapshot = db.collection(coleccionAccesos)
                 .whereEqualTo("usuarioId", usuarioId)
                 .whereEqualTo("estado", "aceptado")
                 .get()
@@ -63,8 +64,7 @@ class PlanFinancieroRepository(
 
             if (planIds.isEmpty()) return emptyList()
 
-            val planesSnapshot = FirebaseFirestore.getInstance()
-                .collection("planes_financieros")
+            val planesSnapshot = db.collection(coleccionPlanes)
                 .whereIn("id", planIds)
                 .get()
                 .await()
@@ -83,8 +83,7 @@ class PlanFinancieroRepository(
     suspend fun obtenerPlanesPorIds(planIds: List<String>): List<PlanFinanciero> {
         if (planIds.isEmpty()) return emptyList()
 
-        val snapshot = FirebaseFirestore.getInstance()
-            .collection("planes_financieros")
+        val snapshot = db.collection(coleccionPlanes)
             .whereIn("id", planIds)
             .get()
             .await()
@@ -129,8 +128,7 @@ class PlanFinancieroRepository(
             return
         }
 
-        FirebaseFirestore.getInstance()
-            .collection("planes_financieros")
+        db.collection(coleccionPlanes)
             .document(plan.id)
             .set(plan)
             .addOnSuccessListener { onResult(true) }
@@ -138,6 +136,17 @@ class PlanFinancieroRepository(
                 Log.e("Firestore", "Error al actualizar plan", e)
                 onResult(false)
             }
+    }
+
+    //Eliminar plan por id
+    suspend fun eliminarPlan(planId: String): Boolean {
+        return try {
+            db.collection(coleccionPlanes).document(planId).delete().await()
+            true
+        } catch (e: Exception) {
+            Log.e("PlanRepo", "Error al eliminar plan", e)
+            false
+        }
     }
 
 }

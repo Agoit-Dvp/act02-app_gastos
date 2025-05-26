@@ -1,13 +1,15 @@
 package com.example.controlgastos.data.repository
 
+import android.util.Log
 import com.example.controlgastos.data.model.Categoria
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import java.util.*
 
 class CategoriaRepository {
 
-    private val firestore = FirebaseFirestore.getInstance()
-    private val categoriaCollection = firestore.collection("categorias")
+    private val db = FirebaseFirestore.getInstance()
+    private val categoriaCollection = db.collection("categorias")
 
     fun agregarCategoria(categoria: Categoria, onResult: (Boolean, String?) -> Unit) {
         val id = UUID.randomUUID().toString()
@@ -65,16 +67,32 @@ class CategoriaRepository {
     }
 
     fun actualizarCategoria(categoria: Categoria, onResult: (Boolean, String?) -> Unit) {
-        firestore.collection("categorias").document(categoria.id)
+        categoriaCollection.document(categoria.id)
             .set(categoria)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
 
     fun eliminarCategoria(id: String, onResult: (Boolean, String?) -> Unit) {
-        firestore.collection("categorias").document(id)
+        categoriaCollection.document(id)
             .delete()
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
+    //Eliminar por planID desde PlanesViewModel
+    suspend fun eliminarCategoriasPorPlan(planId: String): Boolean {
+        return try {
+            val snapshot = categoriaCollection
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+
+            snapshot.documents.forEach { it.reference.delete() }
+            true
+        } catch (e: Exception) {
+            Log.e("CategoriaRepo", "Error al eliminar categorías del plan", e)
+            false
+        }
+    }
+
 }

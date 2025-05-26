@@ -1,7 +1,9 @@
 package com.example.controlgastos.data.repository
 
+import android.util.Log
 import com.example.controlgastos.data.model.Gasto
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import java.util.*
 
 class GastoRepository {
@@ -62,5 +64,21 @@ class GastoRepository {
         gastosCollection.document(gasto.id).set(gasto)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { e -> onResult(false, e.message) }
+    }
+
+    //Eliminar por Plan
+    suspend fun eliminarGastosPorPlan(planId: String): Boolean {
+        return try {
+            val snapshot = gastosCollection
+                .whereEqualTo("planId", planId)
+                .get().await()
+
+            snapshot.documents.forEach { it.reference.delete() }
+
+            true
+        } catch (e: Exception) {
+            Log.e("GastosRepo", "Error al eliminar gastos", e)
+            false
+        }
     }
 }

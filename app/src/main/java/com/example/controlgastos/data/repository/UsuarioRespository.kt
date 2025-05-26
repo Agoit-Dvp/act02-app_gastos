@@ -7,8 +7,8 @@ import kotlinx.coroutines.tasks.await
 
 class UsuarioRepository {
 
-    private val firestore = FirebaseFirestore.getInstance()
-    private val usuariosCollection = firestore.collection("usuarios")
+    private val db = FirebaseFirestore.getInstance()
+    private val usuariosCollection = db.collection("usuarios")
 
     fun obtenerUsuario(uid: String, onResult: (Usuario?, String?) -> Unit) {
         usuariosCollection.document(uid)
@@ -42,8 +42,7 @@ class UsuarioRepository {
 
     //Obtener usuario por id
     fun obtenerNombrePorUid(uid: String, onResult: (String?) -> Unit) {
-        FirebaseFirestore.getInstance()
-            .collection("usuarios")
+        usuariosCollection
             .document(uid)
             .get()
             .addOnSuccessListener { doc ->
@@ -58,16 +57,14 @@ class UsuarioRepository {
 
     //Funciones suspendidas
     suspend fun guardarUsuarioSuspendido(usuario: Usuario) {
-        FirebaseFirestore.getInstance()
-            .collection("usuarios")
+        usuariosCollection
             .document(usuario.uid)
             .set(usuario)
             .await()
     }
 
     suspend fun obtenerUsuarioSuspendido(uid: String): Usuario? {
-        val snapshot = FirebaseFirestore.getInstance()
-            .collection("usuarios")
+        val snapshot = usuariosCollection
             .document(uid)
             .get()
             .await()
@@ -76,8 +73,7 @@ class UsuarioRepository {
     }
 
     suspend fun obtenerTodosLosUsuariosSuspendido(): List<Usuario> {
-        val snapshot = FirebaseFirestore.getInstance()
-            .collection("usuarios")
+        val snapshot = usuariosCollection
             .get()
             .await()
 
@@ -85,8 +81,7 @@ class UsuarioRepository {
     }
 
     suspend fun obtenerNombrePorUidSuspendido(uid: String): String? {
-        val snapshot = FirebaseFirestore.getInstance()
-            .collection("usuarios")
+        val snapshot = usuariosCollection
             .document(uid)
             .get()
             .await()
@@ -98,8 +93,7 @@ class UsuarioRepository {
         return try {
             if (uids.isEmpty()) return emptyList()
 
-            val snapshot = FirebaseFirestore.getInstance()
-                .collection("usuarios")
+            val snapshot = usuariosCollection
                 .whereIn("uid", uids)
                 .get()
                 .await()

@@ -1,13 +1,14 @@
 package com.example.controlgastos.data.repository
 
+import android.util.Log
 import com.example.controlgastos.data.model.Ingreso
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import java.util.*
 
 class IngresoRepository {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val ingresosCollection = firestore.collection("ingresos")
+    private val db = FirebaseFirestore.getInstance()
+    private val ingresosCollection = db.collection("ingresos")
 
     fun addIngreso(ingreso: Ingreso, onResult: (Boolean, String?) -> Unit) {
         val id = UUID.randomUUID().toString()
@@ -73,5 +74,21 @@ class IngresoRepository {
             .set(ingreso)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    //Eliminar por planId desde PlanesViewModel
+    suspend fun eliminarIngresosPorPlan(planId: String): Boolean {
+        return try {
+            val snapshot = ingresosCollection
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+
+            snapshot.documents.forEach { it.reference.delete() }
+            true
+        } catch (e: Exception) {
+            Log.e("IngresoRepo", "Error al eliminar ingresos del plan", e)
+            false
+        }
     }
 }

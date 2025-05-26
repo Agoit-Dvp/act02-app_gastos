@@ -11,12 +11,13 @@ import java.util.Date
 class AccesoPlanFinancieroRepository {
 
     private val db = FirebaseFirestore.getInstance()
-    private val coleccion = "acceso_plan_financiero"
+    private val accesoCollection = db.collection("acceso_plan_financiero")
+    private val usuarioCollection = db.collection("usuarios")
 
     fun guardarAcceso(acceso: AccesoPlanFinanciero, onComplete: (Boolean) -> Unit) {
         val docId = "${acceso.usuarioId}_${acceso.planId}" // 👈 estructura fija
         Log.d("Acceso", "Guardando acceso con ID: $docId")
-        db.collection(coleccion)
+        accesoCollection
             .document(docId) // 👈 usamos ID personalizado
             .set(acceso, SetOptions.merge())
             .addOnSuccessListener {
@@ -32,8 +33,7 @@ class AccesoPlanFinancieroRepository {
     suspend fun guardarAccesoSuspendido(acceso: AccesoPlanFinanciero) {
         val docId = "${acceso.usuarioId}_${acceso.planId}"
 
-        FirebaseFirestore.getInstance()
-            .collection("acceso_plan_financiero")
+        accesoCollection
             .document(docId)
             .set(acceso)
             .await()
@@ -48,7 +48,7 @@ class AccesoPlanFinancieroRepository {
     ) {
         val docId = "${usuarioId}_${planId}"
         Log.d("Firestore", "Intentando actualizar docId: $docId a estado: $nuevoEstado")
-        db.collection(coleccion)
+        accesoCollection
             .document(docId)
             .update("estado", nuevoEstado)
             .addOnSuccessListener { onComplete(true) }
@@ -59,8 +59,7 @@ class AccesoPlanFinancieroRepository {
     }
 
     suspend fun obtenerPrimerPlanIdDeUsuario(uid: String): String? {
-        val snapshot = FirebaseFirestore.getInstance()
-            .collection("acceso_plan_financiero")
+        val snapshot = accesoCollection
             .whereEqualTo("usuarioId", uid)
             .whereEqualTo("estado", "aceptado")
             .limit(1)
@@ -72,8 +71,7 @@ class AccesoPlanFinancieroRepository {
 
     suspend fun obtenerAccesosDeUsuario(usuarioId: String): List<AccesoPlanFinanciero> {
         return try {
-            val snapshot = FirebaseFirestore.getInstance()
-                .collection("acceso_plan_financiero")
+            val snapshot = accesoCollection
                 .whereEqualTo("usuarioId", usuarioId)
                 .whereEqualTo("estado", "aceptado")
                 .get()
@@ -92,7 +90,7 @@ class AccesoPlanFinancieroRepository {
         usuarioId: String,
         onResult: (List<AccesoPlanFinanciero>) -> Unit
     ) {
-        db.collection(coleccion)
+        accesoCollection
             .whereEqualTo("usuarioId", usuarioId)
             .whereEqualTo("estado", "pendiente")
             .get()
@@ -111,7 +109,7 @@ class AccesoPlanFinancieroRepository {
     suspend fun eliminarAcceso(usuarioId: String, planId: String): Boolean {
         return try {
             val docId = "${usuarioId}_${planId}"
-            db.collection(coleccion)
+            accesoCollection
                 .document(docId)
                 .delete()
                 .await()
@@ -125,8 +123,7 @@ class AccesoPlanFinancieroRepository {
     //Invitar usuarios a planes
     suspend fun invitarUsuarioAPlan(usuarioId: String, planId: String): Boolean {
         val docId = "${usuarioId}_${planId}"
-        val ref = FirebaseFirestore.getInstance()
-            .collection("acceso_plan_financiero")
+        val ref = accesoCollection
             .document(docId)
 
         val snapshot = ref.get().await()
@@ -146,8 +143,7 @@ class AccesoPlanFinancieroRepository {
 
     //Buscar por correo
     suspend fun buscarUsuarioPorEmail(email: String): String? {
-        val snapshot = FirebaseFirestore.getInstance()
-            .collection("usuarios")
+        val snapshot = usuarioCollection
             .whereEqualTo("email", email)
             .limit(1)
             .get()
@@ -158,7 +154,7 @@ class AccesoPlanFinancieroRepository {
 
     suspend fun obtenerAccesosPorPlan(planId: String): List<AccesoPlanFinanciero> {
         return try {
-            val snapshot = db.collection(coleccion)
+            val snapshot = accesoCollection
                 .whereEqualTo("planId", planId)
                 .whereEqualTo("estado", "aceptado")
                 .get()
