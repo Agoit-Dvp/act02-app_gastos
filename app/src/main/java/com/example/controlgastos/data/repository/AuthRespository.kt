@@ -1,16 +1,14 @@
 package com.example.controlgastos.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
 
-    fun loginUser(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
+    suspend fun loginUser(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                if (it.isSuccessful) onResult(true, null)
-                else onResult(false, it.exception?.message)
-            }
+            .await()
     }
 
     fun register(email: String, password: String, onResult: (Boolean, String?) -> Unit) {

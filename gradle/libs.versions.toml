@@ -1,35 +1,32 @@
 [versions]
-agp = "8.9.1"
-kotlin = "1.9.0"
-coreKtx = "1.15.0"
+agp = "8.10.0"
+datastorePreferences = "1.0.0"
+hiltAndroid = "2.56.2" #inyeccion de dependencias con HILT
+kotlin = "2.0.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-appcompat = "1.7.0" #Eliminar al finalizar migracion a compose
-material = "1.12.0" #Eliminar al finalizar migracion a compose
-activity = "1.9.3" #Eliminar al finalizar migracion a compose
-constraintlayout = "2.2.0" #Eliminar al finalizar migracion a compose
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2024.04.01"
-navigationCompose = "2.8.2"
-kotlinxSerialization = "1.6.3"
-liveData = "1.6.7" #Vincular ViewMode a Screen
-firebaseBom = "33.1.1" #Conjunto de librerías necesarias para firebase
+composeBom = "2025.05.01"
+navigationCompose = "2.9.0"
+kotlinxSerialization = "1.7.3"
+liveData = "1.8.2" #Vincular ViewMode a Screen
+firebaseBom = "33.14.0" #Conjunto de librerías necesarias para firebase
 services = "4.4.2" #Para servicios de google
-crashlytics = "3.0.2" #Para registrar crashs de la app en el dashboard de firebase
+crashlytics = "3.0.3" #Para registrar crashs de la app en el dashboard de firebase
+ksp = "2.0.0-1.0.21"
 detekt = "1.23.5" #analizador de código (buenas praticas)
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-#Para vistas xml
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 #Para composable
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -42,18 +39,21 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-navigation-compose = {module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose"} #Dependencias para navegacon compose
-kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization"} #Serialization para navegacion
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" } #Dependencias para navegacon compose
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" } #Serialization para navegacion
 #Firebase
-firebase-bom = {module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom"} #Conjunto de librerias necesarias para firebase
-firebase-crashlytics = {module = "com.google.firebase:firebase-crashlytics"}
-firebase-auth = {module = "com.google.firebase:firebase-auth-ktx" }
-firebase-firestore = {module= "com.google.firebase:firebase-firestore"}
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" } #Conjunto de librerias necesarias para firebase
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-jetbrainsKotlinSerialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"} #Plugin para serialization (datos entre ventanas)
-googleServices = {id = "com.google.gms.google-services", version.ref = "services"}
-crashlytics = {id = "com.google.firebase.crashlytics", version.ref = "crashlytics"}
+jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" } #Plugin para serialization (datos entre ventanas)
+googleServices = { id = "com.google.gms.google-services", version.ref = "services" }
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" } #El compilador ahora usa la version de kotlin
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }

@@ -1,31 +1,27 @@
 package com.example.controlgastos
 
-import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
+import com.example.controlgastos.navigation.NavigationWrapper
+import com.example.controlgastos.ui.theme.ControlGastosTheme
 
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_usuario)
+        setContent {
+            ControlGastosTheme {
 
-        val dbHelper = DBHelper(this)
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                        NavigationWrapper()
+                    }
 
-        if (dbHelper.hayUsuarios()) {
-            // Si hay usuarios, abrir LoginActivity
-            val intent = Intent(this, LoginActivity::class.java)
-
-            startActivity(intent)
-        } else {
-            // Si no hay usuarios, abrir UsuarioActivity para crear uno
-            val intent = Intent(this, UsuarioActivity::class.java)
-            startActivity(intent)
+            }
         }
-
-        finish() // Cierra MainActivity para que no se pueda volver atrás
-
     }
 }

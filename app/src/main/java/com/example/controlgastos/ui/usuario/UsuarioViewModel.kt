@@ -41,4 +41,17 @@ class UsuarioViewModel(
             }
         }
     }
+
+    fun actualizarDatosUsuario(nombre: String, telefono: String) {
+        val usuarioActual = usuario.value ?: return
+        val actualizado = usuarioActual.copy(nombre = nombre, telefono = telefono)
+
+        repository.guardarUsuario(actualizado) { exito, errorMsg ->
+            if (exito) {
+                _usuario.value = actualizado
+            } else {
+                _error.value = errorMsg ?: "Error al actualizar usuario"
+            }
+        }
+    }
 }

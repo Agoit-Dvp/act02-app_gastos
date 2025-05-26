@@ -10,14 +10,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.controlgastos.data.model.Categoria
 import com.example.controlgastos.data.repository.CategoriaRepository
+import com.example.controlgastos.ui.categoria.CategoriaViewModel
 import com.example.controlgastos.ui.theme.AppColors
 import java.util.*
 
 @Composable
 fun AddCategoriaSheet(
     esIngreso: Boolean,
-    onCategoriaCreada: () -> Unit,
-    categoriaRepository: CategoriaRepository = CategoriaRepository()
+    usuarioId: String,
+    planId: String,
+    viewModel: CategoriaViewModel,
+    onCategoriaCreada: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
     var selectedIcon by remember { mutableStateOf(customIcons.first().first) }
@@ -49,15 +52,22 @@ fun AddCategoriaSheet(
                     return@Button
                 }
 
+                if (viewModel.existeCategoriaConNombre(nombre, esIngreso)) {
+                    error = "Ya existe una categoría con ese nombre"
+                    return@Button
+                }
+
                 isSaving = true
                 val nueva = Categoria(
                     id = UUID.randomUUID().toString(),
                     nombre = nombre.trim(),
                     esIngreso = esIngreso,
-                    iconName = selectedIcon
+                    iconName = selectedIcon,
+                    usuarioId = usuarioId,
+                    planId = planId
                 )
 
-                categoriaRepository.agregarCategoria(nueva) { success, errorMsg ->
+                viewModel.agregarCategoria(nueva) { success, errorMsg ->
                     isSaving = false
                     if (success) onCategoriaCreada()
                     else error = errorMsg ?: "Error al guardar"

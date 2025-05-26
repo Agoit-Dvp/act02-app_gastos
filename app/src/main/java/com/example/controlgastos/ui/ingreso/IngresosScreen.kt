@@ -2,14 +2,18 @@ package com.example.controlgastos.ui.ingreso
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.padding
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,23 +21,30 @@ import com.example.controlgastos.data.model.Ingreso
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.example.controlgastos.ui.ingreso.components.AddIngresoSheet
 import com.example.controlgastos.ui.ingreso.components.EditIngresoSheet
 import com.example.controlgastos.ui.ingreso.components.IngresosContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
+fun IngresosScreen(
+    planId: String,
+    viewModel: IngresosViewModel = viewModel()
+) {
     val ingresos by viewModel.ingresos.observeAsState(initial = emptyList())
     val error by viewModel.error.observeAsState()
 
     var showSheet by remember { mutableStateOf(false) }
-
     var ingresoSeleccionado by remember { mutableStateOf<Ingreso?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
-    LaunchedEffect(Unit) {
-        viewModel.cargarIngresosUsuario()
+    // ✅ Cargar ingresos del plan actual
+    LaunchedEffect(planId) {
+        viewModel.cargarIngresosDePlan(planId)
     }
 
     Scaffold(
@@ -47,7 +58,7 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showSheet = true},
+                onClick = { showSheet = true },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar ingreso")
@@ -70,14 +81,15 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
             sheetState = sheetState
         ) {
             AddIngresoSheet(
+                planId = planId, // ✅ pasar planId
                 onIngresoGuardado = {
                     showSheet = false
-                    viewModel.cargarIngresosUsuario()
+                    viewModel.cargarIngresosDePlan(planId)
                 }
             )
         }
     }
-    //Editar y modificar en IngresoScreen
+
     if (ingresoSeleccionado != null) {
         ModalBottomSheet(
             onDismissRequest = { ingresoSeleccionado = null },
@@ -88,14 +100,13 @@ fun IngresosScreen(viewModel: IngresosViewModel = viewModel()) {
                 onDismiss = { ingresoSeleccionado = null },
                 onIngresoActualizado = {
                     ingresoSeleccionado = null
-                    viewModel.cargarIngresosUsuario()
+                    viewModel.cargarIngresosDePlan(planId)
                 },
                 onIngresoEliminado = {
                     ingresoSeleccionado = null
-                    viewModel.cargarIngresosUsuario()
+                    viewModel.cargarIngresosDePlan(planId)
                 }
             )
         }
     }
 }
-

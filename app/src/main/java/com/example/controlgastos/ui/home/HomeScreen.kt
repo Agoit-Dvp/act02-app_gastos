@@ -35,19 +35,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    planId: String, //Se agrega id del plan
     viewModel: HomeViewModel = viewModel(),
     onNavigateToIngresos: () -> Unit = {},
     onNavigateToGastos: () -> Unit = {},
     onNavigateToUsuarios: () -> Unit = {},
     onNavigateToPerfil: () -> Unit = {},
     onNavigateToCategorias: () -> Unit = {},
+    onNavigateToPlanesUsuario: () -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
     val usuario by viewModel.usuario.observeAsState()
+    val planSeleccionado by viewModel.planSeleccionado.observeAsState() //para el plan seleccionado
     val context = LocalContext.current
-    // Cargar los datos del usuario al entrar
+    // Cargar los datos del usuario al entrar y el plan actual
     LaunchedEffect(Unit) {
         viewModel.cargarUsuario()
+        viewModel.cargarPlanSeleccionado(planId)
     }
 
     Scaffold(
@@ -92,13 +96,29 @@ fun HomeScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
+                //Confirmar que recebimos el plan
+                Text(
+                    text = "Plan actual: ${planSeleccionado?.nombre ?: "No seleccionado"}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                if (!planSeleccionado?.descripcion.isNullOrBlank()) {
+                    Text(
+                        text = planSeleccionado!!.descripcion,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
 
                 // Composables después del mensaje de bienvenida
                 DashboardGrid(
                     onIngresosClick = { onNavigateToIngresos() },
                     onGastosClick = { onNavigateToGastos() },
                     onUsuariosClick = { onNavigateToUsuarios() },
-                    onCategoriasClick = {onNavigateToCategorias()},
+                    onCategoriasClick = { onNavigateToCategorias() },
+                    onPlanesUsuarioClick = { onNavigateToPlanesUsuario() },
                     onLogoutClick = {
                         viewModel.cerrarSesion()
                         Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
@@ -116,6 +136,7 @@ fun DashboardGrid(
     onGastosClick: () -> Unit,
     onUsuariosClick: () -> Unit,
     onCategoriasClick: () -> Unit,
+    onPlanesUsuarioClick: () -> Unit,//Probar pantalla invitaciones
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -150,6 +171,14 @@ fun DashboardGrid(
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            //
+            DashboardItem(
+                title = "Planes",
+                iconRes = R.drawable.ic_planesuser_24,
+                onClick = onPlanesUsuarioClick,
+                modifier = Modifier.weight(1f)
+            )
+            //
             DashboardItem(
                 title = "Salir",
                 iconRes = R.drawable.ic_logout_24,

@@ -14,5 +14,6 @@ data class Gasto(
     val notas: String? = null,
     val recurrente: Boolean = false,
     val frecuencia: String? = null,        // "Mensual", "Semanal", etc.
-    val usuarioId: String = ""             // ID del usuario que hizo el gasto
+    val usuarioId: String = "",             // ID del usuario que hizo el gasto
+    val planId: String = ""             // nuevo: vinculación al plan financiero
 )

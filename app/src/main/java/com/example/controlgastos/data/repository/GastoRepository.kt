@@ -1,13 +1,16 @@
 package com.example.controlgastos.data.repository
 
+import android.util.Log
 import com.example.controlgastos.data.model.Gasto
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import java.util.*
 
 class GastoRepository {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val gastosCollection = firestore.collection("gastos")
+    //Crear conexión con la base de datos
+    private val db = FirebaseFirestore.getInstance()
+    //Indicar la colección de firestore donde se realizara: Add, Get, Update, Delete
+    private val gastosCollection = db.collection("gastos")
 
     fun addGasto(gasto: Gasto, onResult: (Boolean, String?) -> Unit) {
         val id = UUID.randomUUID().toString()
@@ -17,8 +20,14 @@ class GastoRepository {
             .addOnFailureListener { onResult(false, it.message) }
     }
 
-    fun getGastosByUser(userId: String, onResult: (List<Gasto>?, String?) -> Unit) {
-        gastosCollection.whereEqualTo("usuarioId", userId)
+    fun getGastosByUserAndPlan(
+        userId: String,
+        planId: String,
+        onResult: (List<Gasto>?, String?) -> Unit
+    ) {
+        gastosCollection
+            .whereEqualTo("usuarioId", userId)
+            .whereEqualTo("planId", planId) // 👈 nuevo filtro
             .get()
             .addOnSuccessListener { result ->
                 val gastos = result.toObjects(Gasto::class.java)
@@ -55,5 +64,21 @@ class GastoRepository {
         gastosCollection.document(gasto.id).set(gasto)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { e -> onResult(false, e.message) }
+    }
+
+    //Eliminar por Plan
+    suspend fun eliminarGastosPorPlan(planId: String): Boolean {
+        return try {
+            val snapshot = gastosCollection
+                .whereEqualTo("planId", planId)
+                .get().await()
+
+            snapshot.documents.forEach { it.reference.delete() }
+
+            true
+        } catch (e: Exception) {
+            Log.e("GastosRepo", "Error al eliminar gastos", e)
+            false
+        }
     }
 }

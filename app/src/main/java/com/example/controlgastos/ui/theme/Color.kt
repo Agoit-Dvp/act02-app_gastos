@@ -21,3 +21,7 @@ val Orange80 = Color(0xFFFFE0B2)      // Naranja claro - gastos
 val Green40 = Color(0xFF2E7D32)       // Verde oscuro - ingresos
 val GreyBlue40 = Color(0xFF455A64)    // Azul grisáceo oscuro - neutro
 val Orange40 = Color(0xFFE65100)      // Naranja fuerte - gastos
+
+// Botones de acción
+val RedButton = Color(0xFFD32F2F)     // Rojo Material Design - rechazar
+val GreenButton = Color(0xFF388E3C)   // Verde Material Design - aceptar

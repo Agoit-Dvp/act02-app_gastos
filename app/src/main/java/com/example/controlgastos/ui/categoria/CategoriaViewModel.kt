@@ -20,7 +20,7 @@ class CategoriaViewModel(
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    fun cargarCategorias(esIngreso: Boolean) {
+/*    fun cargarCategorias(esIngreso: Boolean) { //eliminar si funciona el nuevo
         _isLoading.value = true
         repository.obtenerCategorias(esIngreso) { lista, errorMsg ->
             _isLoading.value = false
@@ -31,30 +31,51 @@ class CategoriaViewModel(
                 _error.value = null
             }
         }
+    }*/
+
+    fun cargarCategorias(planId: String, esIngreso: Boolean) {
+        _isLoading.value = true
+        repository.obtenerCategoriasDePlan(planId, esIngreso) { lista ->
+            _isLoading.value = false
+            _categorias.value = lista
+            _error.value = null
+        }
     }
 
-    fun agregarCategoria(categoria: Categoria, onFinish: (Boolean, String?) -> Unit = { _, _ -> }) {
+    fun existeCategoriaConNombre(nombre: String, esIngreso: Boolean): Boolean {
+        return _categorias.value
+            ?.any { it.nombre.equals(nombre.trim(), ignoreCase = true) && it.esIngreso == esIngreso }
+            ?: false
+    }
+//Funciones sin uso
+   fun agregarCategoria(categoria: Categoria, onFinish: (Boolean, String?) -> Unit = { _, _ -> }) {
         repository.agregarCategoria(categoria) { success, errorMsg ->
             if (success) {
-                cargarCategorias(categoria.esIngreso)
+                cargarCategorias(categoria.planId, categoria.esIngreso)
             }
             onFinish(success, errorMsg)
         }
     }
 
-    fun eliminarCategoria(id: String, esIngreso: Boolean, onFinish: (Boolean, String?) -> Unit = { _, _ -> }) {
+    fun eliminarCategoria(
+        id: String,
+        planId: String,
+        esIngreso: Boolean,
+        onFinish: (Boolean, String?) -> Unit = { _, _ -> }
+    ) {
         repository.eliminarCategoria(id) { success, errorMsg ->
             if (success) {
-                cargarCategorias(esIngreso)
+                cargarCategorias(planId, esIngreso)
             }
             onFinish(success, errorMsg)
         }
     }
+
 
     fun actualizarCategoria(categoria: Categoria, onFinish: (Boolean, String?) -> Unit = { _, _ -> }) {
         repository.actualizarCategoria(categoria) { success, errorMsg ->
             if (success) {
-                cargarCategorias(categoria.esIngreso)
+                cargarCategorias(categoria.planId, categoria.esIngreso)
             }
             onFinish(success, errorMsg)
         }

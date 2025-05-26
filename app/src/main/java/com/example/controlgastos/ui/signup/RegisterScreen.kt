@@ -16,12 +16,14 @@ import com.example.controlgastos.ui.theme.AppColors
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = viewModel(),
-    navigateToHome: () -> Unit
+    navigateToLogin: () -> Unit
 ) {
     val nombre by viewModel.nombre.observeAsState("")
     val email by viewModel.email.observeAsState("")
     val password by viewModel.password.observeAsState("")
     val telefono by viewModel.telefono.observeAsState("")
+
+    //Estados de confirmación y error
     val success by viewModel.registerSuccess.observeAsState(false)
     val error by viewModel.errorMessage.observeAsState()
 
@@ -30,7 +32,7 @@ fun RegisterScreen(
     LaunchedEffect(success) {
         if (success) {
             Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
-            navigateToHome()
+            navigateToLogin()
         }
     }
 

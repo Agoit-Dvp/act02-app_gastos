@@ -5,11 +5,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
 import com.example.controlgastos.data.repository.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
 class LoginViewModel(private val authRepository: AuthRepository = AuthRepository()) : ViewModel() {
+
+    private val accesoRepo = AccesoPlanFinancieroRepository()
 
     private val _email = MutableLiveData<String>() //Estado privado
     val email: LiveData<String> = _email // Modificar el estado privado solo desde el loginViewModel
@@ -20,14 +27,11 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
     private val _loginEnable = MutableLiveData<Boolean>()
     val loginEnable: LiveData<Boolean> = _loginEnable
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
+    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
-    private val _loginSuccess = MutableLiveData<Boolean>()
-    val loginSuccess: LiveData<Boolean> = _loginSuccess
-
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> = _errorMessage
+    private val _planId = MutableStateFlow<String?>(null)
+    val planId: StateFlow<String?> = _planId.asStateFlow()
 
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
@@ -46,18 +50,31 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
         val password = _password.value ?: return
 
         viewModelScope.launch {
-            _isLoading.value = true
-            authRepository.loginUser(email, password) { success, error ->
-                _isLoading.value = false
-                if (success) {
-                    _loginSuccess.value = true
-                    _errorMessage.value = null
-                } else {
-                    _loginSuccess.value = false
-                    _errorMessage.value = error
+            _loginState.value = LoginState.Loading
+            try {
+                authRepository.loginUser(email, password) // suspend
+                _loginState.value = LoginState.Success
+
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                uid?.let {
+                    val planId = accesoRepo.obtenerPrimerPlanIdDeUsuario(it)
+                    _planId.value = planId
                 }
+
+            } catch (e: Exception) {
+                _loginState.value = LoginState.Error(e.message ?: "Error desconocido")
             }
         }
     }
 
+    fun resetLoginState() {
+        _loginState.value = LoginState.Idle
+    }
+}
+
+sealed class LoginState {
+    object Idle : LoginState()
+    object Loading : LoginState()
+    object Success : LoginState()
+    data class Error(val message: String) : LoginState()
 }

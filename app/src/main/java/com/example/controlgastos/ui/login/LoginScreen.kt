@@ -22,6 +22,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,26 +46,27 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
+    planId: String?,
     navigateToRegister: () -> Unit,
-    navigateToHome: () -> Unit
+    navigateToHome: (String) -> Unit
 ) { //Para poder acceder a los estados de LoginViewModel
-    val loginSuccess: Boolean by viewModel.loginSuccess.observeAsState(initial = false)
-    val errorMessage: String? by viewModel.errorMessage.observeAsState()
+    val loginState by viewModel.loginState.collectAsState()
+    val loadedPlanId by viewModel.planId.collectAsState()
     val context = LocalContext.current //Saber el contexto actual de la UI para pasarlo a Toast
 
-    LaunchedEffect(loginSuccess, errorMessage) {
-        when {
-            loginSuccess == true && errorMessage == null -> {
-                navigateToHome()
-            }
+    // Navegar cuando el login tiene éxito y el planId fue cargado
+    LaunchedEffect(loginState, loadedPlanId) {
+        if (loginState is LoginState.Success && loadedPlanId != null) {
+            viewModel.resetLoginState()
+            navigateToHome(loadedPlanId!!)
+        }
 
-            errorMessage != null -> {
-                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-                // Opcional: limpiar el mensaje para no mostrarlo varias veces
-                //viewModel.clearError()
-            }
+        if (loginState is LoginState.Error) {
+            val message = (loginState as LoginState.Error).message
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -83,7 +85,8 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: () 
     val email: String by viewModel.email.observeAsState(initial = "")
     val password: String by viewModel.password.observeAsState(initial = "")
     val loginEnable: Boolean by viewModel.loginEnable.observeAsState(initial = false)
-    val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
+    val loginState by viewModel.loginState.collectAsState()
+    val isLoading = loginState is LoginState.Loading
     val coroutineScope = rememberCoroutineScope()
 
     if (isLoading) {

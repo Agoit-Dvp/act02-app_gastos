@@ -9,16 +9,19 @@ import kotlinx.serialization.Serializable
 object Login
 
 @Serializable
-object Home
+data class Home(val planId: String)
+
+/*@Serializable
+object Home()*/ //Sin pasar id
 
 @Serializable
-object Ingresos
+data class Ingresos(val planId: String)
 
 @Serializable
-object Gastos
+data class Gastos(val planId: String)
 
 @Serializable
-object Usuarios
+data class Usuarios(val planId: String)
 
 @Serializable
 object Perfil
@@ -27,7 +30,10 @@ object Perfil
 object Register
 
 @Serializable
-object Categorias
+data class Categorias(val planId: String)
+
+@Serializable
+object PlanesListado
 
 //Pasar parametros, debemos usar dataclass
 //@Serializable

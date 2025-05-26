@@ -17,9 +17,10 @@ class IngresosViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    fun cargarIngresosUsuario() {
+    // ✅ NUEVO: cargar ingresos filtrando por planId
+    fun cargarIngresosDePlan(planId: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        repository.getIngresosByUser(userId) { lista, errorMsg ->
+        repository.getIngresosByUserAndPlan(userId, planId) { lista, errorMsg ->
             if (errorMsg != null) {
                 _error.value = errorMsg
             } else {

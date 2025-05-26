@@ -17,9 +17,11 @@ class GastosViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    fun cargarGastosUsuario() {
+    // NUEVO: Cargar gastos filtrando por usuario y plan
+    fun cargarGastosDePlan(planId: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        repository.getGastosByUser(userId) { lista, errorMsg ->
+
+        repository.getGastosByUserAndPlan(userId, planId) { lista, errorMsg ->
             if (errorMsg != null) {
                 _error.value = errorMsg
             } else {
