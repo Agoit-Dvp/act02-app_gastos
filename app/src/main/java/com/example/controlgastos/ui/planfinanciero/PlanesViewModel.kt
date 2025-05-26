@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.data.model.PlanFinanciero
 import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
+import com.example.controlgastos.data.repository.CategoriaRepository
+import com.example.controlgastos.data.repository.GastoRepository
+import com.example.controlgastos.data.repository.IngresoRepository
 import com.example.controlgastos.data.repository.PlanFinancieroRepository
 import com.example.controlgastos.data.repository.UsuarioRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +22,9 @@ class PlanesViewModel : ViewModel() {
     private val repoPlanes = PlanFinancieroRepository()
     private val repoAccesos = AccesoPlanFinancieroRepository()
     private val repoUsuarios = UsuarioRepository()
+    private val repoGastos = GastoRepository()
+    private val repoIngresos = IngresoRepository()
+    private val repoCategorias = CategoriaRepository()
 
     private val _planes = MutableStateFlow<List<PlanFinanciero>>(emptyList())
     val planes: StateFlow<List<PlanFinanciero>> = _planes
@@ -37,6 +43,9 @@ class PlanesViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _mensaje = MutableStateFlow<String?>(null)
+    val mensaje: StateFlow<String?> = _mensaje
 
     private val currentUserId: String
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
@@ -163,6 +172,65 @@ class PlanesViewModel : ViewModel() {
                 _isLoading.value = false
             }
         }
+    }
+
+    //Eliminar Plan si es un plan propietario sin más usuarios. Y si hay más planes disponibles para el mismo usuario
+    fun eliminarPlan(planId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                val planesDelUsuario = _planes.value
+
+                // Verifica si solo tiene ese plan
+                if (planesDelUsuario.size <= 1) {
+                    _isLoading.value = false
+                    Log.w("PlanesVM", "No se puede eliminar: es el único plan del usuario.")
+                    mostrarMensaje("No se puede eliminar: es el único plan disponible.")
+                    return@launch
+                }
+
+                // Verifica si es propietario y único acceso
+                val accesosDelPlan = repoAccesos.obtenerAccesosPorPlan(planId)
+                val accesoActual = accesosDelPlan.find { it.usuarioId == currentUserId }
+
+                val esPropietarioUnico = accesoActual?.esPropietario == true && accesosDelPlan.size == 1
+                if (!esPropietarioUnico) {
+                    _isLoading.value = false
+                    Log.w("PlanesVM", "No se puede eliminar: no es propietario único.")
+                    mostrarMensaje("No se puede eliminar: el plan es compartido")
+                    return@launch
+                }
+
+                // Elimina el acceso y el plan
+                val exitoAcceso = repoAccesos.eliminarAcceso(currentUserId, planId)
+                val exitoGastos = repoGastos.eliminarGastosPorPlan(planId)
+                val exitoIngresos = repoIngresos.eliminarIngresosPorPlan(planId)
+                val exitoCategorias = repoCategorias.eliminarCategoriasPorPlan(planId)
+                val exitoPlan = repoPlanes.eliminarPlan(planId)
+
+                if (exitoAcceso && exitoGastos && exitoIngresos && exitoCategorias && exitoPlan) {
+                    mostrarMensaje("Plan y datos relacionados eliminados correctamente.")
+                    cargarPlanesDelUsuario()
+                } else {
+                    mostrarMensaje("Error al eliminar uno o más elementos del plan.")
+                    _isLoading.value = false
+                }
+
+            } catch (e: Exception) {
+                _isLoading.value = false
+                mostrarMensaje("Error: ${e.message}")
+            }
+        }
+    }
+
+    //Funciones auxiliares
+    fun mostrarMensaje(mensaje: String) {
+        _mensaje.value = mensaje
+    }
+
+    fun limpiarMensaje() {
+        _mensaje.value = null
     }
 
     //Limpiar estados

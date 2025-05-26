@@ -30,6 +30,7 @@ fun PlanesListadoEntryPoint(
     }
 
     PlanesListadoScreen(
+        viewModel = viewModel,
         planes = planes,
         accesos = accesos,
         nombresCreadores = nombresCreadores,
@@ -44,6 +45,9 @@ fun PlanesListadoEntryPoint(
             navController.navigate(Home(plan.id)) {
                 popUpTo(PlanesListado) { inclusive = true }
             }
+        },
+        onEliminarPlan = { planId ->
+            viewModel.eliminarPlan(planId)
         }
     )
 }

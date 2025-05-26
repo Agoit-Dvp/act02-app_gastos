@@ -14,6 +14,7 @@ fun EditPlanSheet(
     plan: PlanFinanciero,
     onDismiss: () -> Unit,
     onActualizar: (PlanFinanciero) -> Unit,
+    onEliminar: ((String) -> Unit)? = null,
     planRepository: PlanFinancieroRepository = PlanFinancieroRepository()
 ) {
     var nombre by remember { mutableStateOf(plan.nombre) }
@@ -48,6 +49,18 @@ fun EditPlanSheet(
         ) {
             OutlinedButton(onClick = onDismiss) {
                 Text("Cancelar")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            if (onEliminar != null) {
+                OutlinedButton(
+                    onClick = {
+                        onEliminar(plan.id)
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Eliminar")
+                }
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(

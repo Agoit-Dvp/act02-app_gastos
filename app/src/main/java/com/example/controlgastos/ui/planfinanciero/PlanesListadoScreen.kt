@@ -32,12 +32,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.ui.planfinanciero.components.AddPlanSheet
 import com.example.controlgastos.ui.planfinanciero.components.EditPlanSheet
@@ -48,13 +53,15 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanesListadoScreen(
+    viewModel: PlanesViewModel = viewModel(),
     planes: List<PlanFinanciero>,
     accesos: List<AccesoPlanFinanciero> = emptyList(),
     nombresCreadores: Map<String, String> = emptyMap(),
     isLoading: Boolean = false,
     onCrearNuevo: (String, String) -> Unit = { _, _ -> },
     onActualizarPlan: (PlanFinanciero) -> Unit = {},
-    onSeleccionar: (PlanFinanciero) -> Unit = {}
+    onSeleccionar: (PlanFinanciero) -> Unit = {},
+    onEliminarPlan: (String) -> Unit = {}
 ) {
     var mostrarSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -62,7 +69,19 @@ fun PlanesListadoScreen(
 
     var planSeleccionado by remember { mutableStateOf<PlanFinanciero?>(null) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val mensaje by viewModel.mensaje.collectAsState()
+
+    LaunchedEffect(mensaje) {
+        if (!mensaje.isNullOrEmpty()) {
+            snackbarHostState.showSnackbar(mensaje.toString())
+            viewModel.limpiarMensaje() // Esta función debe limpiar el mensaje
+        }
+    }
+
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Planes financieros") },
@@ -146,13 +165,21 @@ fun PlanesListadoScreen(
             onDismissRequest = { planSeleccionado = null },
             sheetState = sheetState
         ) {
+            val puedeEliminar = accesos.find { it.planId == planSeleccionado!!.id }?.esPropietario == true &&
+                    accesos.count { it.planId == planSeleccionado!!.id } == 1
             EditPlanSheet(
                 plan = planSeleccionado!!,
                 onDismiss = { planSeleccionado = null },
                 onActualizar = { actualizado ->
                     planSeleccionado = null
                     onActualizarPlan(actualizado)
-                }
+                },
+                onEliminar = if (puedeEliminar) {
+                    {
+                        onEliminarPlan(planSeleccionado!!.id)
+                        planSeleccionado = null
+                    }
+                } else null
             )
 
         }
