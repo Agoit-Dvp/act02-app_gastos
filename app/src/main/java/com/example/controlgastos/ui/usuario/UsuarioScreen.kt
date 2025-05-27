@@ -156,7 +156,6 @@ fun UsuarioScreen(viewModel: UsuarioViewModel = viewModel()) {
 @Composable
 fun UsuarioInfo(usuario: Usuario, onEditar: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("UID: ${usuario.uid}")
         Text("Nombre: ${usuario.nombre}")
         Text("Email: ${usuario.email}")
         Text("Teléfono: ${usuario.telefono}")
