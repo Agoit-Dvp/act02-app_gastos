@@ -94,14 +94,18 @@ class IngresoRepository {
     }
 
     //Obtener total ingresos por plan
-    fun obtenerTotalIngresos(planId: String, callback: (Double) -> Unit) {
-        ingresosCollection
-            .whereEqualTo("planId", planId)
-            .get()
-            .addOnSuccessListener { result ->
-                val total = result.sumOf { it.getDouble("monto") ?: 0.0 }
-                callback(total)
-            }
+    suspend fun obtenerTotalIngresos(planId: String): Double {
+        return try {
+            val snapshot = ingresosCollection
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+
+            snapshot.sumOf { it.getDouble("valor") ?: 0.0 }
+        } catch (e: Exception) {
+            Log.e("Repo", "Error al obtener ingresos", e)
+            0.0
+        }
     }
 
 }
