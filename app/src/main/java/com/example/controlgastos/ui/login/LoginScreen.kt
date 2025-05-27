@@ -103,8 +103,9 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: () 
             Spacer(modifier = Modifier.padding(8.dp))
             ForgotPassword(Modifier.align(Alignment.Start))
             Spacer(modifier = Modifier.padding(16.dp))
+            val context = LocalContext.current// contexto para usar datastore desde viewMddel
             LoginButton(loginEnable) {
-                coroutineScope.launch { viewModel.onLoginSelected() }
+                coroutineScope.launch { viewModel.onLoginSelected(context) }
             }
             Spacer(modifier = Modifier.padding(16.dp))
             RegisterButton(onRegisterClick = navigateToRegister)
