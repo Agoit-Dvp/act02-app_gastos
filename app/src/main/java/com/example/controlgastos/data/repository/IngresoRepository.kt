@@ -29,6 +29,7 @@ class IngresoRepository {
                 onResult(null, it.message)
             }
     }
+
     //Funcion para obtener ingresos por usuario y plan
     fun getIngresosByUserAndPlan(
         userId: String,
@@ -91,4 +92,16 @@ class IngresoRepository {
             false
         }
     }
+
+    //Obtener total ingresos por plan
+    fun obtenerTotalIngresos(planId: String, callback: (Double) -> Unit) {
+        ingresosCollection
+            .whereEqualTo("planId", planId)
+            .get()
+            .addOnSuccessListener { result ->
+                val total = result.sumOf { it.getDouble("monto") ?: 0.0 }
+                callback(total)
+            }
+    }
+
 }

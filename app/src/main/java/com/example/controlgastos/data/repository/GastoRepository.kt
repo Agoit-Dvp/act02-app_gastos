@@ -81,4 +81,14 @@ class GastoRepository {
             false
         }
     }
+    //Obtener total gastos por plan
+    fun obtenerTotalGastos(planId: String, callback: (Double) -> Unit) {
+        gastosCollection
+            .whereEqualTo("planId", planId)
+            .get()
+            .addOnSuccessListener { result ->
+                val total = result.sumOf { it.getDouble("monto") ?: 0.0 }
+                callback(total)
+            }
+    }
 }
