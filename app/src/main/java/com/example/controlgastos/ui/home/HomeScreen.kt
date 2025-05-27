@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -71,12 +72,21 @@ fun HomeScreen(
 
     val usuario by viewModel.usuario.observeAsState()
     val planSeleccionado by viewModel.planSeleccionado.observeAsState() //para el plan seleccionado
+
+    //Para el saldo (saldoCard)
     val saldo by viewModel.saldo.observeAsState(0.0)
+    //Para acceder a planId guardado en PlanPreferences
     val context = LocalContext.current
+
+    //Para presupuesto mensual (PresupuestoBar)
+    val totalGastado by viewModel.totalGastado.observeAsState(0.0)
+    val presupuestoMensual = planSeleccionado?.presupuestoMensual ?: 0.0
 
     //Cargar PlanesViewModel para acceder al estado interno hayInvitacioensPendientes
     val planesViewModel: PlanesViewModel = viewModel()
     val hayInvitacionesPendientes by planesViewModel.hayInvitacionesPendientes.collectAsState()
+
+    val listState = rememberLazyListState()
 
     // Cargar los datos del usuario al entrar y el plan actual
     LaunchedEffect(Unit) {
@@ -175,9 +185,17 @@ fun HomeScreen(
                     }
                 }
 
-                // ✅ Tarjeta de saldo
+                //Tarjeta de saldo
                 item {
                     SaldoCard(saldo = saldo)
+                }
+
+                //Barra de progreso del presupuesto
+                item {
+                    PresupuestoBar(
+                        totalGastado = totalGastado,
+                        presupuestoMensual = presupuestoMensual
+                    )
                 }
 
                 item {
@@ -198,6 +216,7 @@ fun HomeScreen(
         }
     )
 }
+
 //Menus de acceso
 @Composable
 fun DashboardGrid(
@@ -258,6 +277,7 @@ fun DashboardGrid(
 
     }
 }
+
 //Composable individual para cada menu
 @Composable
 fun DashboardItem(
