@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
@@ -40,6 +41,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.controlgastos.ui.planfinanciero.PlanesViewModel
 
@@ -65,6 +69,7 @@ fun HomeScreen(
 
     val usuario by viewModel.usuario.observeAsState()
     val planSeleccionado by viewModel.planSeleccionado.observeAsState() //para el plan seleccionado
+    val saldo by viewModel.saldo.observeAsState(0.0)
     val context = LocalContext.current
 
     //Cargar PlanesViewModel para acceder al estado interno hayInvitacioensPendientes
@@ -76,6 +81,21 @@ fun HomeScreen(
         viewModel.cargarUsuario()
         viewModel.cargarPlanSeleccionado(planId)
         planesViewModel.cargarInvitacionesPendientes()
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Escuchar ON_RESUME para actualizar saldo al volver
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.actualizarSaldo(planId)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Scaffold(
@@ -155,7 +175,7 @@ fun HomeScreen(
 
                 // ✅ Tarjeta de saldo
                 item {
-                    SaldoCard(saldo = /*planSeleccionado?.saldo ?:*/ 0.0) // Usa saldo real si lo tienes
+                    SaldoCard(saldo = saldo)
                 }
 
                 item {
@@ -250,7 +270,7 @@ fun DashboardItem(
             .clip(MaterialTheme.shapes.medium)
             .clickable { onClick() }
             .padding(24.dp),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Image(
