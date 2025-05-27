@@ -7,5 +7,6 @@ data class PlanFinanciero(
     val nombre: String = "",
     val descripcion: String = "",
     val creadorId: String = "",             // ID del usuario creador
+    val presupuestoMensual: Double = 0.0,
     val fechaCreacion: Date = Date()
 )
