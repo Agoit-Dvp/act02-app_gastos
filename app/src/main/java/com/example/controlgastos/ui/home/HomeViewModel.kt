@@ -35,6 +35,11 @@ class HomeViewModel(
     //Estado para mostrar saldo
     private val _saldo = MutableLiveData<Double>()
     val saldo: LiveData<Double> = _saldo
+
+    //Estado para mostrar total de gastos
+    private val _totalGastado = MutableLiveData<Double>()
+    val totalGastado: LiveData<Double> = _totalGastado
+
     //Cargar usuario
     fun cargarUsuario() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -65,6 +70,7 @@ class HomeViewModel(
                 val totalIngresos = ingresoRepository.obtenerTotalIngresos(planId)
                 val totalGastos = gastoRepository.obtenerTotalGastos(planId)
                 _saldo.value = totalIngresos - totalGastos
+                _totalGastado.value = totalGastos // para PresupuestoBar
             } catch (e: Exception) {
                 _error.value = "Error al calcular el saldo"
             }
