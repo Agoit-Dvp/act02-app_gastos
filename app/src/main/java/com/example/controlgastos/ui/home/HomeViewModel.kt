@@ -3,6 +3,7 @@ package com.example.controlgastos.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.controlgastos.data.model.PlanFinanciero
 import com.example.controlgastos.data.model.Usuario
 import com.example.controlgastos.data.repository.AuthRepository
@@ -11,6 +12,7 @@ import com.example.controlgastos.data.repository.IngresoRepository
 import com.example.controlgastos.data.repository.PlanFinancieroRepository
 import com.example.controlgastos.data.repository.UsuarioRepository
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val repository: UsuarioRepository = UsuarioRepository(),
@@ -58,9 +60,13 @@ class HomeViewModel(
     }
     //Calcular saldo
     private fun calcularSaldo(planId: String) {
-        ingresoRepository.obtenerTotalIngresos(planId) { totalIngresos ->
-            gastoRepository.obtenerTotalGastos(planId) { totalGastos ->
-                _saldo.postValue(totalIngresos - totalGastos)
+        viewModelScope.launch {
+            try {
+                val totalIngresos = ingresoRepository.obtenerTotalIngresos(planId)
+                val totalGastos = gastoRepository.obtenerTotalGastos(planId)
+                _saldo.value = totalIngresos - totalGastos
+            } catch (e: Exception) {
+                _error.value = "Error al calcular el saldo"
             }
         }
     }
@@ -68,7 +74,6 @@ class HomeViewModel(
     fun actualizarSaldo(planId: String) {
         calcularSaldo(planId) // función privada ya existente
     }
-
 
 
     fun cerrarSesion() {
