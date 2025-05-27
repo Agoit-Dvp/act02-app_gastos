@@ -63,11 +63,11 @@ class PlanesViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             Log.d("PlanesVM", "Planes cargados:")
-            val planesList = repoPlanes.obtenerPlanesDeUsuario(currentUserId) // ✅ Nuevo uso de función suspend
+            val planesList = repoPlanes.obtenerPlanesDeUsuario(currentUserId)
             _planes.value = planesList
 
             val accesos = repoAccesos.obtenerAccesosDeUsuario(currentUserId)
-            _accesos.value = accesos // ✅ Puedes mantener esto si necesitas saber qué accesos tiene
+            _accesos.value = accesos // saber qué accesos tiene el usuario
 
             cargarNombresCreadores(planesList)
 
@@ -117,13 +117,14 @@ class PlanesViewModel : ViewModel() {
         }
     }
 
-    fun crearNuevoPlan(nombre: String, descripcion: String) {
+    fun crearNuevoPlan(nombre: String, descripcion: String, presupuesto: Double) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val nuevoPlan = PlanFinanciero(
                     nombre = nombre,
                     descripcion = descripcion,
+                    presupuestoMensual = presupuesto,
                     creadorId = currentUserId,
                     fechaCreacion = Date()
                 )
