@@ -12,11 +12,16 @@ import androidx.compose.foundation.layout.Row
 import com.example.controlgastos.R
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -117,54 +122,61 @@ fun HomeScreen(
             )
         },
         content = { padding ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .padding(16.dp),
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Bienvenido, ${usuario?.nombre ?: "Usuario"}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                //Confirmar que recebimos el plan
-                Text(
-                    text = "Plan actual: ${planSeleccionado?.nombre ?: "No seleccionado"}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                if (!planSeleccionado?.descripcion.isNullOrBlank()) {
+                item {
                     Text(
-                        text = planSeleccionado!!.descripcion,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        text = "Bienvenido, ${usuario?.nombre ?: "Usuario"}",
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
 
-                // Composables después del mensaje de bienvenida
-                DashboardGrid(
-                    onIngresosClick = { onNavigateToIngresos() },
-                    onGastosClick = { onNavigateToGastos() },
-                    onUsuariosClick = { onNavigateToUsuarios() },
-                    onCategoriasClick = { onNavigateToCategorias() },
-                    onPlanesUsuarioClick = { onNavigateToPlanesUsuario() },
-                    onLogoutClick = {
-                        viewModel.cerrarSesion()
-                        Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
-                        onLogout()
+                item {
+                    Text(
+                        text = "Plan actual: ${planSeleccionado?.nombre ?: "No seleccionado"}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                if (!planSeleccionado?.descripcion.isNullOrBlank()) {
+                    item {
+                        Text(
+                            text = planSeleccionado!!.descripcion,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
                     }
-                )
+                }
+
+                // ✅ Tarjeta de saldo
+                item {
+                    SaldoCard(saldo = /*planSeleccionado?.saldo ?:*/ 0.0) // Usa saldo real si lo tienes
+                }
+
+                item {
+                    DashboardGrid(
+                        onIngresosClick = { onNavigateToIngresos() },
+                        onGastosClick = { onNavigateToGastos() },
+                        onUsuariosClick = { onNavigateToUsuarios() },
+                        onCategoriasClick = { onNavigateToCategorias() },
+                        onPlanesUsuarioClick = { onNavigateToPlanesUsuario() },
+                        onLogoutClick = {
+                            viewModel.cerrarSesion()
+                            Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+                            onLogout()
+                        }
+                    )
+                }
             }
         }
     )
 }
-
+//Menus de acceso
 @Composable
 fun DashboardGrid(
     onIngresosClick: () -> Unit,
@@ -224,7 +236,7 @@ fun DashboardGrid(
 
     }
 }
-
+//Composable individual para cada menu
 @Composable
 fun DashboardItem(
     title: String,
@@ -249,5 +261,38 @@ fun DashboardItem(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = title, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+//Composable para mostrar saldo
+@Composable
+fun SaldoCard(
+    saldo: Double,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(120.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF4CAF50))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Saldo disponible",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
+            )
+            Text(
+                text = "$${"%.2f".format(saldo)}",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.End)
+            )
+        }
     }
 }
