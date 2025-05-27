@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -21,19 +22,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.controlgastos.ui.theme.GreenButton
 
 
 @Composable
 fun AddPlanSheet(
-    onCrear: (String, String) -> Unit,
+    onCrear: (String, String, Double) -> Unit,
     onCancelar: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+    var presupuesto by remember { mutableStateOf("") }
     var isSaving by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var presupuestoError by remember { mutableStateOf<String?>(null) }
+
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Nuevo plan financiero", style = MaterialTheme.typography.titleMedium)
@@ -53,6 +58,28 @@ fun AddPlanSheet(
             onValueChange = { descripcion = it },
             label = { Text("Descripción") },
             modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = presupuesto,
+            onValueChange = {
+                presupuesto = it
+                presupuestoError = null // limpiar el error al escribir
+            },
+            label = { Text("Presupuesto mensual") },
+            isError = presupuestoError != null,
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth(),
+            supportingText = {
+                if (presupuestoError != null) {
+                    Text(
+                        text = presupuestoError ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
         )
 
         if (!errorMessage.isNullOrEmpty()) {
@@ -78,9 +105,16 @@ fun AddPlanSheet(
                         errorMessage = "El nombre es obligatorio"
                         return@Button
                     }
+                    val presupuestoDouble = presupuesto.toDoubleOrNull()
+                    if (presupuestoDouble == null || presupuestoDouble < 0) {
+                        presupuestoError = "Presupuesto inválido"
+                        return@Button
+                    }
+
                     isSaving = true
                     errorMessage = null
-                    onCrear(nombre, descripcion)
+
+                    onCrear(nombre, descripcion, presupuestoDouble)
                     isSaving = false
                 },
                 enabled = !isSaving,
