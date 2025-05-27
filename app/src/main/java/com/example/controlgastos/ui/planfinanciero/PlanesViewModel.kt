@@ -147,18 +147,6 @@ class PlanesViewModel : ViewModel() {
         }
     }
 
-    fun eliminarAcceso(usuarioId: String, planId: String) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val exito = repoAccesos.eliminarAcceso(usuarioId, planId)
-            if (exito) {
-                cargarPlanesDelUsuario()
-            } else {
-                _isLoading.value = false
-            }
-        }
-    }
-
     fun aceptarInvitacion(planId: String) {
         repoAccesos.actualizarEstado(currentUserId, planId, "aceptado") { exito ->
             if (exito) {
