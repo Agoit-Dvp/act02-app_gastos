@@ -62,6 +62,7 @@ class RegisterViewModel(
                 val nuevoPlan = PlanFinanciero(
                     nombre = "Mi primer plan",
                     descripcion = "Plan creado automáticamente",
+                    presupuestoMensual = 0.0,
                     creadorId = uid
                 )
                 val planId = planRepository.crearPlan(nuevoPlan)
