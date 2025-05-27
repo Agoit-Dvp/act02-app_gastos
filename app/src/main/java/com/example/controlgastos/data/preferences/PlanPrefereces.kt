@@ -11,25 +11,23 @@ val Context.dataStore by preferencesDataStore(name = "plan_prefs")
 
 object PlanPreferences {
 
-    private val LAST_PLAN_ID = stringPreferencesKey("last_plan_id")
+    private fun keyUsuario(userId: String) = stringPreferencesKey("last_plan_id_$userId")
 
-    // Guardar último planId
-    suspend fun guardarUltimoPlan(context: Context, planId: String) {
+    // Guardar planId junto al usuario actual
+    suspend fun guardarUltimoPlan(context: Context, userId: String, planId: String) {
         context.dataStore.edit { prefs ->
-            prefs[LAST_PLAN_ID] = planId
+            prefs[keyUsuario(userId)] = planId
         }
     }
 
-    // Obtener último planId
-    suspend fun obtenerUltimoPlan(context: Context): String? {
+    suspend fun obtenerUltimoPlan(context: Context, userId: String): String? {
         val prefs = context.dataStore.data.first()
-        return prefs[LAST_PLAN_ID]
+        return prefs[keyUsuario(userId)]
     }
 
-    // Borrar planId guardado
-    suspend fun borrarUltimoPlan(context: Context) {
+    suspend fun borrarUltimoPlan(context: Context, userId: String) {
         context.dataStore.edit { prefs ->
-            prefs.remove(LAST_PLAN_ID)
+            prefs.remove(keyUsuario(userId))
         }
     }
 }

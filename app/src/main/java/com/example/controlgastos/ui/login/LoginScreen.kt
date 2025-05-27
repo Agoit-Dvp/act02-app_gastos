@@ -46,7 +46,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    planId: String?,
     navigateToRegister: () -> Unit,
     navigateToHome: (String) -> Unit
 ) { //Para poder acceder a los estados de LoginViewModel

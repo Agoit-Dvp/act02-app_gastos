@@ -59,8 +59,8 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
 
                 val uid = FirebaseAuth.getInstance().currentUser?.uid
                 uid?.let {
-                    // Verificar si ya hay un plan guardado
-                    val ultimoPlanGuardado = PlanPreferences.obtenerUltimoPlan(context)
+                    // Verificar si ya hay un plan guardado para ese usuario
+                    val ultimoPlanGuardado = PlanPreferences.obtenerUltimoPlan(context, it)
 
                     if (ultimoPlanGuardado != null) {
                         _planId.value = ultimoPlanGuardado
@@ -71,7 +71,7 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
 
                         // Guardar solo si hay uno disponible
                         primerPlanId?.let { id ->
-                            PlanPreferences.guardarUltimoPlan(context, id)
+                            PlanPreferences.guardarUltimoPlan(context, it, id)
                         }
                     }
                 }

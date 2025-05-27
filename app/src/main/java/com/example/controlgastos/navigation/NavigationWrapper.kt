@@ -47,19 +47,20 @@ fun NavigationWrapper() {
     // ✅ CAMBIO: primero intentamos obtener el planId desde DataStore
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
+            val uid = currentUser.uid
             // Intentamos recuperar el último plan guardado
-            val planGuardado = PlanPreferences.obtenerUltimoPlan(context)
+            val planGuardado = PlanPreferences.obtenerUltimoPlan(context, uid)
 
             if (planGuardado != null) {
                 planId = planGuardado
             } else {
                 // Si no hay plan guardado, obtenemos el primero disponible
-                val primerPlan = accesoRepo.obtenerPrimerPlanIdDeUsuario(currentUser.uid)
+                val primerPlan = accesoRepo.obtenerPrimerPlanIdDeUsuario(uid)
                 planId = primerPlan
 
                 // Lo guardamos en DataStore si existe
                 primerPlan?.let {
-                    PlanPreferences.guardarUltimoPlan(context, it)
+                    PlanPreferences.guardarUltimoPlan(context, uid, it)
                 }
             }
         }
@@ -86,7 +87,6 @@ fun NavigationWrapper() {
             //Si la función solo tiene como parametro una función Lambda podemos quitar los parentesis
             LoginScreen(
                 viewModel = viewModel(),
-                planId = planId,
                 navigateToRegister = {
                     navController.navigate(Register)
                 },
