@@ -3,6 +3,7 @@ package com.example.controlgastos.ui.planfinanciero
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.controlgastos.data.initializer.FirestoreInitializer
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.data.model.PlanFinanciero
 import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
@@ -121,8 +122,12 @@ class PlanesViewModel : ViewModel() {
                     fechaCreacion = Date()
                 )
 
-                // Usamos la versión suspendida aquí
-                repoPlanes.crearPlan(nuevoPlan)
+                // Crear el plan y obtener su ID
+                val planId = repoPlanes.crearPlan(nuevoPlan)
+
+                // Inicializar categorías por defecto para ese plan
+                val initializer = FirestoreInitializer(currentUserId)
+                initializer.inicializarCategoriasSuspend(planId)
 
                 // Recargar planes tras crear
                 cargarPlanesDelUsuario()
