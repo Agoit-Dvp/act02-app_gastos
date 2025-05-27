@@ -104,9 +104,9 @@ fun HomeScreen(
                 title = {
                     //Logo que se queda a la izquierda
                     Image(
-                        painter = painterResource(id = R.drawable.logo_horizontal),
+                        painter = painterResource(id = R.drawable.ic_logo_plansave_color),
                         contentDescription = "PlanSave Logo",
-                        modifier = Modifier.height(32.dp)
+                        modifier = Modifier.height(52.dp)
                     )
                 },
                 actions = {
