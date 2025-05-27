@@ -63,7 +63,7 @@ fun LoginScreen(
 
         if (loginState is LoginState.Error) {
             val message = (loginState as LoginState.Error).message
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Usuario o credenciales erroneas", Toast.LENGTH_LONG).show()
         }
     }
 
