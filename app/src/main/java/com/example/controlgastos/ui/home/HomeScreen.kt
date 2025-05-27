@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -312,6 +314,59 @@ fun SaldoCard(
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 modifier = Modifier.align(Alignment.End)
+            )
+        }
+    }
+}
+
+//Composable para mostrar el progreso del presupuesto
+@Composable
+fun PresupuestoBar(
+    totalGastado: Double,
+    presupuestoMensual: Double,
+    modifier: Modifier = Modifier
+) {
+    val porcentajeUsado = if (presupuestoMensual > 0) {
+        (totalGastado / presupuestoMensual).coerceAtMost(1.0)
+    } else 0.0
+
+    val (barraColor, textoColor, mensaje) = when {
+        porcentajeUsado < 0.5 -> Triple(Color(0xFF4CAF50), Color.Gray, "Presupuesto saludable")
+        porcentajeUsado < 0.8 -> Triple(Color(0xFFFFC107), Color.DarkGray, "Precaución")
+        else -> Triple(Color(0xFFF44336), Color.Red, "¡Cerca del límite!")
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(100.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Presupuesto mensual",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            LinearProgressIndicator(
+                progress = { porcentajeUsado.toFloat() }, // ✅ NUEVA API
+                color = barraColor,
+                trackColor = Color.LightGray,
+                strokeCap = StrokeCap.Round,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp))
+            )
+
+            Text(
+                text = "${(porcentajeUsado * 100).toInt()}% usado - $mensaje",
+                style = MaterialTheme.typography.bodySmall,
+                color = textoColor
             )
         }
     }
