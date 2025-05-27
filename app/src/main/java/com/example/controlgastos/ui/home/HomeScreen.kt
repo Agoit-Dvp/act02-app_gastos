@@ -3,14 +3,17 @@ package com.example.controlgastos.ui.home
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import com.example.controlgastos.R
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -22,8 +25,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -31,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.controlgastos.ui.planfinanciero.PlanesViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,16 +61,23 @@ fun HomeScreen(
     val usuario by viewModel.usuario.observeAsState()
     val planSeleccionado by viewModel.planSeleccionado.observeAsState() //para el plan seleccionado
     val context = LocalContext.current
+
+    //Cargar PlanesViewModel para acceder al estado interno hayInvitacioensPendientes
+    val planesViewModel: PlanesViewModel = viewModel()
+    val hayInvitacionesPendientes by planesViewModel.hayInvitacionesPendientes.collectAsState()
+
     // Cargar los datos del usuario al entrar y el plan actual
     LaunchedEffect(Unit) {
         viewModel.cargarUsuario()
         viewModel.cargarPlanSeleccionado(planId)
+        planesViewModel.cargarInvitacionesPendientes()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
+                    //Logo que se queda a la izquierda
                     Image(
                         painter = painterResource(id = R.drawable.logo_horizontal),
                         contentDescription = "PlanSave Logo",
@@ -73,15 +86,30 @@ fun HomeScreen(
                 },
                 actions = {
                     // Imagen de perfil circular a la derecha
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_userprofile_circle_24), // Usa tu icono de usuario o avatar
-                        contentDescription = "Perfil",
+                    Box(
                         modifier = Modifier
                             .padding(end = 16.dp)
                             .size(40.dp)
-                            .clip(CircleShape)
                             .clickable { onNavigateToPerfil() }
-                    )
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_userprofile_circle_24),
+                            contentDescription = "Perfil",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                        )
+
+                        if (hayInvitacionesPendientes) {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = 2.dp, y = (-2).dp)
+                                    .background(Color.Red, shape = CircleShape)
+                            )
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF283593)
