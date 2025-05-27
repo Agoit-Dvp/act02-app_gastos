@@ -239,6 +239,14 @@ fun PlanItem(
                     color = Color.Gray
                 )
             }
+            if (plan.presupuestoMensual > 0.0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Presupuesto mensual: $${"%.2f".format(plan.presupuestoMensual)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
         }
     }
 }
