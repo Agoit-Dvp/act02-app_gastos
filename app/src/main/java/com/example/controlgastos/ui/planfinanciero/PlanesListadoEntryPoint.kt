@@ -42,8 +42,8 @@ fun PlanesListadoEntryPoint(
         accesos = accesos,
         nombresCreadores = nombresCreadores,
         isLoading = isLoading,
-        onCrearNuevo = { nombre, descripcion ->
-            viewModel.crearNuevoPlan(nombre, descripcion)
+        onCrearNuevo = { nombre, descripcion, presupuesto ->
+            viewModel.crearNuevoPlan(nombre, descripcion, presupuesto)
         },
         onActualizarPlan = { plan ->
             viewModel.actualizarPlan(plan)
