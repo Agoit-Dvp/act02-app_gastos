@@ -1,6 +1,7 @@
 package com.example.controlgastos.ui.home
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +46,12 @@ fun HomeScreen(
     onNavigateToPlanesUsuario: () -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
+    // bloquear el botón de retroceso
+    BackHandler {
+        // No hace nada si el usuario pulsa hacia atras
+    }
+
+
     val usuario by viewModel.usuario.observeAsState()
     val planSeleccionado by viewModel.planSeleccionado.observeAsState() //para el plan seleccionado
     val context = LocalContext.current
