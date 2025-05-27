@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -86,7 +85,7 @@ fun HomeScreen(
     val planesViewModel: PlanesViewModel = viewModel()
     val hayInvitacionesPendientes by planesViewModel.hayInvitacionesPendientes.collectAsState()
 
-    val listState = rememberLazyListState()
+
 
     // Cargar los datos del usuario al entrar y el plan actual
     LaunchedEffect(Unit) {
@@ -102,6 +101,7 @@ fun HomeScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 viewModel.actualizarSaldo(planId)
+
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
