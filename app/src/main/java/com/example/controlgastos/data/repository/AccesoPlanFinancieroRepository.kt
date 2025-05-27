@@ -168,4 +168,10 @@ class AccesoPlanFinancieroRepository {
             emptyList()
         }
     }
+
+    suspend fun obtenerAcceso(planId: String, usuarioId: String): AccesoPlanFinanciero? {
+        val docId = "${usuarioId}_${planId}"
+        val snapshot = accesoCollection.document(docId).get().await()
+        return if (snapshot.exists()) snapshot.toObject(AccesoPlanFinanciero::class.java) else null
+    }
 }

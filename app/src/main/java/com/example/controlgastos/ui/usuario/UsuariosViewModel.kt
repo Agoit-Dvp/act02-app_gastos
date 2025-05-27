@@ -82,6 +82,30 @@ class UsuariosViewModel(
                     _mensaje.value = "No se encontró ningún usuario con ese correo electrónico."
                     return@launch
                 }
+                // Buscar si ya hay un acceso existente
+                val accesoExistente = accesoRepository.obtenerAcceso(planId, usuarioId)
+
+                if (accesoExistente != null) {
+                    when (accesoExistente.estado) {
+                        "rechazado" -> {
+                            accesoRepository.actualizarEstado(usuarioId, planId, "pendiente") { actualizado ->
+                                if (actualizado) {
+                                    cargarUsuariosDelPlan(planId)
+                                    _mensaje.value = "Invitación reenviada correctamente."
+                                } else {
+                                    _error.value = "Error al reenviar la invitación."
+                                }
+                            }
+                        }
+                        "pendiente", "aceptado" -> {
+                            _mensaje.value = "Este usuario ya ha sido invitado o pertenece al plan."
+                        }
+                        else -> {
+                            _mensaje.value = "El usuario ya tiene un acceso registrado."
+                        }
+                    }
+                    return@launch
+                }
 
                 val exito = accesoRepository.invitarUsuarioAPlan(usuarioId, planId)
 
@@ -89,8 +113,7 @@ class UsuariosViewModel(
                     cargarUsuariosDelPlan(planId)
                     _mensaje.value = "Usuario invitado correctamente"
                 } else {
-                    _error.value = "Este usuario ya ha sido invitado o ya pertenece al plan."
-                    _mensaje.value = "Usuario invitado correctamente"
+                    _mensaje.value = "Este usuario ya ha sido invitado o ya pertenece al plan."
                 }
 
             } catch (e: Exception) {
