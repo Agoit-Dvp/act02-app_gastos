@@ -48,6 +48,9 @@ class PlanesViewModel : ViewModel() {
     private val _mensaje = MutableStateFlow<String?>(null)
     val mensaje: StateFlow<String?> = _mensaje
 
+    private val _hayInvitacionesPendientes = MutableStateFlow(false)
+    val hayInvitacionesPendientes: StateFlow<Boolean> = _hayInvitacionesPendientes
+
     private val currentUserId: String
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
@@ -94,6 +97,9 @@ class PlanesViewModel : ViewModel() {
     fun cargarInvitacionesPendientes() {
         repoAccesos.obtenerInvitacionesPendientes(currentUserId) { accesosList ->
             _invitaciones.value = accesosList
+
+            //Actualizamos el flag de invitaciones pendientes
+            _hayInvitacionesPendientes.value = accesosList.isNotEmpty()
 
             // Cargar los planes de las invitaciones
             val planIds = accesosList.map { it.planId }.distinct()
