@@ -58,7 +58,7 @@ fun PlanesListadoScreen(
     accesos: List<AccesoPlanFinanciero> = emptyList(),
     nombresCreadores: Map<String, String> = emptyMap(),
     isLoading: Boolean = false,
-    onCrearNuevo: (String, String) -> Unit = { _, _ -> },
+    onCrearNuevo: (String, String, Double) -> Unit = { _, _, _ -> },
     onActualizarPlan: (PlanFinanciero) -> Unit = {},
     onSeleccionar: (PlanFinanciero) -> Unit = {},
     onEliminarPlan: (String) -> Unit = {}
@@ -150,9 +150,9 @@ fun PlanesListadoScreen(
             sheetState = sheetState
         ) {
             AddPlanSheet(
-                onCrear = { nombre, descripcion ->
+                onCrear = { nombre, descripcion, presupuesto ->
                     mostrarSheet = false
-                    onCrearNuevo(nombre, descripcion)
+                    onCrearNuevo(nombre, descripcion, presupuesto)
                 },
                 onCancelar = { mostrarSheet = false }
             )
@@ -235,6 +235,14 @@ fun PlanItem(
                 val fechaTexto = formato.format(fecha)
                 Text(
                     "Creado el: $fechaTexto",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
+            if (plan.presupuestoMensual > 0.0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Presupuesto mensual: $${"%.2f".format(plan.presupuestoMensual)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray
                 )

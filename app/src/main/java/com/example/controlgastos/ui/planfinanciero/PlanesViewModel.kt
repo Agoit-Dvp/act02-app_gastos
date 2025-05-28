@@ -3,6 +3,7 @@ package com.example.controlgastos.ui.planfinanciero
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.controlgastos.data.initializer.FirestoreInitializer
 import com.example.controlgastos.data.model.AccesoPlanFinanciero
 import com.example.controlgastos.data.model.PlanFinanciero
 import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
@@ -47,6 +48,9 @@ class PlanesViewModel : ViewModel() {
     private val _mensaje = MutableStateFlow<String?>(null)
     val mensaje: StateFlow<String?> = _mensaje
 
+    private val _hayInvitacionesPendientes = MutableStateFlow(false)
+    val hayInvitacionesPendientes: StateFlow<Boolean> = _hayInvitacionesPendientes
+
     private val currentUserId: String
         get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
@@ -59,11 +63,11 @@ class PlanesViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             Log.d("PlanesVM", "Planes cargados:")
-            val planesList = repoPlanes.obtenerPlanesDeUsuario(currentUserId) // ✅ Nuevo uso de función suspend
+            val planesList = repoPlanes.obtenerPlanesDeUsuario(currentUserId)
             _planes.value = planesList
 
             val accesos = repoAccesos.obtenerAccesosDeUsuario(currentUserId)
-            _accesos.value = accesos // ✅ Puedes mantener esto si necesitas saber qué accesos tiene
+            _accesos.value = accesos // saber qué accesos tiene el usuario
 
             cargarNombresCreadores(planesList)
 
@@ -94,6 +98,9 @@ class PlanesViewModel : ViewModel() {
         repoAccesos.obtenerInvitacionesPendientes(currentUserId) { accesosList ->
             _invitaciones.value = accesosList
 
+            //Actualizamos el flag de invitaciones pendientes
+            _hayInvitacionesPendientes.value = accesosList.isNotEmpty()
+
             // Cargar los planes de las invitaciones
             val planIds = accesosList.map { it.planId }.distinct()
             if (planIds.isEmpty()) return@obtenerInvitacionesPendientes
@@ -110,19 +117,24 @@ class PlanesViewModel : ViewModel() {
         }
     }
 
-    fun crearNuevoPlan(nombre: String, descripcion: String) {
+    fun crearNuevoPlan(nombre: String, descripcion: String, presupuesto: Double) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val nuevoPlan = PlanFinanciero(
                     nombre = nombre,
                     descripcion = descripcion,
+                    presupuestoMensual = presupuesto,
                     creadorId = currentUserId,
                     fechaCreacion = Date()
                 )
 
-                // Usamos la versión suspendida aquí
-                repoPlanes.crearPlan(nuevoPlan)
+                // Crear el plan y obtener su ID
+                val planId = repoPlanes.crearPlan(nuevoPlan)
+
+                // Inicializar categorías por defecto para ese plan
+                val initializer = FirestoreInitializer(currentUserId)
+                initializer.inicializarCategoriasSuspend(planId)
 
                 // Recargar planes tras crear
                 cargarPlanesDelUsuario()
@@ -130,18 +142,6 @@ class PlanesViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("PlanesVM", "Error al crear plan", e)
             } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    fun eliminarAcceso(usuarioId: String, planId: String) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val exito = repoAccesos.eliminarAcceso(usuarioId, planId)
-            if (exito) {
-                cargarPlanesDelUsuario()
-            } else {
                 _isLoading.value = false
             }
         }

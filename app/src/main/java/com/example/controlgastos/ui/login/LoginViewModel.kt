@@ -1,10 +1,12 @@
 package com.example.controlgastos.ui.login
 
+import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.controlgastos.data.preferences.PlanPreferences
 import com.example.controlgastos.data.repository.AccesoPlanFinancieroRepository
 import com.example.controlgastos.data.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -45,7 +47,7 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
     private fun isValidPassword(password: String): Boolean =
         password.length > 5 //Prueba sencilla para probar componente
 
-    fun onLoginSelected() {
+    fun onLoginSelected(context: Context) {
         val email = _email.value ?: return
         val password = _password.value ?: return
 
@@ -57,8 +59,21 @@ class LoginViewModel(private val authRepository: AuthRepository = AuthRepository
 
                 val uid = FirebaseAuth.getInstance().currentUser?.uid
                 uid?.let {
-                    val planId = accesoRepo.obtenerPrimerPlanIdDeUsuario(it)
-                    _planId.value = planId
+                    // Verificar si ya hay un plan guardado para ese usuario
+                    val ultimoPlanGuardado = PlanPreferences.obtenerUltimoPlan(context, it)
+
+                    if (ultimoPlanGuardado != null) {
+                        _planId.value = ultimoPlanGuardado
+                    } else {
+                        // Si no hay plan guardado, obtener el primero disponible
+                        val primerPlanId = accesoRepo.obtenerPrimerPlanIdDeUsuario(it)
+                        _planId.value = primerPlanId
+
+                        // Guardar solo si hay uno disponible
+                        primerPlanId?.let { id ->
+                            PlanPreferences.guardarUltimoPlan(context, it, id)
+                        }
+                    }
                 }
 
             } catch (e: Exception) {

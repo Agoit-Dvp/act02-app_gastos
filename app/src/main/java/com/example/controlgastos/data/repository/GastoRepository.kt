@@ -38,6 +38,19 @@ class GastoRepository {
             }
     }
 
+    suspend fun getGastosByPlan(planId: String): List<Gasto> {
+        return try {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("gastos")
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+            snapshot.toObjects(Gasto::class.java)
+        } catch (e: Exception) {
+            emptyList() // O puedes lanzar e si quieres manejar el error en ViewModel
+        }
+    }
+
     fun getGastoById(gastoId: String, onResult: (Gasto?, String?) -> Unit) {
         gastosCollection.document(gastoId)
             .get()
@@ -79,6 +92,20 @@ class GastoRepository {
         } catch (e: Exception) {
             Log.e("GastosRepo", "Error al eliminar gastos", e)
             false
+        }
+    }
+    //Obtener total gastos por plan
+    suspend fun obtenerTotalGastos(planId: String): Double {
+        return try {
+            val snapshot = gastosCollection
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+
+            snapshot.sumOf { it.getDouble("valor") ?: 0.0 }
+        } catch (e: Exception) {
+            Log.e("Repo", "Error al obtener gastos", e)
+            0.0
         }
     }
 }

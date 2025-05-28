@@ -32,7 +32,6 @@ fun ListaUsuariosScreen(
     planId: String, viewModel: UsuariosViewModel = viewModel()
 ) {
     val usuarios by viewModel.usuarios.observeAsState(initial = emptyList())
-    val error by viewModel.error.observeAsState()
     val mensaje by viewModel.mensaje.observeAsState() //Mostrar mensaje de éxito/error invitación
     val rolActual by viewModel.rolUsuarioActual.observeAsState()
     val usuarioActualId by viewModel.currentUserId.observeAsState()
@@ -54,6 +53,7 @@ fun ListaUsuariosScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Usuarios") },
@@ -77,13 +77,6 @@ fun ListaUsuariosScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            if (error != null) {
-                Text(
-                    text = error ?: "",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
 
             if (usuarios.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

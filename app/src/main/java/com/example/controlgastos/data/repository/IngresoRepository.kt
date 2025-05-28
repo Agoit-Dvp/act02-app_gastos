@@ -29,6 +29,7 @@ class IngresoRepository {
                 onResult(null, it.message)
             }
     }
+
     //Funcion para obtener ingresos por usuario y plan
     fun getIngresosByUserAndPlan(
         userId: String,
@@ -46,6 +47,18 @@ class IngresoRepository {
             .addOnFailureListener {
                 onResult(null, it.message)
             }
+    }
+
+    suspend fun getIngresosByPlan(planId: String): List<Ingreso> {
+        return try {
+            val snapshot = ingresosCollection
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+            snapshot.toObjects(Ingreso::class.java)
+        } catch (e: Exception) {
+            emptyList() // o lanza la excepción según lo que prefieras
+        }
     }
 
     fun getIngresoById(ingresoId: String, onResult: (Ingreso?, String?) -> Unit) {
@@ -91,4 +104,20 @@ class IngresoRepository {
             false
         }
     }
+
+    //Obtener total ingresos por plan
+    suspend fun obtenerTotalIngresos(planId: String): Double {
+        return try {
+            val snapshot = ingresosCollection
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+
+            snapshot.sumOf { it.getDouble("valor") ?: 0.0 }
+        } catch (e: Exception) {
+            Log.e("Repo", "Error al obtener ingresos", e)
+            0.0
+        }
+    }
+
 }

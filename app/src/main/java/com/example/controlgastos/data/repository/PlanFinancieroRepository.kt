@@ -34,7 +34,7 @@ class PlanFinancieroRepository(
                 estado = "aceptado"
             )
 
-            accesoRepo.guardarAccesoSuspendido(acceso) // 🔁 Requiere que la conviertas también
+            accesoRepo.guardarAccesoSuspendido(acceso)
 
             return planConId.id
 

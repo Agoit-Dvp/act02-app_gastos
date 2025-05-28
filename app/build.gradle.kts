@@ -82,4 +82,6 @@ dependencies {
     //HILT (inyeccion de dependencias)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+    //Datastore
+    implementation(libs.androidx.datastore.preferences)
 }

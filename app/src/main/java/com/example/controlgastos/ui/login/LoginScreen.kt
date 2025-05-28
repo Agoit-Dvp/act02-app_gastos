@@ -46,7 +46,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    planId: String?,
     navigateToRegister: () -> Unit,
     navigateToHome: (String) -> Unit
 ) { //Para poder acceder a los estados de LoginViewModel
@@ -63,7 +62,7 @@ fun LoginScreen(
 
         if (loginState is LoginState.Error) {
             val message = (loginState as LoginState.Error).message
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Usuario o credenciales erroneas", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -103,8 +102,9 @@ fun Login(modifier: Modifier, viewModel: LoginViewModel, navigateToRegister: () 
             Spacer(modifier = Modifier.padding(8.dp))
             ForgotPassword(Modifier.align(Alignment.Start))
             Spacer(modifier = Modifier.padding(16.dp))
+            val context = LocalContext.current// contexto para usar datastore desde viewMddel
             LoginButton(loginEnable) {
-                coroutineScope.launch { viewModel.onLoginSelected() }
+                coroutineScope.launch { viewModel.onLoginSelected(context) }
             }
             Spacer(modifier = Modifier.padding(16.dp))
             RegisterButton(onRegisterClick = navigateToRegister)

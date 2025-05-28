@@ -4,7 +4,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -21,7 +23,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import com.example.controlgastos.ui.invitaciones.InvitacionesScreen
+import com.example.controlgastos.ui.planfinanciero.PlanesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,9 +38,14 @@ fun UsuarioScreen(viewModel: UsuarioViewModel = viewModel()) {
 
     var topBarPadding by remember { mutableStateOf(0.dp) } //Calcular limite altura animación pantalla invitaciones
 
+    //Notificacion de invitaciones
+    val planesViewModel: PlanesViewModel = viewModel()
+    val hayInvitacionesPendientes by planesViewModel.hayInvitacionesPendientes.collectAsState()
+
     // Cargar datos al entrar
     LaunchedEffect(Unit) {
         viewModel.cargarDatosUsuario()
+        planesViewModel.cargarInvitacionesPendientes()
     }
     Box(modifier = Modifier.fillMaxSize()) { //Permite usar  en su contenido modifer align
         Scaffold(
@@ -47,8 +56,27 @@ fun UsuarioScreen(viewModel: UsuarioViewModel = viewModel()) {
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
                     actions = {
-                        IconButton(onClick = { showInvitaciones = !showInvitaciones }) {
-                            Icon(Icons.Default.MailOutline, contentDescription = "Ver invitaciones")
+                        Box(//Permite colocar un icono con badge
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(48.dp) // Tamaño para acomodar el icono y el badge
+                                .clickable { showInvitaciones = !showInvitaciones },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MailOutline,
+                                contentDescription = "Ver invitaciones",
+                                modifier = Modifier.size(24.dp)
+                            )
+                            if (hayInvitacionesPendientes) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = 2.dp, y = (-2).dp)
+                                        .background(Color.Red, shape = CircleShape)
+                                )
+                            }
                         }
                     }
                 )
@@ -128,7 +156,6 @@ fun UsuarioScreen(viewModel: UsuarioViewModel = viewModel()) {
 @Composable
 fun UsuarioInfo(usuario: Usuario, onEditar: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("UID: ${usuario.uid}")
         Text("Nombre: ${usuario.nombre}")
         Text("Email: ${usuario.email}")
         Text("Teléfono: ${usuario.telefono}")
