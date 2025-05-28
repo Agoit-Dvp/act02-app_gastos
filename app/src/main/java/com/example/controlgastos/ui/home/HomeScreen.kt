@@ -47,7 +47,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.controlgastos.data.preferences.PlanPreferences
 import com.example.controlgastos.ui.planfinanciero.PlanesViewModel
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -208,6 +213,15 @@ fun HomeScreen(
                         onLogoutClick = {
                             viewModel.cerrarSesion()
                             Toast.makeText(context, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+
+                            // BORRAR planId del usuario actual de DataStore
+                            val userId = FirebaseAuth.getInstance().currentUser?.uid
+                            if (userId != null) {
+                                // Usar una coroutine porque DataStore es suspend
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    PlanPreferences.borrarUltimoPlan(context, userId)
+                                }
+                            }
                             onLogout()
                         }
                     )

@@ -38,6 +38,19 @@ class GastoRepository {
             }
     }
 
+    suspend fun getGastosByPlan(planId: String): List<Gasto> {
+        return try {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("gastos")
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+            snapshot.toObjects(Gasto::class.java)
+        } catch (e: Exception) {
+            emptyList() // O puedes lanzar e si quieres manejar el error en ViewModel
+        }
+    }
+
     fun getGastoById(gastoId: String, onResult: (Gasto?, String?) -> Unit) {
         gastosCollection.document(gastoId)
             .get()

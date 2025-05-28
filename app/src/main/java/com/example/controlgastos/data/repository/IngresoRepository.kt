@@ -49,6 +49,18 @@ class IngresoRepository {
             }
     }
 
+    suspend fun getIngresosByPlan(planId: String): List<Ingreso> {
+        return try {
+            val snapshot = ingresosCollection
+                .whereEqualTo("planId", planId)
+                .get()
+                .await()
+            snapshot.toObjects(Ingreso::class.java)
+        } catch (e: Exception) {
+            emptyList() // o lanza la excepción según lo que prefieras
+        }
+    }
+
     fun getIngresoById(ingresoId: String, onResult: (Ingreso?, String?) -> Unit) {
         ingresosCollection.document(ingresoId)
             .get()
