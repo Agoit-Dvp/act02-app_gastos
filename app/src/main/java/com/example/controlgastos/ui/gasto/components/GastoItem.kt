@@ -46,7 +46,7 @@ fun GastoItem(gasto: Gasto, onClick: () -> Unit) {
         Text("Categoría: $categoriaNombre")
         Text("Fecha: $fechaFormateada")
         Text("Método de pago: ${gasto.metodoPago}")
-        Text("Estado: ${gasto.estado}")
+        //("Estado: ${gasto.estado}")
         gasto.notas?.takeIf { it.isNotBlank() }?.let {
             Text("Notas: $it")
         }

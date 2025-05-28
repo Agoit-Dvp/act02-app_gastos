@@ -39,17 +39,13 @@ fun AddGastoSheet(
             }
         }
     }
-    //-------Para dropdown con opciones de categoria
 
     //----- Para dropdown con opciones de pago
     val metodosPago = listOf("Tarjeta", "Efectivo", "Transferencia")
     var metodoPagoSeleccionado by remember { mutableStateOf(metodosPago[0]) }
     var expandedPago by remember { mutableStateOf(false) }
-    //----- Para dropdown con opciones de pago
-
 
     var descripcion by remember { mutableStateOf("") }
-    var metodoPago by remember { mutableStateOf("") }
 
     var isSaving by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -98,7 +94,7 @@ fun AddGastoSheet(
         }
         Spacer(Modifier.height(8.dp))
 
-        //Despliegable metodo de pago
+        // Despliegable método de pago
         ExposedDropdownMenuBox(
             expanded = expandedPago,
             onExpandedChange = { expandedPago = !expandedPago }
@@ -155,11 +151,9 @@ fun AddGastoSheet(
                     valor = valorDouble,
                     fecha = Date(),
                     categoriaId = categoriaSeleccionada?.id ?: "",
-                    metodoPago = metodoPago,
-                    //estado = estado,
+                    metodoPago = metodoPagoSeleccionado, // <-- CORREGIDO AQUÍ
                     notas = descripcion,
                     recurrente = false,
-                    //frecuencia = frequencia,
                     usuarioId = uid,
                     planId = planId,
                 )
